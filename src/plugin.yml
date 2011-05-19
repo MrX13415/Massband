@@ -1,0 +1,22 @@
+main: de.MrX13415.Massband.Massband
+
+name: Massband
+version: 2.1 beta r28 (Minecraft 1.5_01)
+description: Measuring-tape for Bukkit
+author: MrX13415
+
+commands:
+  massband:
+    aliases: mb
+    description: "Manages a measuring-tape"
+    usage: |
+           Right-click with a wood-sword to add a measuring point.
+           Add more then 2 points to start a measurement.
+           /massband <clear|length|switchmode>
+           /massband clear
+           Clears all measuring points
+           /massband length
+           Returns the last measured length (even after 'clear')
+           /massband switchmode
+           Changes the mode between 2D and 3D
+           (2D - ignores differences in height)
