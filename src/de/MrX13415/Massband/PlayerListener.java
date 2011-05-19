@@ -29,17 +29,17 @@ public class PlayerListener extends org.bukkit.event.player.PlayerListener {
     					tmpVars.addVector(block.getX(), block.getY(), block.getZ());
     					
     					if (tmpVars.getignoreHeight()) {
-    						player.sendMessage("vector #" + ChatColor.GRAY + tmpVars.getWayPointListSize() + ChatColor.WHITE + ": " +
+    						player.sendMessage("Point #" + ChatColor.GRAY + tmpVars.getWayPointListSize() + ChatColor.WHITE + ": " +
     								ChatColor.RED + block.getX() + ChatColor.WHITE + "," + ChatColor.RED + block.getY() + ChatColor.WHITE + "," + 
     								ChatColor.RED + block.getZ() + ChatColor.WHITE + " mode: " + ChatColor.GRAY + " 2D");
     					}else{
-    						player.sendMessage("vector #" + ChatColor.GRAY + tmpVars.getWayPointListSize() + ChatColor.WHITE + ": " +
+    						player.sendMessage("Point #" + ChatColor.GRAY + tmpVars.getWayPointListSize() + ChatColor.WHITE + ": " +
     								ChatColor.RED + block.getX() + ChatColor.WHITE + "," + ChatColor.RED + block.getY() + ChatColor.WHITE + "," + 
     								ChatColor.RED + block.getZ() + ChatColor.WHITE + " mode: " + ChatColor.GRAY + " 3D");
     					}
     					
     					if (tmpVars.getWayPointListSize() >= 2) {
-    						player.sendMessage(ChatColor.WHITE +  "lenght: " + ChatColor.GOLD + tmpVars.computingVectors() + ChatColor.WHITE + " Blocks");
+    						player.sendMessage(ChatColor.WHITE +  "Lenght: " + ChatColor.GOLD + tmpVars.computingVectors() + ChatColor.WHITE + " Blocks");
     					}
     					
     					break;
