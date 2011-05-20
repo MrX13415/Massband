@@ -10,15 +10,13 @@ import org.bukkit.event.player.PlayerQuitEvent;
 import org.bukkit.inventory.ItemStack;
 
 public class PlayerListener extends org.bukkit.event.player.PlayerListener {
-    
-	private static final int woodSword = 268;
-    
+        
     public void onPlayerInteract(PlayerInteractEvent event){
 		if (event.getAction() == Action.RIGHT_CLICK_BLOCK) {
     		Player player = event.getPlayer();
     		Block block = event.getClickedBlock();
     		
-    		if (player.getItemInHand().equals(new ItemStack(woodSword, player.getItemInHand().getAmount()))) {
+    		if (player.getItemInHand().equals(new ItemStack(Massband.configFile.itemID, player.getItemInHand().getAmount()))) {
     	    	
     			for (int playerIndex = 0; playerIndex < Massband.getPlayerListSize(); playerIndex++) {
     	    		PlayerVars tmpVars = Massband.getPlayer(playerIndex);
@@ -39,7 +37,7 @@ public class PlayerListener extends org.bukkit.event.player.PlayerListener {
     					}
     					
     					if (tmpVars.getWayPointListSize() >= 2) {
-    						player.sendMessage(ChatColor.WHITE +  "Lenght: " + ChatColor.GOLD + tmpVars.computingVectors() + ChatColor.WHITE + " Blocks");
+    						player.sendMessage(ChatColor.WHITE +  "Length: " + ChatColor.GOLD + tmpVars.computingVectors() + ChatColor.WHITE + " Blocks");
     					}
     					
     					break;

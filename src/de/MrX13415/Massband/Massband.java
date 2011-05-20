@@ -13,8 +13,14 @@ import org.bukkit.plugin.java.JavaPlugin;
 
 public class Massband extends JavaPlugin {
 	
+	static String pluginName = null;
+	static String consoleOutputHeader = null;
+	
+	public static Config configFile = null;
+	
 	private final PlayerListener pListener = new de.MrX13415.Massband.PlayerListener();
 	private final HashMap<Player, Boolean> debugees = new HashMap<Player, Boolean>();
+	
 	
 	//holds informations for all Players.
 	public static ArrayList<PlayerVars> playerlist = new ArrayList<PlayerVars>();
@@ -25,9 +31,17 @@ public class Massband extends JavaPlugin {
 
 	@Override
 	public void onEnable() {
+	
 		PluginDescriptionFile pdfFile = this.getDescription();
-        System.out.println("[" + pdfFile.getName() + "] version " + pdfFile.getVersion() + " " + pdfFile.getAuthors() + " is enabled.");
+		pluginName = pdfFile.getName();
+		consoleOutputHeader = "[" + pluginName + "]";
+
+        System.out.println(consoleOutputHeader + " version " + pdfFile.getVersion() + " " + pdfFile.getAuthors() + " is enabled.");
   
+        configFile = new Config();
+        configFile.read();
+        
+        //register events ...
 		PluginManager pm = getServer().getPluginManager();
 		pm.registerEvent(Event.Type.PLAYER_INTERACT, pListener, Priority.Normal, this);
 		pm.registerEvent(Event.Type.PLAYER_ITEM_HELD, pListener, Priority.Normal, this);
@@ -38,8 +52,10 @@ public class Massband extends JavaPlugin {
 		try {
 			this.getCommand("massband").setExecutor(new MassbandCommandExecuter());
 		} catch (Exception e) {
-			System.out.println("[" + pdfFile.getName() + "] Error: Commands not definated in 'plugin.yaml'");
+			System.err.println("[" + pdfFile.getName() + "] Error: Commands not definated in 'plugin.yaml'");
 		}
+		
+		
 	}
 	
     public boolean isDebugging(final Player player) {

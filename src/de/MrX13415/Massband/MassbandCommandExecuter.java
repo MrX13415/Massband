@@ -7,7 +7,7 @@ import org.bukkit.command.CommandExecutor;
 import org.bukkit.command.CommandSender;
 
 /**
-* Handler for the massband command.
+* Handler for the 'massband' command.
 * @author MrX13415
 */
 public class MassbandCommandExecuter implements CommandExecutor{
@@ -33,10 +33,10 @@ public class MassbandCommandExecuter implements CommandExecutor{
 				
 				if (args[0].equalsIgnoreCase("clear") || args[0].equalsIgnoreCase("clr")) {
 			    	tmpVars.removeAllWayPoints();
-		        	player.sendMessage(ChatColor.RED + "Vectors-list cleared.");
+		        	player.sendMessage(ChatColor.RED + "Points-list cleared.");
 		        	
 				}else if (args[0].equalsIgnoreCase("length") || args[0].equalsIgnoreCase("l")) {
-		        	player.sendMessage(ChatColor.WHITE + "Lenght: " + ChatColor.GOLD + tmpVars.getLenght() + ChatColor.WHITE + " Blocks");
+		        	player.sendMessage(ChatColor.WHITE + "Length: " + ChatColor.GOLD + tmpVars.getLenght() + ChatColor.WHITE + " Blocks");
 
 				}else if (args[0].equalsIgnoreCase("switchmode") || args[0].equalsIgnoreCase("sm")) {
 					if(tmpVars.getignoreHeight()){
