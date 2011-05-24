@@ -28,8 +28,15 @@ public class MassbandCommandExecuter implements CommandExecutor{
 	    	}	
 			
 			if (args.length <= 0) {
-				player.sendMessage(ChatColor.RED + command.getUsage());
-			}else{
+				String[] usage = command.getUsage().split("" + (char) 10);
+				
+				for (String line : usage) {
+					if (line.contains("<%item>")) line = line.replaceAll("<%item>", Massband.configFile.itemName);
+					
+					player.sendRawMessage(ChatColor.GRAY + line);
+				}
+
+			}else if (tmpVars != null){
 				
 				if (args[0].equalsIgnoreCase("clear") || args[0].equalsIgnoreCase("clr")) {
 			    	tmpVars.removeAllWayPoints();

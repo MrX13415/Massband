@@ -3,6 +3,7 @@ package de.MrX13415.Massband;
 import java.util.ArrayList;
 import java.util.HashMap;
 
+import org.bukkit.Server;
 import org.bukkit.entity.Player;
 import org.bukkit.event.Event;
 import org.bukkit.event.Event.Priority;
@@ -13,6 +14,7 @@ import org.bukkit.plugin.java.JavaPlugin;
 
 public class Massband extends JavaPlugin {
 	
+	static Server server = null;
 	static String pluginName = null;
 	static String consoleOutputHeader = null;
 	
@@ -27,11 +29,13 @@ public class Massband extends JavaPlugin {
 		
 	@Override
 	public void onDisable() {
+
 	}
 
 	@Override
 	public void onEnable() {
-	
+		server = this.getServer();
+		
 		PluginDescriptionFile pdfFile = this.getDescription();
 		pluginName = pdfFile.getName();
 		consoleOutputHeader = "[" + pluginName + "]";
@@ -55,7 +59,14 @@ public class Massband extends JavaPlugin {
 			System.err.println("[" + pdfFile.getName() + "] Error: Commands not definated in 'plugin.yaml'");
 		}
 		
-		
+		//initialize user data...
+		 
+		System.out.println(consoleOutputHeader + " initialize user data... ");
+		for (int playerIndex = 0; playerIndex < server.getOnlinePlayers().length ; playerIndex++) {
+			Player player = server.getOnlinePlayers()[playerIndex];
+			Massband.addPlayer(new PlayerVars(player));
+//			player.sendMessage("MB: ADD: " + player.getName() + " COUNT: " + Massband.getPlayerListSize());
+		}
 	}
 	
     public boolean isDebugging(final Player player) {

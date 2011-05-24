@@ -10,8 +10,6 @@ public class PlayerVars{
 	
 	private double lenght = 0;
 	
-	@SuppressWarnings("unused")
-	private ArrayList<Double> lenghts = new ArrayList<Double>();
 	private ArrayList<Vector> wayPoints = new ArrayList<Vector>();
 	
 	private boolean ignoreHeight = true;	//Y-axe
