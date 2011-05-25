@@ -1,7 +1,7 @@
 main: de.MrX13415.Massband.Massband
 
 name: Massband
-version: 2.4 beta r32 (Minecraft 1.5_01)
+version: 2.5 (Minecraft 1.5_01)
 description: Measuring-tape for Bukkit
 author: MrX13415
 
@@ -10,12 +10,17 @@ commands:
     aliases: mb
     description: Manages a measuring Tape
     usage: |
-           Massband 2.4 - A Measuring Tape
+           Massband 2.5 - A Measuring Tape
            Right-click with a <%item> on any Block to start measuring.
             
-           /massband <clear|length|switchmode>  or  /mb <clr|l|sm>
-           /massband clear ------ Clears all measuring points
-           /massband length ----- Returns the last measured length 
-           ---------------------- (even after 'clear')
-           /massband switchmode - Changes the mode between 2D and 3D 
-           ---------------------- (2D - ignores differences in height)
+           /massband             This help message
+           /massband clear       Clears all measuring points
+           /massband 2D          Changes the mode to 2D 
+           /massband 3D          Changes the mode to 3D
+           /massband lengthmode  Select the length measuring tool 
+           /massband surfacemode Select the surface measuring tool
+           - Length-mode ----------------------------------------
+           /massband length      Returns the last measured length 
+           - Surface-mode ---------------------------------------
+           /massband dimensions  Returns the dimensions of the cuboid
+           /massband countBlocks Returns the count of Blocks in a cuboid (exept air)           
