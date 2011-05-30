@@ -51,10 +51,10 @@ public class MassbandCommandExecuter implements CommandExecutor{
 				}else if (args[0].equalsIgnoreCase("countblocks") || args[0].equalsIgnoreCase("cb")) {
 					onCommandCountBlocks(tmpVars, player);
 				
-				}else if (args[0].equalsIgnoreCase("lengthmode") || args[0].equalsIgnoreCase("lt")) {
+				}else if (args[0].equalsIgnoreCase("lengthmode") || args[0].equalsIgnoreCase("lm")) {
 					onCommandMode(tmpVars, player, PlayerVars.MODE_LENGTH);
 					
-				}else if (args[0].equalsIgnoreCase("surfacemode") || args[0].equalsIgnoreCase("st")) {
+				}else if (args[0].equalsIgnoreCase("surfacemode") || args[0].equalsIgnoreCase("sm")) {
 					onCommandMode(tmpVars, player, PlayerVars.MODE_SURFACE);
 					
 				}else{
