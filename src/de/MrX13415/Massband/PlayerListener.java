@@ -12,34 +12,42 @@ import org.bukkit.inventory.ItemStack;
 public class PlayerListener extends org.bukkit.event.player.PlayerListener {
         
     public void onPlayerInteract(PlayerInteractEvent event){
-    	if (event.getAction() == Action.RIGHT_CLICK_BLOCK) {
+    	if ((event.getAction() == Action.RIGHT_CLICK_BLOCK)) {
     		Player player = event.getPlayer();
     		Block block = event.getClickedBlock();
     		
-    		if (player.getItemInHand().equals(new ItemStack(Massband.configFile.itemID, player.getItemInHand().getAmount()))) {
-    	    	
-    			for (int playerIndex = 0; playerIndex < Massband.getPlayerListSize(); playerIndex++) {
-    	    		PlayerVars tmpVars = Massband.getPlayer(playerIndex);
-    	
-    				if (tmpVars.getPlayer().equals(event.getPlayer())) {	//player found
-//    					player.sendMessage("MB: PLAYER-FOUND: " + player.getName());
-    					
-    					//mode ?
-    					if (tmpVars.getMode() == PlayerVars.MODE_LENGTH) {
-							onModeLength(tmpVars, player, block);
-							
-						}else if(tmpVars.getMode() == PlayerVars.MODE_SURFACE){
-							onModeSurface(tmpVars, player, block);
-							
-						}
-    					
-    					break;
-    				}
-    	    	}	
-    		}
-		}
+    		if (Massband.permissionHandler != null) {
+    			if (Massband.permissionHandler.has(player, Massband.PERMISSION_NODE_Massband_use)) {
+        			playerInteract(player, block);
+    			}
+			}else{
+				playerInteract(player, block);
+			}
+    		
+    	}
     }
     
+    private void playerInteract(Player player, Block block){
+		if (player.getItemInHand().equals(new ItemStack(Massband.configFile.itemID, player.getItemInHand().getAmount()))) {
+	    	
+			for (int playerIndex = 0; playerIndex < Massband.getPlayerListSize(); playerIndex++) {
+	    		PlayerVars tmpVars = Massband.getPlayer(playerIndex);
+	
+				if (tmpVars.getPlayer().equals(player)) {	//player found
+//					player.sendMessage("MB: PLAYER-FOUND: " + player.getName());
+					
+					//mode ?
+					if (tmpVars.getMode() == PlayerVars.MODE_LENGTH) {
+						onModeLength(tmpVars, player, block);
+					}else if(tmpVars.getMode() == PlayerVars.MODE_SURFACE){
+						onModeSurface(tmpVars, player, block);
+					}
+					break;
+				}
+	    	}
+			
+		}
+    }
     
     public void onModeLength(PlayerVars tmpVars, Player player, Block block){
 		tmpVars.addPoint(block.getX(), block.getY(), block.getZ());

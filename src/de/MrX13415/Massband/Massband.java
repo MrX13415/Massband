@@ -2,6 +2,7 @@ package de.MrX13415.Massband;
 
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.logging.Logger;
 
 import org.bukkit.Server;
 import org.bukkit.entity.Player;
@@ -12,21 +13,37 @@ import org.bukkit.plugin.PluginDescriptionFile;
 import org.bukkit.plugin.PluginManager;
 import org.bukkit.plugin.java.JavaPlugin;
 
+import com.nijiko.permissions.PermissionHandler;
+import com.nijikokun.bukkit.Permissions.Permissions;
+import org.bukkit.plugin.Plugin;
+
+/**
+ * Massband (bukkit plugin)
+ * A Mesuring Tape
+ *
+ * @version 2.6 r39
+ * @author Oliver Daus
+ *
+ */
 public class Massband extends JavaPlugin {
 	
 	static Server server = null;
+	static Logger log = null;
 	static String pluginName = null;
 	static String consoleOutputHeader = null;
+	static Config configFile = null;
+
+	//permissions
+	static PermissionHandler permissionHandler;
+	static final String PERMISSION_NODE_Massband_use = "Massband.use";
 	
-	public static Config configFile = null;
+	//holds information for all Players.
+	public static ArrayList<PlayerVars> playerlist = new ArrayList<PlayerVars>();
 	
 	private final PlayerListener pListener = new de.MrX13415.Massband.PlayerListener();
 	private final HashMap<Player, Boolean> debugees = new HashMap<Player, Boolean>();
 	
 	
-	//holds informations for all Players.
-	public static ArrayList<PlayerVars> playerlist = new ArrayList<PlayerVars>();
-		
 	@Override
 	public void onDisable() {
 
@@ -34,17 +51,20 @@ public class Massband extends JavaPlugin {
 
 	@Override
 	public void onEnable() {
+		//set static vars ...
 		server = this.getServer();
+		log = server.getLogger();
 		
 		PluginDescriptionFile pdfFile = this.getDescription();
 		pluginName = pdfFile.getName();
 		consoleOutputHeader = "[" + pluginName + "]";
 
-        System.out.println(consoleOutputHeader + " version " + pdfFile.getVersion() + " " + pdfFile.getAuthors() + " is enabled.");
+        log.info(consoleOutputHeader + " v" + pdfFile.getVersion() + " " + pdfFile.getAuthors() + " is enabled.");
   
         configFile = new Config();
         configFile.read();
-        
+        //---------------------
+                
         //register events ...
 		PluginManager pm = getServer().getPluginManager();
 		pm.registerEvent(Event.Type.PLAYER_INTERACT, pListener, Priority.Normal, this);
@@ -56,7 +76,7 @@ public class Massband extends JavaPlugin {
 		try {
 			this.getCommand("massband").setExecutor(new MassbandCommandExecuter());
 		} catch (Exception e) {
-			System.err.println("[" + pdfFile.getName() + "] Error: Commands not definated in 'plugin.yaml'");
+			log.warning("[" + pdfFile.getName() + "] Error: Commands not definated in 'plugin.yaml'");
 		}
 		
 		//initialize user data...
@@ -67,6 +87,8 @@ public class Massband extends JavaPlugin {
 			Massband.addPlayer(new PlayerVars(player));
 //			player.sendMessage("MB: ADD: " + player.getName() + " COUNT: " + Massband.getPlayerListSize());
 		}
+		
+		setupPermissions();
 	}
 	
     public boolean isDebugging(final Player player) {
@@ -80,6 +102,19 @@ public class Massband extends JavaPlugin {
     public void setDebugging(final Player player, final boolean value) {
         debugees.put(player, value);
     }
+    
+    private void setupPermissions() {
+	      Plugin permissionsPlugin = this.getServer().getPluginManager().getPlugin("Permissions");
+
+	      if (Massband.permissionHandler == null) {
+	          if (permissionsPlugin != null) {
+	        	  Massband.permissionHandler = ((Permissions) permissionsPlugin).getHandler();
+	        	  log.info(consoleOutputHeader + " Permission system dedected: " + permissionsPlugin.getDescription().getFullName());
+	          } else {
+	        	  log.warning(consoleOutputHeader + " Permission system NOT detected!");
+	          }
+	      }
+	  }
     
 	public static void addPlayer(PlayerVars player) {
 		playerlist.add(player);
