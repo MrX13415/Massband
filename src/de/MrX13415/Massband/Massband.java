@@ -15,6 +15,8 @@ import org.bukkit.plugin.java.JavaPlugin;
 
 import com.nijiko.permissions.PermissionHandler;
 import com.nijikokun.bukkit.Permissions.Permissions;
+
+
 import org.bukkit.plugin.Plugin;
 
 /**
@@ -40,7 +42,7 @@ public class Massband extends JavaPlugin {
 	//holds information for all Players.
 	public static ArrayList<PlayerVars> playerlist = new ArrayList<PlayerVars>();
 	
-	private final PlayerListener pListener = new de.MrX13415.Massband.PlayerListener();
+	private final PlayerListener pListener = new PlayerListener();
 	private final HashMap<Player, Boolean> debugees = new HashMap<Player, Boolean>();
 	
 	
@@ -109,9 +111,9 @@ public class Massband extends JavaPlugin {
 	      if (Massband.permissionHandler == null) {
 	          if (permissionsPlugin != null) {
 	        	  Massband.permissionHandler = ((Permissions) permissionsPlugin).getHandler();
-	        	  log.info(consoleOutputHeader + " Permission system dedected: " + permissionsPlugin.getDescription().getFullName());
+	        	  log.info(consoleOutputHeader + " Permission system detected: " + permissionsPlugin.getDescription().getFullName());
 	          } else {
-	        	  log.warning(consoleOutputHeader + " Permission system NOT detected!");
+	        	  log.warning(consoleOutputHeader + " Permission system NOT detected! (everyone will have permissions to use it.)");
 	          }
 	      }
 	  }

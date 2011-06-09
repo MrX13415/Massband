@@ -3,8 +3,80 @@ Readme
 =======
 
 Massband
-Version: 2.6
+Version: 2.6.1
 
 Measuring-tape for Bukkit Minecraft-Server
 
 by: MrX13415
+
+Changelog:
+
+Version: 2.6.1
+    * FIX: typo.
+    * Change-log for all non-public releases added (this file only)
+    * Old non-public Plugin Version (Massband 2.0 beta r26) are download able (with Readme [german])
+
+Version: 2.6
+    * Add Permission Support (see 'Permissions')
+
+Version: 2.5.1
+    * FIX: The short version of some commands doesn't work
+
+Version: 2.5
+    * Add a Surface measuring tool (Thanks to Nitnelave)
+
+Version: 2.4
+    * Add ItemName to the configfile
+    * help message improved (see 'command-list')
+    * NullPointerExeption fixed
+    * FIX: Massband doesn't work anymore after reload all Plugins
+
+Version: 2.3
+    * Add config file
+    * Change some more Strings xD
+
+Version: 2.2
+    * Change some Strings. ("vector" to "Point")
+
+Version: 2.1
+    * First public release
+
+** NON-PUBLIC **
+
+Version: 2.0 beta r26:
+	- FIX: commands changed to only one command.
+
+Version: 1.9 beta r25:
+	- FIX: commands changed again  (commands arn't very well yet ;) )
+ 
+Version: 1.8 beta r23:
+	- FIX: Method signature changed
+ 
+Version: 1.7 beta r22:
+	- FIX: Minecraft 1.4_1 compatible
+	- FIX: Commands changed
+ 
+Version: 1.6 beta r19:
+	- FIX: typo: '2D' <-> '3D'
+	- ADD: allway show the current mode
+	- FIX: don't switch back to 2D mode, after clear, anymore (/vclear) [/vclear -> /mb clr]
+	
+Version: 1.5 beta r17:
+	- ADD: Colored text
+	
+Version: 1.4 beta r16:
+	- ADD: /switchMode (/vsw) command added
+	- FIX: Ignore Height (see /vsw) [/vsw -> /mb 2D/3D]
+
+Version: 1.3 beta r15:
+	- ADD: Measure a way with more the rwo Points
+	- FIX: More than one user can use it at the same time
+        
+Version: 0.2 alpha r2 - 1.2 beta r14:
+    - ADD/FIX: commands
+    - ADD/FIX: Measuring
+
+Version: 0.1 alpha r1:
+    - init Version.
+    
+    

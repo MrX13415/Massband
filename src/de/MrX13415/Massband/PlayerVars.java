@@ -6,6 +6,7 @@ import org.bukkit.block.Block;
 import org.bukkit.entity.Player;
 import org.bukkit.util.Vector;
 
+
 public class PlayerVars{
 
 	public static final int MODE_LENGTH = 0;
