@@ -1,7 +1,7 @@
 package de.MrX13415.Massband;
 
 import java.util.ArrayList;
-import java.util.HashMap;
+//import java.util.HashMap;
 import java.util.logging.Logger;
 
 import org.bukkit.Server;
@@ -23,7 +23,7 @@ import org.bukkit.plugin.Plugin;
  * Massband (bukkit plugin)
  * A Mesuring Tape
  *
- * @version 2.6 r39
+ * @version 2.6.2 r42
  * @author Oliver Daus
  *
  */
@@ -42,8 +42,8 @@ public class Massband extends JavaPlugin {
 	//holds information for all Players.
 	public static ArrayList<PlayerVars> playerlist = new ArrayList<PlayerVars>();
 	
-	private final PlayerListener pListener = new PlayerListener();
-	private final HashMap<Player, Boolean> debugees = new HashMap<Player, Boolean>();
+	private final PlayerListener pListener = new MassbandPlayerListener();
+//	private final HashMap<Player, Boolean> debugees = new HashMap<Player, Boolean>();
 	
 	
 	@Override
@@ -70,10 +70,8 @@ public class Massband extends JavaPlugin {
         //register events ...
 		PluginManager pm = getServer().getPluginManager();
 		pm.registerEvent(Event.Type.PLAYER_INTERACT, pListener, Priority.Normal, this);
-		pm.registerEvent(Event.Type.PLAYER_ITEM_HELD, pListener, Priority.Normal, this);
-		pm.registerEvent(Event.Type.PLAYER_JOIN, pListener, Priority.Normal, this);
 		pm.registerEvent(Event.Type.PLAYER_QUIT, pListener, Priority.Normal, this);
-
+		
 		//register commands ...
 		try {
 			this.getCommand("massband").setExecutor(new MassbandCommandExecuter());
@@ -81,29 +79,20 @@ public class Massband extends JavaPlugin {
 			log.warning("[" + pdfFile.getName() + "] Error: Commands not definated in 'plugin.yaml'");
 		}
 		
-		//initialize user data...
-		 
-		System.out.println(consoleOutputHeader + " initialize user data... ");
-		for (int playerIndex = 0; playerIndex < server.getOnlinePlayers().length ; playerIndex++) {
-			Player player = server.getOnlinePlayers()[playerIndex];
-			Massband.addPlayer(new PlayerVars(player));
-//			player.sendMessage("MB: ADD: " + player.getName() + " COUNT: " + Massband.getPlayerListSize());
-		}
-		
 		setupPermissions();
 	}
 	
-    public boolean isDebugging(final Player player) {
-        if (debugees.containsKey(player)) {
-            return debugees.get(player);
-        } else {
-            return false;
-        }
-    }
-    
-    public void setDebugging(final Player player, final boolean value) {
-        debugees.put(player, value);
-    }
+//    public boolean isDebugging(final Player player) {
+//        if (debugees.containsKey(player)) {
+//            return debugees.get(player);
+//        } else {
+//            return false;
+//        }
+//    }
+//    
+//    public void setDebugging(final Player player, final boolean value) {
+//        debugees.put(player, value);
+//    }
     
     private void setupPermissions() {
 	      Plugin permissionsPlugin = this.getServer().getPluginManager().getPlugin("Permissions");
@@ -117,20 +106,38 @@ public class Massband extends JavaPlugin {
 	          }
 	      }
 	  }
-    
-	public static void addPlayer(PlayerVars player) {
-		playerlist.add(player);
+  	
+	/** remove PlayerVars from the current Player, to keep
+	 *  the ArrayList short.
+	 * 
+	 * @param player
+	 */
+	public static void removePlayer(Player player) {
+		PlayerVars playerVars = getPlayerVars(player);
+		if (playerVars != null) playerlist.remove(playerVars);
 	}
-	
-	public static void removePlayer(int index) {
-		playerlist.remove(index);
-	}
-	
-	public static PlayerVars getPlayer(int index) {
-		return playerlist.get(index);
-	}
-	
-	public static int getPlayerListSize() {
-		return playerlist.size();
+
+	/** returns the PlayerVars for the given player
+	 *  or create it.
+	 *   
+	 * @param player
+	 * @return
+	 */
+	public static PlayerVars getPlayerVars(Player player) {
+		PlayerVars playerVars = null;
+		
+		for (int playerIndex = 0; playerIndex < playerlist.size(); playerIndex++) {
+    		if (playerlist.get(playerIndex).getPlayer().equals(player)) {
+    			playerVars = playerlist.get(playerIndex); 
+    		}
+    	}
+    	
+		if (playerVars == null){
+			//create PlayerVars for the current Player.
+			playerVars = new PlayerVars(player);
+			playerlist.add(playerVars);
+		}
+		
+		return playerVars;
 	}
 }

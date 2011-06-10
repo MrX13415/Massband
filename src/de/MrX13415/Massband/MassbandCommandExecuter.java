@@ -18,15 +18,8 @@ public class MassbandCommandExecuter implements CommandExecutor{
 	        Player player = (Player) sender;
 	        PlayerVars tmpVars = null;
 	        
-	        //search for current player ...
-			for (int playerIndex = 0; playerIndex < Massband.getPlayerListSize(); playerIndex++) {
-	    		tmpVars = Massband.getPlayer(playerIndex);
-				
-	    		if (tmpVars.getPlayer().equals(player)) {	//player found
-//	    			player.sendMessage("MB: PLAYER-FOUND: " + player.getName());
-					break;
-				}
-	    	}	
+	        //get current Players PlayerVars ...
+	        tmpVars = Massband.getPlayerVars(player);
 			
 			if (args.length <= 0) {
 				printHelpMsg(command, player);
@@ -92,9 +85,9 @@ public class MassbandCommandExecuter implements CommandExecutor{
     	tmpVars.setignoreHeight(! threeD);
     	
 		if(tmpVars.getignoreHeight()){
-        	player.sendMessage(ChatColor.GRAY + "switch to 3D-Mode (does't ignores the height)");
-    	}else{
         	player.sendMessage(ChatColor.GRAY + "switch to 2D-Mode (ignores the height)");
+    	}else{
+        	player.sendMessage(ChatColor.GRAY + "switch to 3D-Mode (does't ignores the height)");
     	}
 	}
 	

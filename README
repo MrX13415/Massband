@@ -3,13 +3,16 @@ Readme
 =======
 
 Massband
-Version: 2.6.1
+Version: 2.6.2
 
 Measuring-tape for Bukkit Minecraft-Server
 
 by: MrX13415
 
 Changelog:
+
+Version: 2.6.2
+    * FIX: Event bug.
 
 Version: 2.6.1
     * FIX: typo.
