@@ -13,52 +13,62 @@ import org.bukkit.command.CommandSender;
 public class MassbandCommandExecuter implements CommandExecutor{
 
 	@Override
-	public boolean onCommand(CommandSender sender, Command command, String label, String[] args) {
-	    if (sender instanceof Player) {
-	        Player player = (Player) sender;
-	        PlayerVars tmpVars = null;
-	        
-	        //get current Players PlayerVars ...
-	        tmpVars = Massband.getPlayerVars(player);
-			
-			if (args.length <= 0) {
-				printHelpMsg(command, player);
-
-			}else if (tmpVars != null){
-				
-				if (args[0].equalsIgnoreCase("clear") || args[0].equalsIgnoreCase("clr")) {
-			    	onCommandClear(tmpVars, player);
-			    	
-				}else if (args[0].equalsIgnoreCase("length") || args[0].equalsIgnoreCase("l")) {
-		        	onCommandLength(tmpVars, player);
-		        	
-				}else if (args[0].equalsIgnoreCase("3d") || args[0].equalsIgnoreCase("3d")) {
-					onCommandSwitchMode(tmpVars, player, true);
-				
-				}else if (args[0].equalsIgnoreCase("2d") || args[0].equalsIgnoreCase("2d")) {
-					onCommandSwitchMode(tmpVars, player, false);
-					
-				}else if (args[0].equalsIgnoreCase("dimensions") || args[0].equalsIgnoreCase("d")) {
-					onCommandDimensions(tmpVars, player);
-						
-				}else if (args[0].equalsIgnoreCase("countblocks") || args[0].equalsIgnoreCase("cb")) {
-					onCommandCountBlocks(tmpVars, player);
-				
-				}else if (args[0].equalsIgnoreCase("lengthmode") || args[0].equalsIgnoreCase("lm")) {
-					onCommandMode(tmpVars, player, PlayerVars.MODE_LENGTH);
-					
-				}else if (args[0].equalsIgnoreCase("surfacemode") || args[0].equalsIgnoreCase("sm")) {
-					onCommandMode(tmpVars, player, PlayerVars.MODE_SURFACE);
-					
-				}else{
-					printHelpMsg(command, player);
+	public boolean onCommand(CommandSender sender, Command command, String label, String[] args) {		
+		if (sender instanceof Player) {
+			if (Massband.permissionHandler != null) {
+				//use Permission
+				if (Massband.permissionHandler.permission((Player)sender, Massband.PERMISSION_NODE_Massband_use)) {
+					command(sender, command, label, args);
 				}
+			}else{
+				//no Permission installed ! (everyone has access)
+				command(sender, command, label, args);
 			}
-			
 			return true;
-	    } else {
-	        return false;
 	    }
+		return false;
+	}
+	
+	private void command(CommandSender sender, Command command, String label, String[] args){
+		Player player = (Player) sender;
+        PlayerVars tmpVars = null;
+        
+        //get current Players PlayerVars ...
+        tmpVars = Massband.getPlayerVars(player);
+		
+		if (args.length <= 0) {
+			printHelpMsg(command, player);
+
+		}else if (tmpVars != null){
+			
+			if (args[0].equalsIgnoreCase("clear") || args[0].equalsIgnoreCase("clr")) {
+		    	onCommandClear(tmpVars, player);
+		    	
+			}else if (args[0].equalsIgnoreCase("length") || args[0].equalsIgnoreCase("l")) {
+	        	onCommandLength(tmpVars, player);
+	        	
+			}else if (args[0].equalsIgnoreCase("3d") || args[0].equalsIgnoreCase("3d")) {
+				onCommandSwitchMode(tmpVars, player, true);
+			
+			}else if (args[0].equalsIgnoreCase("2d") || args[0].equalsIgnoreCase("2d")) {
+				onCommandSwitchMode(tmpVars, player, false);
+				
+			}else if (args[0].equalsIgnoreCase("dimensions") || args[0].equalsIgnoreCase("d")) {
+				onCommandDimensions(tmpVars, player);
+					
+			}else if (args[0].equalsIgnoreCase("countblocks") || args[0].equalsIgnoreCase("cb")) {
+				onCommandCountBlocks(tmpVars, player);
+			
+			}else if (args[0].equalsIgnoreCase("lengthmode") || args[0].equalsIgnoreCase("lm")) {
+				onCommandMode(tmpVars, player, PlayerVars.MODE_LENGTH);
+				
+			}else if (args[0].equalsIgnoreCase("surfacemode") || args[0].equalsIgnoreCase("sm")) {
+				onCommandMode(tmpVars, player, PlayerVars.MODE_SURFACE);
+				
+			}else{
+				printHelpMsg(command, player);
+			}
+		}
 	}
 	
 	public void onCommandMode(PlayerVars tmpVars, Player player, int mode){

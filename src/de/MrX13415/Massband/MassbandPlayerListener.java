@@ -16,7 +16,7 @@ public class MassbandPlayerListener extends org.bukkit.event.player.PlayerListen
     	
     		if (Massband.permissionHandler != null) {
     			//use Permission
-    			if (Massband.permissionHandler.has(player, Massband.PERMISSION_NODE_Massband_use)) {
+    			if (Massband.permissionHandler.permission(player, Massband.PERMISSION_NODE_Massband_use)) {
         			playerInteract(player, block);
     			}
 			}else{
