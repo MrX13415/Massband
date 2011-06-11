@@ -1,7 +1,7 @@
 main: de.MrX13415.Massband.Massband
 
 name: Massband
-version: 2.6.2 (MC 1.6.6)
+version: 2.6.3 (MC 1.6.6)
 description: Measuring-tape for Bukkit
 author: MrX13415
 
@@ -10,7 +10,7 @@ commands:
     aliases: mb
     description: Manages a measuring Tape
     usage: |
-           Massband 2.6.2 - A Measuring Tape
+           Massband 2.6.3 - A Measuring Tape
            Right-click with a <%item> on any Block to start measuring.
             
            /massband             This help message

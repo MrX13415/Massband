@@ -14,7 +14,7 @@ public class MassbandPlayerListener extends org.bukkit.event.player.PlayerListen
     		Player player = event.getPlayer();
     		Block block = event.getClickedBlock();
     	
-    		if (Massband.permissionHandler != null) {
+    		if (Massband.permissionHandler != null && Massband.configFile.usePermissions) {
     			//use Permission
     			if (Massband.permissionHandler.permission(player, Massband.PERMISSION_NODE_Massband_use)) {
         			playerInteract(player, block);
@@ -65,7 +65,8 @@ public class MassbandPlayerListener extends org.bukkit.event.player.PlayerListen
 		printPoints(tmpVars, player, block);
 		
 		if (tmpVars.getWayPointListSize() == 2) {
-			tmpVars.calculateDiminsion();
+			tmpVars.computingVectors();
+			tmpVars.calculateDiminsions();
 			MassbandCommandExecuter.onCommandDimensions(tmpVars, player);	//output
 		}
     }

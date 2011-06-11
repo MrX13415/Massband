@@ -23,7 +23,7 @@ import org.bukkit.plugin.Plugin;
  * Massband (bukkit plugin)
  * A Mesuring Tape
  *
- * @version 2.6.2 r42
+ * @version 2.6.3 r43
  * @author Oliver Daus
  *
  */
@@ -48,7 +48,8 @@ public class Massband extends JavaPlugin {
 	
 	@Override
 	public void onDisable() {
-
+		log.info(consoleOutputHeader + " Save Settings to config ...");
+		configFile.write();
 	}
 
 	@Override

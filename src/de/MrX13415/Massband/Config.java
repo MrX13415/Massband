@@ -13,12 +13,13 @@ public class Config {
 	
 	private static final String keyItemID = "ItemID";
 	private static final String keyItemName = "ItemName";
+	private static final String keyUsePermissions = "UsePermissions";
 	private static final String fileFormat = "%s: %s"; 
 	
 	//-- file content --
 	public int itemID = 268;
 	public String itemName = "wood-sword";
-	
+	public boolean usePermissions = false;
 	//------------------
 	
 	public void read() {
@@ -37,6 +38,19 @@ public class Config {
 
 					if (line[0].equalsIgnoreCase(keyItemName)) {
 						itemName = line[1];
+					}
+					
+					if (line[0].equalsIgnoreCase(keyUsePermissions)) {
+						String tmpValue = line[1].toLowerCase();
+						if (tmpValue.contains("true")) {
+							usePermissions = true;
+						}else if (tmpValue.contains("false")) {
+							usePermissions = false;
+						}else if (tmpValue.contains("1")) {
+							usePermissions = true;
+						}else if (tmpValue.contains("0")) {
+							usePermissions = false;
+						}
 					}
 
 				}				
@@ -60,6 +74,7 @@ public class Config {
 			
 			writer.write(String.format(fileFormat, keyItemID, itemID) + "\n");
 			writer.write(String.format(fileFormat, keyItemName, itemName) + "\n");
+			writer.write(String.format(fileFormat, keyUsePermissions, usePermissions) + "\n");
 			
 			writer.close();
 		

@@ -15,7 +15,7 @@ public class MassbandCommandExecuter implements CommandExecutor{
 	@Override
 	public boolean onCommand(CommandSender sender, Command command, String label, String[] args) {		
 		if (sender instanceof Player) {
-			if (Massband.permissionHandler != null) {
+			if (Massband.permissionHandler != null && Massband.configFile.usePermissions) {
 				//use Permission
 				if (Massband.permissionHandler.permission((Player)sender, Massband.PERMISSION_NODE_Massband_use)) {
 					command(sender, command, label, args);
@@ -102,12 +102,18 @@ public class MassbandCommandExecuter implements CommandExecutor{
 	}
 	
 	public static void onCommandCountBlocks(PlayerVars tmpVars, Player player){
-		player.sendMessage(ChatColor.GRAY + "Counting Blocks ...  (could take some time)");
-		player.sendMessage(ChatColor.GRAY + "cuboid-volume: " + (int)(tmpVars.getDimensionHieght() * tmpVars.getDimensionWith() * tmpVars.getDimensionLength()) + " Blocks");
-		
 		if (tmpVars.getMode() == PlayerVars.MODE_SURFACE) {
-			int count = tmpVars.countBlocks(player.getWorld());
-			player.sendMessage(ChatColor.WHITE + "Content: " + ChatColor.GOLD + count + ChatColor.WHITE + " Blocks" + ChatColor.GRAY + " (exept air)");
+			if (tmpVars.getWayPointListSize() >= 2) {
+				player.sendMessage(ChatColor.GRAY + "Counting Blocks ...  (could take some time)");
+				player.sendMessage(ChatColor.GRAY + "cuboid-volume: " + (int)(tmpVars.getDimensionHieght() * tmpVars.getDimensionWith() * tmpVars.getDimensionLength()) + " Blocks");
+				
+				int count = tmpVars.countBlocks(player.getWorld());	
+				
+				player.sendMessage(ChatColor.WHITE + "Content: " + ChatColor.GOLD + count + ChatColor.WHITE + " Blocks" + ChatColor.GRAY + " (exept air)");
+				
+			}else{
+				player.sendMessage(ChatColor.RED + "Make a Selection first. see help (/massband)");	
+			}
 		}else{
 			player.sendMessage(ChatColor.RED + "This command is only in the 'surface-mode' available - see help (/massband)");
 		}

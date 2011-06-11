@@ -104,7 +104,7 @@ public class PlayerVars{
 		return lenght;
 	}
 	
-	public void calculateDiminsion(){
+	public void calculateDiminsions(){
 		if (ignoreHeight){
 			wayPoints.get(0).setY(0);
 			wayPoints.get(1).setY(0);
