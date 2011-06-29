@@ -23,33 +23,40 @@ import org.bukkit.plugin.Plugin;
  * Massband (bukkit plugin)
  * A Mesuring Tape
  *
- * @version 2.6.3 r43
+ * @version 2.6.4 r49
  * @author Oliver Daus
  *
  */
 public class Massband extends JavaPlugin {
 	
-	static Server server = null;
-	static Logger log = null;
-	static String pluginName = null;
-	static String consoleOutputHeader = null;
-	static Config configFile = null;
+	public static Server server = null;
+	public static Logger log = null;
+	public static String pluginName = null;
+	public static String consoleOutputHeader = null;
+	public static Config configFile = null;
 
 	//permissions
-	static PermissionHandler permissionHandler;
-	static final String PERMISSION_NODE_Massband_use = "Massband.use";
+	public static PermissionHandler permissionHandler;
+	public static final String PERMISSION_NODE_Massband_use = "Massband.use";
+	public static final String PERMISSION_NODE_Massband_stop_all = "Massband.stopall";
 	
 	//holds information for all Players.
 	public static ArrayList<PlayerVars> playerlist = new ArrayList<PlayerVars>();
 	
+	//holds all Counting Threads ..
+	public static ArrayList<CountBlocks> threads = new ArrayList<CountBlocks>();
+	
 	private final PlayerListener pListener = new MassbandPlayerListener();
 //	private final HashMap<Player, Boolean> debugees = new HashMap<Player, Boolean>();
-	
-	
+
+
 	@Override
 	public void onDisable() {
-		log.info(consoleOutputHeader + " Save Settings to config ...");
-		configFile.write();
+//		if (configFile.write()) { //create new File
+//			log.info(consoleOutputHeader + " Settings in config saved");
+//		}
+		
+		CountBlocks.interuptAll(null);
 	}
 
 	@Override

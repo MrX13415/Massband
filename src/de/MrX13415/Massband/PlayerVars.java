@@ -2,7 +2,6 @@ package de.MrX13415.Massband;
 
 import java.util.ArrayList;
 import org.bukkit.World;
-import org.bukkit.block.Block;
 import org.bukkit.entity.Player;
 import org.bukkit.util.Vector;
 
@@ -11,9 +10,11 @@ public class PlayerVars{
 
 	public static final int MODE_LENGTH = 0;
 	public static final int MODE_SURFACE = 1;
-	
+
 	private Player player;
 	private int mode = MODE_LENGTH;
+	
+	private CountBlocks myThread = null;
 	
 	private double lenght = 0;
 	
@@ -42,6 +43,10 @@ public class PlayerVars{
 	
 	public int getWayPointListSize(){
 		return wayPoints.size();
+	}	
+
+	public ArrayList<Vector> getWayPointList(){
+		return wayPoints;
 	}	
 	
 	public void removeAllWayPoints() {
@@ -78,6 +83,14 @@ public class PlayerVars{
 	
 	public int getMode() {
 		return mode;
+	}
+	
+	public void setBlockCountingThread(CountBlocks thread) {
+		this.myThread = thread;
+	}
+	
+	public CountBlocks getBlockCountingThread() {
+		return myThread;
 	}
 	
 	public void setMode(int mode) {
@@ -117,30 +130,33 @@ public class PlayerVars{
 
 	}
 	
-	public int countBlocks(World world){
-		int yStart = (int) Math.min(wayPoints.get(0).getY(), wayPoints.get(1).getY());
-		int yEnd = (int) Math.max(wayPoints.get(0).getY(), wayPoints.get(1).getY());
+	public void countBlocks(World world){	
+		new CountBlocks(this).start();
+//		int blockCount = ;
 		
-		int zStart = (int) Math.min(wayPoints.get(0).getZ(), wayPoints.get(1).getZ());
-		int zEnd = (int) Math.max(wayPoints.get(0).getZ(), wayPoints.get(1).getZ());
-	
-		int xStart = (int) Math.min(wayPoints.get(0).getX(), wayPoints.get(1).getX());
-		int xEnd = (int) Math.max(wayPoints.get(0).getX(), wayPoints.get(1).getX());
-
-		int blockCount = 0;
-		
-		for (int yIndex = yStart; yIndex <= yEnd; yIndex++) {
-			for (int zIndex = zStart; zIndex <= zEnd; zIndex++) {
-				for (int xIndex = xStart; xIndex <= xEnd; xIndex++) {
-					//get Block
-					Block b = Massband.server.getWorld(world.getName()).getBlockAt(xIndex, yIndex, zIndex);
-					//count blocks exept air ...
-					if (b.getTypeId()!= 0) blockCount++;
-				}
-			}	
-		}
-		
-		return this.blockCount = blockCount;
+//		int yStart = (int) Math.min(wayPoints.get(0).getY(), wayPoints.get(1).getY());
+//		int yEnd = (int) Math.max(wayPoints.get(0).getY(), wayPoints.get(1).getY());
+//		
+//		int zStart = (int) Math.min(wayPoints.get(0).getZ(), wayPoints.get(1).getZ());
+//		int zEnd = (int) Math.max(wayPoints.get(0).getZ(), wayPoints.get(1).getZ());
+//	
+//		int xStart = (int) Math.min(wayPoints.get(0).getX(), wayPoints.get(1).getX());
+//		int xEnd = (int) Math.max(wayPoints.get(0).getX(), wayPoints.get(1).getX());
+//
+//		int blockCount = 0;
+//		
+//		for (int yIndex = yStart; yIndex <= yEnd; yIndex++) {
+//			for (int zIndex = zStart; zIndex <= zEnd; zIndex++) {
+//				for (int xIndex = xStart; xIndex <= xEnd; xIndex++) {
+//					//get Block
+//					Block b = Massband.server.getWorld(world.getName()).getBlockAt(xIndex, yIndex, zIndex);
+//					//count blocks exept air ...
+//					if (b.getTypeId()!= 0) blockCount++;
+//				}
+//			}	
+//		}
+//		
+//		return this.blockCount = blockCount;
 	}
 	
 	/**ignors the Y axe

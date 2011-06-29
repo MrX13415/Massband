@@ -12,20 +12,42 @@ import org.bukkit.command.CommandSender;
 */
 public class MassbandCommandExecuter implements CommandExecutor{
 
+	boolean hasPermission_use = false;
+	boolean hasPermission_stopall = false;
+	
 	@Override
 	public boolean onCommand(CommandSender sender, Command command, String label, String[] args) {		
 		if (sender instanceof Player) {
-			if (Massband.permissionHandler != null && Massband.configFile.usePermissions) {
+			Player player = (Player) sender;
+			
+			if (Massband.permissionHandler != null) {	
+								
 				//use Permission
-				if (Massband.permissionHandler.permission((Player)sender, Massband.PERMISSION_NODE_Massband_use)) {
-					command(sender, command, label, args);
-				}
+				if (Massband.permissionHandler.permission(player, Massband.PERMISSION_NODE_Massband_use)) hasPermission_use = true;
+				if (Massband.permissionHandler.permission(player, Massband.PERMISSION_NODE_Massband_stop_all)) hasPermission_stopall = true;
+				
+				if (hasPermission_use) command(sender, command, label, args);
 			}else{
+				
+				if (player.isOp()) {
+					hasPermission_stopall = true;
+				}
+				
 				//no Permission installed ! (everyone has access)
 				command(sender, command, label, args);
 			}
+			hasPermission_use = false;
+			hasPermission_stopall = false;
 			return true;
+	    }else{
+	    	if (args.length > 0) {
+		    	if (args[0].equalsIgnoreCase("stopall") || args[0].equalsIgnoreCase("all")) {
+		    		CountBlocks.interuptAll(sender);
+		    		return true;
+		    	}
+	    	}	
 	    }
+		
 		return false;
 	}
 	
@@ -37,7 +59,7 @@ public class MassbandCommandExecuter implements CommandExecutor{
         tmpVars = Massband.getPlayerVars(player);
 		
 		if (args.length <= 0) {
-			printHelpMsg(command, player);
+			printHelpMsg(command, sender);
 
 		}else if (tmpVars != null){
 			
@@ -64,13 +86,87 @@ public class MassbandCommandExecuter implements CommandExecutor{
 				
 			}else if (args[0].equalsIgnoreCase("surfacemode") || args[0].equalsIgnoreCase("sm")) {
 				onCommandMode(tmpVars, player, PlayerVars.MODE_SURFACE);
-				
+			
+			}else if (args[0].equalsIgnoreCase("expand") || args[0].equalsIgnoreCase("ex")) {
+				if (args.length >= 2 ){
+					try {
+						int expandSize = 0;
+						String direction = args[1];
+						
+						if (args.length == 3) {
+							expandSize = Integer.valueOf(args[1]);
+							direction = args[2];
+						}
+						
+						onCommandExpand(tmpVars, player, PlayerVars.MODE_SURFACE, expandSize, direction);
+						
+					} catch (Exception e) {
+						printHelpMsg(command, player);
+					}
+				}else{
+					printHelpMsg(command, player);
+				}
+			}else if (args[0].equalsIgnoreCase("stop") || args[0].equalsIgnoreCase("stp")) {
+				if (tmpVars.getBlockCountingThread() != null) {
+					tmpVars.getBlockCountingThread().interrupt();
+				}else{
+					player.sendMessage(ChatColor.RED + " Nothing to Interrupt ...");
+				}
+			}else if (args[0].equalsIgnoreCase("stopall") || args[0].equalsIgnoreCase("all")) {
+				//stopall Permission
+				if (hasPermission_stopall) {
+					CountBlocks.interuptAll(sender);
+				}
 			}else{
 				printHelpMsg(command, player);
 			}
 		}
 	}
 	
+	private void onCommandExpand(PlayerVars tmpVars, Player player, int modeSurface, int expandsize, String direction ) {
+		if (tmpVars.getWayPointListSize() == 2) {
+			
+			org.bukkit.util.Vector point1 = tmpVars.getWayPointList().get(0);
+			org.bukkit.util.Vector point2 = tmpVars.getWayPointList().get(1);
+			
+			if (direction.equalsIgnoreCase("up")) {
+				point1.setY(point1.getY() + expandsize);
+			
+				if (point1.getY() > 128) point1.setY(128);
+				if (point1.getY() < 0) point1.setY(0);
+				
+				player.sendMessage(ChatColor.GRAY + "Selection expanded ... (" + expandsize + " Blocks up)");
+				
+			}else if (direction.equalsIgnoreCase("down")) {
+				point2.setY(point2.getY() - expandsize);
+				
+				if (point2.getY() > 127) point2.setY(127);
+				if (point2.getY() < 0) point2.setY(0);
+				
+				player.sendMessage(ChatColor.GRAY + "Selection expanded ... (" + expandsize + " Block down)");
+				
+				
+			}else if (direction.equalsIgnoreCase("vert")) {
+				point1.setY(128);
+				point2.setY(0);
+			
+				if (point1.getY() > 127) point1.setY(127);
+				if (point2.getY() > 127) point2.setY(127);
+				if (point1.getY() < 0) point1.setY(0);
+				if (point2.getY() < 0) point2.setY(0);
+				
+				player.sendMessage(ChatColor.GRAY + "Selection expanded ... (bottom - top)");
+			}
+			
+
+			tmpVars.computingVectors();
+			tmpVars.calculateDiminsions();
+			MassbandCommandExecuter.onCommandDimensions(tmpVars, player);	//output
+		}else{
+			player.sendMessage(ChatColor.RED + "Make a Selection first ... (use " + Massband.configFile.itemName + ")");
+		}
+	}
+
 	public void onCommandMode(PlayerVars tmpVars, Player player, int mode){
 		tmpVars.setMode(mode);
 		tmpVars.removeAllWayPoints();
@@ -103,16 +199,21 @@ public class MassbandCommandExecuter implements CommandExecutor{
 	
 	public static void onCommandCountBlocks(PlayerVars tmpVars, Player player){
 		if (tmpVars.getMode() == PlayerVars.MODE_SURFACE) {
-			if (tmpVars.getWayPointListSize() >= 2) {
-				player.sendMessage(ChatColor.GRAY + "Counting Blocks ...  (could take some time)");
-				player.sendMessage(ChatColor.GRAY + "cuboid-volume: " + (int)(tmpVars.getDimensionHieght() * tmpVars.getDimensionWith() * tmpVars.getDimensionLength()) + " Blocks");
-				
-				int count = tmpVars.countBlocks(player.getWorld());	
-				
-				player.sendMessage(ChatColor.WHITE + "Content: " + ChatColor.GOLD + count + ChatColor.WHITE + " Blocks" + ChatColor.GRAY + " (exept air)");
-				
+			if (tmpVars.getBlockCountingThread() == null) {
+				if (tmpVars.getWayPointListSize() >= 2) {
+					player.sendMessage(ChatColor.GRAY + "Counting Blocks ...  (could take some time)");
+					player.sendMessage(ChatColor.WHITE + "Cuboid-Volume: " + ChatColor.GOLD + (int)(tmpVars.getDimensionHieght() * tmpVars.getDimensionWith() * tmpVars.getDimensionLength()) + ChatColor.WHITE + " Blocks");
+					
+					tmpVars.countBlocks(player.getWorld());	
+					Massband.log.warning(Massband.consoleOutputHeader + " " + tmpVars.getBlockCountingThread().getOwner().getName() + " starts a Block-counting Thread.");
+					
+	//				player.sendMessage(ChatColor.WHITE + "Content: " + ChatColor.GOLD + count + ChatColor.WHITE + " Blocks" + ChatColor.GRAY + " (exept air)");
+					
+				}else{
+					player.sendMessage(ChatColor.RED + "Make a Selection first. see help (/massband)");	
+				}
 			}else{
-				player.sendMessage(ChatColor.RED + "Make a Selection first. see help (/massband)");	
+				player.sendMessage(ChatColor.RED + "You can count Blocks once at the same time only ! Wait until it's ready or interrupt it");
 			}
 		}else{
 			player.sendMessage(ChatColor.RED + "This command is only in the 'surface-mode' available - see help (/massband)");
@@ -129,12 +230,12 @@ public class MassbandCommandExecuter implements CommandExecutor{
 		}
 	}
 	
-	public static void printHelpMsg(Command command, Player player){
+	public static void printHelpMsg(Command command, CommandSender sender){
 		String[] usage = command.getUsage().split("" + (char) 10);
 		
 		for (String line : usage) {
 			if (line.contains("<%item>")) line = line.replaceAll("<%item>", Massband.configFile.itemName);	
-			player.sendRawMessage(ChatColor.GRAY + line);
+			sender.sendMessage(ChatColor.GRAY + line);
 		}
 	}
 
