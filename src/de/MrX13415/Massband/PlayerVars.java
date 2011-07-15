@@ -8,11 +8,12 @@ import org.bukkit.util.Vector;
 
 public class PlayerVars{
 
-	public static final int MODE_LENGTH = 0;
-	public static final int MODE_SURFACE = 1;
+	public static final int MODE_SIMPLE = 0;
+	public static final int MODE_LENGTH = 1;
+	public static final int MODE_SURFACE = 2;
 
 	private Player player;
-	private int mode = MODE_LENGTH;
+	private int mode = MODE_SIMPLE;	//default
 	
 	private CountBlocks myThread = null;
 	

@@ -87,6 +87,9 @@ public class MassbandCommandExecuter implements CommandExecutor{
 			}else if (args[0].equalsIgnoreCase("surfacemode") || args[0].equalsIgnoreCase("sm")) {
 				onCommandMode(tmpVars, player, PlayerVars.MODE_SURFACE);
 			
+			}else if (args[0].equalsIgnoreCase("simplemode") || args[0].equalsIgnoreCase("im")) {
+				onCommandMode(tmpVars, player, PlayerVars.MODE_SIMPLE);
+			
 			}else if (args[0].equalsIgnoreCase("expand") || args[0].equalsIgnoreCase("ex")) {
 				if (args.length >= 2 ){
 					try {
@@ -171,7 +174,9 @@ public class MassbandCommandExecuter implements CommandExecutor{
 		tmpVars.setMode(mode);
 		tmpVars.removeAllWayPoints();
 		
-		if (mode == PlayerVars.MODE_LENGTH) {
+		if (mode == PlayerVars.MODE_SIMPLE) {
+			player.sendMessage(ChatColor.GRAY + "Simple-mode selected ...");
+		}else if (mode == PlayerVars.MODE_LENGTH) {
 			player.sendMessage(ChatColor.GRAY + "Length-mode selected ...");
 		}else if(mode == PlayerVars.MODE_SURFACE){
 			player.sendMessage(ChatColor.GRAY + "Surface-mode selected ...");

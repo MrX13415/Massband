@@ -3,13 +3,16 @@ Readme
 =======
 
 Massband
-Version: 2.6.4
+Version: 2.6.5
 
 Measuring-tape for Bukkit Minecraft-Server
 
 by: MrX13415
 
 Changelog:
+Version: 2.6.5
+    * ADD: Simple mode (/mb im)
+    
 Version: 2.6.4
     * FIX: Block-counting runns in a new Thread now.
     * ADD: /massband stop command

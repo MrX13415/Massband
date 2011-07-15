@@ -23,7 +23,7 @@ import org.bukkit.plugin.Plugin;
  * Massband (bukkit plugin)
  * A Mesuring Tape
  *
- * @version 2.6.4 r49
+ * @version 2.6.5 r51
  * @author Oliver Daus
  *
  */

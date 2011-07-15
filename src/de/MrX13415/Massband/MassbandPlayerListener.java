@@ -36,11 +36,25 @@ public class MassbandPlayerListener extends org.bukkit.event.player.PlayerListen
 			PlayerVars tmpVars = Massband.getPlayerVars(player);
 		
 			//mode ?
-			if (tmpVars.getMode() == PlayerVars.MODE_LENGTH) {
+			if (tmpVars.getMode() == PlayerVars.MODE_SIMPLE) {
+				onModeSimple(tmpVars, player, block);
+			}else if (tmpVars.getMode() == PlayerVars.MODE_LENGTH) {
 				onModeLength(tmpVars, player, block);
 			}else if(tmpVars.getMode() == PlayerVars.MODE_SURFACE){
 				onModeSurface(tmpVars, player, block);
 			}
+		}
+    }
+    
+    public void onModeSimple(PlayerVars tmpVars, Player player, Block block){
+		tmpVars.addPoint(block.getX(), block.getY(), block.getZ());
+		
+		printPoints(tmpVars, player, block);
+		
+		if (tmpVars.getWayPointListSize() >= 2) {
+			tmpVars.computingVectors();
+			MassbandCommandExecuter.onCommandLength(tmpVars, player); //output
+			tmpVars.removeAllWayPoints();	//clear all Points
 		}
     }
     
