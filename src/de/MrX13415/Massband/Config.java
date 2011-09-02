@@ -13,17 +13,38 @@ public class Config {
 	
 	private static final String keyItemID = "ItemID";
 	private static final String keyItemName = "ItemName";
+	private static final String keyCommandShortForm_clear = "ClearCommand_ShortForm";
+	private static final String keyCommandShortForm_lenght = "LenghtCommand_ShortForm";
+	private static final String keyCommandShortForm_dimensions = "DimensionsCommand_ShortForm";
+	private static final String keyCommandShortForm_countblocks = "CountblocksCommand_ShortForm";
+	private static final String keyCommandShortForm_lengthmode = "LengthmodeCommand_ShortForm";
+	private static final String keyCommandShortForm_surfacemode = "SurfacemodeCommand_ShortForm";
+	private static final String keyCommandShortForm_simplemode = "SimplemodeCommand_ShortForm";
+	private static final String keyCommandShortForm_expand = "ExpandCommand_ShortForm";
+	private static final String keyCommandShortForm_stop = "StopCommand_ShortForm";
+	private static final String keyCommandShortForm_stopall = "StopallCommand_ShortForm";
 	private static final String keyUsePermissions = "UsePermissions";
 	private static final String keyBlockCountingSpeedLimit = "BlockCountingSpeedLimit";
 	private static final String fileFormat = "%s: %s"; 
 	
 	private int minLineCount = 4;
-	//-- file content --
+	//#-- file content --#
 	public int itemID = 268;
 	public String itemName = "wood-sword";
 	public boolean usePermissions = false;
 	public boolean blockCountingSpeedLimit = false;
-	//------------------
+	//-- shortforms --
+	public String commandShortForm_clear = "clr";
+	public String commandShortForm_lenght = "l";
+	public String commandShortForm_dimensions = "d";
+	public String commandShortForm_countblocks = "cb";
+	public String commandShortForm_lengthmode = "lm";
+	public String commandShortForm_surfacemode = "sfm";
+	public String commandShortForm_simplemode = "sim";
+	public String commandShortForm_expand = "ex";
+	public String commandShortForm_stop = "stp";
+	public String commandShortForm_stopall = "all";
+	//#-----------------#
 	
 	public void read() {
 		LineNumberReader reader;
@@ -49,6 +70,46 @@ public class Config {
 
 					if (line[0].equalsIgnoreCase(keyBlockCountingSpeedLimit)) {
 						blockCountingSpeedLimit = getBoolean(line[1]);
+					}
+					
+					if (line[0].equalsIgnoreCase(keyCommandShortForm_clear)) {
+						commandShortForm_clear = line[1];
+					}
+					
+					if (line[0].equalsIgnoreCase(keyCommandShortForm_lenght)) {
+						commandShortForm_lenght = line[1];
+					}
+					
+					if (line[0].equalsIgnoreCase(keyCommandShortForm_dimensions)) {
+						commandShortForm_dimensions = line[1];
+					}
+					
+					if (line[0].equalsIgnoreCase(keyCommandShortForm_countblocks)) {
+						commandShortForm_countblocks = line[1];
+					}
+					
+					if (line[0].equalsIgnoreCase(keyCommandShortForm_lengthmode)) {
+						commandShortForm_lengthmode = line[1];
+					}
+					
+					if (line[0].equalsIgnoreCase(keyCommandShortForm_surfacemode)) {
+						commandShortForm_surfacemode = line[1];
+					}
+					
+					if (line[0].equalsIgnoreCase(keyCommandShortForm_simplemode)) {
+						commandShortForm_simplemode = line[1];
+					}
+					
+					if (line[0].equalsIgnoreCase(keyCommandShortForm_expand)) {
+						commandShortForm_expand = line[1];
+					}
+					
+					if (line[0].equalsIgnoreCase(keyCommandShortForm_stop)) {
+						commandShortForm_stop = line[1];
+					}
+					
+					if (line[0].equalsIgnoreCase(keyCommandShortForm_stopall)) {
+						commandShortForm_stopall = line[1];
 					}
 				}			
 
@@ -96,6 +157,18 @@ public class Config {
 			writer.write("\n");
 			writer.write("#This can infect the Server performance ...\n");
 			writer.write(String.format(fileFormat, keyBlockCountingSpeedLimit, blockCountingSpeedLimit) + "\n");
+			writer.write("\n");
+			writer.write("#Command short-forms ...\n");
+			writer.write(String.format(fileFormat, keyCommandShortForm_clear, commandShortForm_clear) + "\n");
+			writer.write(String.format(fileFormat, keyCommandShortForm_lenght, commandShortForm_lenght) + "\n");
+			writer.write(String.format(fileFormat, keyCommandShortForm_dimensions, commandShortForm_dimensions) + "\n");
+			writer.write(String.format(fileFormat, keyCommandShortForm_countblocks, commandShortForm_countblocks) + "\n");
+			writer.write(String.format(fileFormat, keyCommandShortForm_lengthmode, commandShortForm_lengthmode) + "\n");
+			writer.write(String.format(fileFormat, keyCommandShortForm_surfacemode, commandShortForm_surfacemode) + "\n");
+			writer.write(String.format(fileFormat, keyCommandShortForm_simplemode, commandShortForm_simplemode) + "\n");
+			writer.write(String.format(fileFormat, keyCommandShortForm_expand, commandShortForm_expand) + "\n");
+			writer.write(String.format(fileFormat, keyCommandShortForm_stop, commandShortForm_stop) + "\n");
+			writer.write(String.format(fileFormat, keyCommandShortForm_stopall, commandShortForm_stopall) + "\n");
 			
 			writer.close();
 		

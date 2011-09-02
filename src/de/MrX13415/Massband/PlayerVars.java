@@ -132,7 +132,9 @@ public class PlayerVars{
 	}
 	
 	public void countBlocks(World world){	
-		new CountBlocks(this).start();
+		myThread = new CountBlocks(this);
+		myThread.start();
+		
 //		int blockCount = ;
 		
 //		int yStart = (int) Math.min(wayPoints.get(0).getY(), wayPoints.get(1).getY());

@@ -41,7 +41,7 @@ public class MassbandCommandExecuter implements CommandExecutor{
 			return true;
 	    }else{
 	    	if (args.length > 0) {
-		    	if (args[0].equalsIgnoreCase("stopall") || args[0].equalsIgnoreCase("all")) {
+		    	if (args[0].equalsIgnoreCase("stopall") || args[0].equalsIgnoreCase(Massband.configFile.commandShortForm_stopall)) {
 		    		CountBlocks.interuptAll(sender);
 		    		return true;
 		    	}
@@ -63,34 +63,34 @@ public class MassbandCommandExecuter implements CommandExecutor{
 
 		}else if (tmpVars != null){
 			
-			if (args[0].equalsIgnoreCase("clear") || args[0].equalsIgnoreCase("clr")) {
+			if (args[0].equalsIgnoreCase("clear") || args[0].equalsIgnoreCase(Massband.configFile.commandShortForm_clear)) {
 		    	onCommandClear(tmpVars, player);
 		    	
-			}else if (args[0].equalsIgnoreCase("length") || args[0].equalsIgnoreCase("l")) {
+			}else if (args[0].equalsIgnoreCase("length") || args[0].equalsIgnoreCase(Massband.configFile.commandShortForm_lenght)) {
 	        	onCommandLength(tmpVars, player);
 	        	
-			}else if (args[0].equalsIgnoreCase("3d") || args[0].equalsIgnoreCase("3d")) {
+			}else if (args[0].equalsIgnoreCase("3d")) {
 				onCommandSwitchMode(tmpVars, player, true);
 			
-			}else if (args[0].equalsIgnoreCase("2d") || args[0].equalsIgnoreCase("2d")) {
+			}else if (args[0].equalsIgnoreCase("2d")) {
 				onCommandSwitchMode(tmpVars, player, false);
 				
-			}else if (args[0].equalsIgnoreCase("dimensions") || args[0].equalsIgnoreCase("d")) {
+			}else if (args[0].equalsIgnoreCase("dimensions") || args[0].equalsIgnoreCase(Massband.configFile.commandShortForm_dimensions)) {
 				onCommandDimensions(tmpVars, player);
 					
-			}else if (args[0].equalsIgnoreCase("countblocks") || args[0].equalsIgnoreCase("cb")) {
+			}else if (args[0].equalsIgnoreCase("countblocks") || args[0].equalsIgnoreCase(Massband.configFile.commandShortForm_countblocks)) {
 				onCommandCountBlocks(tmpVars, player);
 			
-			}else if (args[0].equalsIgnoreCase("lengthmode") || args[0].equalsIgnoreCase("lm")) {
+			}else if (args[0].equalsIgnoreCase("lengthmode") || args[0].equalsIgnoreCase(Massband.configFile.commandShortForm_lengthmode)) {
 				onCommandMode(tmpVars, player, PlayerVars.MODE_LENGTH);
 				
-			}else if (args[0].equalsIgnoreCase("surfacemode") || args[0].equalsIgnoreCase("sm")) {
+			}else if (args[0].equalsIgnoreCase("surfacemode") || args[0].equalsIgnoreCase(Massband.configFile.commandShortForm_surfacemode)) {
 				onCommandMode(tmpVars, player, PlayerVars.MODE_SURFACE);
 			
-			}else if (args[0].equalsIgnoreCase("simplemode") || args[0].equalsIgnoreCase("im")) {
+			}else if (args[0].equalsIgnoreCase("simplemode") || args[0].equalsIgnoreCase(Massband.configFile.commandShortForm_simplemode)) {
 				onCommandMode(tmpVars, player, PlayerVars.MODE_SIMPLE);
 			
-			}else if (args[0].equalsIgnoreCase("expand") || args[0].equalsIgnoreCase("ex")) {
+			}else if (args[0].equalsIgnoreCase("expand") || args[0].equalsIgnoreCase(Massband.configFile.commandShortForm_expand)) {
 				if (args.length >= 2 ){
 					try {
 						int expandSize = 0;
@@ -109,13 +109,13 @@ public class MassbandCommandExecuter implements CommandExecutor{
 				}else{
 					printHelpMsg(command, player);
 				}
-			}else if (args[0].equalsIgnoreCase("stop") || args[0].equalsIgnoreCase("stp")) {
+			}else if (args[0].equalsIgnoreCase("stop") || args[0].equalsIgnoreCase(Massband.configFile.commandShortForm_stop)) {
 				if (tmpVars.getBlockCountingThread() != null) {
 					tmpVars.getBlockCountingThread().interrupt();
 				}else{
 					player.sendMessage(ChatColor.RED + " Nothing to Interrupt ...");
 				}
-			}else if (args[0].equalsIgnoreCase("stopall") || args[0].equalsIgnoreCase("all")) {
+			}else if (args[0].equalsIgnoreCase("stopall") || args[0].equalsIgnoreCase(Massband.configFile.commandShortForm_stopall)) {
 				//stopall Permission
 				if (hasPermission_stopall) {
 					CountBlocks.interuptAll(sender);
@@ -227,7 +227,7 @@ public class MassbandCommandExecuter implements CommandExecutor{
 	
 	public static void onCommandDimensions(PlayerVars tmpVars, Player player){
 		if (tmpVars.getMode() == PlayerVars.MODE_SURFACE) {
-			player.sendMessage(ChatColor.WHITE +  "With: " + ChatColor.GOLD + tmpVars.getDimensionWith() + ChatColor.WHITE + " Blocks");
+			player.sendMessage(ChatColor.WHITE +  "Width: " + ChatColor.GOLD + tmpVars.getDimensionWith() + ChatColor.WHITE + " Blocks");
 			player.sendMessage(ChatColor.WHITE +  "Length: " + ChatColor.GOLD + tmpVars.getDimensionLength() + ChatColor.WHITE + " Blocks");
 			player.sendMessage(ChatColor.WHITE +  "Height: " + ChatColor.GOLD + tmpVars.getDimensionHieght() + ChatColor.WHITE + " Blocks");
 		}else{

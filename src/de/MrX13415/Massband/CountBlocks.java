@@ -103,9 +103,9 @@ public class CountBlocks extends Thread{
 						} catch (Exception e) {
 						}
 					}
-					
 				}
 			}
+			
 //			//perc ---------------------
 //			perc = 100d / (double)maxblocks * (double)percindex;
 //			System.out.println("counting ... " + perc + "% (" + percindex + "/" + maxblocks + ")");
@@ -167,22 +167,44 @@ public class CountBlocks extends Thread{
 		}
 		Massband.log.info(Massband.consoleOutputHeader + ChatColor.RED + " " + sender + " trys to interrupt all Threads ... (count: " + Massband.threads.size() + ")");
 		
-		for (int ThreadIndex = 0; ThreadIndex < Massband.threads.size(); ThreadIndex++) {
-			CountBlocks thread = Massband.threads.get(ThreadIndex);
-			if (thread.isAlive()){
+		//create a clone of the threads array ...
+		@SuppressWarnings("unchecked")
+		ArrayList<CountBlocks> threads = (ArrayList<CountBlocks>) Massband.threads.clone();
+
+		for (CountBlocks thread : threads) {
+			if (thread.isAlive()){				
 				thread.interrupt();
 				
-				while (! thread.threadEndRechearched) {
+				int timeout = 5000; // in millis
+				long timeOutTime = System.currentTimeMillis() + timeout; 
+				
+				while (Massband.threads.contains(thread)){
+					if (System.currentTimeMillis() > timeOutTime) {
+						Massband.log.warning(Massband.consoleOutputHeader + " Timeout: Could not interrupt the thread from player" + thread.threadOwner.getName() + "!");
+						break;
+					}
 				}
+
 				if (thread.getOwner() != null) thread.getOwner().sendMessage(Massband.consoleOutputHeader + ChatColor.RED + " Your block-counting was interrupted by " + ChatColor.GOLD + sender);
 			}
 		}
 		
-		if (player != null) {
-			player.sendMessage(Massband.consoleOutputHeader +  ChatColor.RED + " All running Threads interrupted ! (count: " + Massband.threads.size() + ")");
-		}
+		threads = null;
 		
-		Massband.log.info(Massband.consoleOutputHeader + " All running Threads interrupted ! (count: " + Massband.threads.size() + ")");
+		if (Massband.threads.isEmpty()) {
+			if (player != null) {
+				player.sendMessage(Massband.consoleOutputHeader +  ChatColor.RED + " All running Threads interrupted ! (count: " + Massband.threads.size() + ")");
+			}
+			
+			Massband.log.info(Massband.consoleOutputHeader + " All running Threads interrupted ! (count: " + Massband.threads.size() + ")");
+		
+		}else{
+			if (player != null) {
+				player.sendMessage(Massband.consoleOutputHeader +  ChatColor.RED + " Could not interrupt some Threads ! (count: " + Massband.threads.size() + "). Please try again.");
+			}
+			
+			Massband.log.info(Massband.consoleOutputHeader + " Could not interrupt some Threads ! (count: " + Massband.threads.size() + "). Please try again.");
+		}
 	}
 		
 }

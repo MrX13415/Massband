@@ -1,7 +1,7 @@
 main: de.MrX13415.Massband.Massband
 
 name: Massband
-version: 2.6.5 (MC 1.6.6)
+version: 2.6.6 (MC 1.6.6)
 description: Measuring-tape for Bukkit
 author: MrX13415
 
@@ -10,13 +10,13 @@ commands:
     aliases: mb
     description: Manages a measuring Tape
     usage: |
-           Massband 2.6.5 - A Measuring Tape
+           Massband 2.6.6 - A Measuring Tape
            Right-click with a <%item> on any Block to start measuring.
            /massband - This help message
            /massband clear - Clears all measuring points
            /massband 2D - Changes the mode to 2D 
            /massband 3D - Changes the mode to 3D
-           /massband simple - Select the simple measuring tool
+           /massband simplemode - Select the simple measuring tool
            /massband lengthmode - Select the length measuring tool 
            /massband surfacemode - Select the surface measuring tool
            /massband stop - Interrupt Block-counting ...
