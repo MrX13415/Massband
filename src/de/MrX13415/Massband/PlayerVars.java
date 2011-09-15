@@ -1,6 +1,9 @@
 package de.MrX13415.Massband;
 
 import java.util.ArrayList;
+
+import org.bukkit.ChatColor;
+import org.bukkit.Material;
 import org.bukkit.World;
 import org.bukkit.entity.Player;
 import org.bukkit.util.Vector;
@@ -23,7 +26,9 @@ public class PlayerVars{
 	private double dimensionWith = 0;
 	private double dimensionHieght = 0;
 	
-	private int blockCount = 0;
+	public int blockCount = 0;
+	public ArrayList<Material> blocksCount_Material = new ArrayList<Material>();
+	public ArrayList<Integer> blocksCount_counts = new ArrayList<Integer>();
 	
 	private ArrayList<Vector> wayPoints = new ArrayList<Vector>();
 	
@@ -65,11 +70,7 @@ public class PlayerVars{
 	public double getLenght() {
 		return lenght;
 	}
-	
-	public int getBlockCount() {
-		return blockCount;
-	}
-	
+		
 	public double getDimensionWith() {
 		return dimensionWith;
 	}
@@ -162,6 +163,27 @@ public class PlayerVars{
 //		return this.blockCount = blockCount;
 	}
 	
+	public void printArray(int page) {
+		int linesPerPage = 7;
+		double pages = (double) blocksCount_Material.size() / (double) linesPerPage;
+		if((int) pages < pages) pages +=1; //correct pages count if pages is a double value 
+		int startIndex = (page - 1) * linesPerPage;
+		
+		player.sendMessage(ChatColor.GRAY + "- Block counts --- page " + page + "/" + (int) pages + " ------------------------");
+		
+		for (int materialIndex = startIndex; materialIndex < blocksCount_Material.size(); materialIndex++) {
+			Material material = blocksCount_Material.get(materialIndex);
+			int count = blocksCount_counts.get(materialIndex);
+			
+			player.sendMessage(ChatColor.WHITE + "  + " + material + ": " + ChatColor.GOLD + count);
+			
+			if (materialIndex >= (startIndex + linesPerPage - 1)) break;
+		}
+		player.sendMessage(ChatColor.GRAY + "----------------------------------------------------");
+		player.sendMessage(ChatColor.WHITE + " Total content: " + ChatColor.GOLD + blockCount + ChatColor.WHITE + " Blocks" + ChatColor.GRAY + " (exept air)");
+		player.sendMessage(ChatColor.GRAY + "----------------------------------------------------");
+	}
+		
 	/**ignors the Y axe
 	 * 
 	 * @param bool

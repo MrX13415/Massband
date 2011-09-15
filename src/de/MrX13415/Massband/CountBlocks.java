@@ -1,7 +1,9 @@
 package de.MrX13415.Massband;
 
 import java.util.ArrayList;
+
 import org.bukkit.ChatColor;
+import org.bukkit.Material;
 import org.bukkit.World;
 import org.bukkit.block.Block;
 import org.bukkit.command.CommandSender;
@@ -13,7 +15,11 @@ public class CountBlocks extends Thread{
 	private World world = null;
 	private ArrayList<Vector> wayPoints = null;
 	private PlayerVars tmpVars;
+	
 	private int blockCount = 0;
+	private ArrayList<Material> blocksCount_Material = new ArrayList<Material>();
+	private ArrayList<Integer> blocksCount_counts = new ArrayList<Integer>();
+	
 	private Player threadOwner = null;
 	private boolean interrupted = false;
 	private boolean threadEndRechearched = false;
@@ -39,8 +45,14 @@ public class CountBlocks extends Thread{
 		//count ...
 		blockCount = countBlocks(world, wayPoints);
 //		System.out.println("count: " + blockCount);
-
-		if (! interrupted) tmpVars.getPlayer().sendMessage(ChatColor.WHITE + "Content: " + ChatColor.GOLD + blockCount + ChatColor.WHITE + " Blocks" + ChatColor.GRAY + " (exept air)");
+		
+		if (! interrupted) {
+			tmpVars.blockCount = this.blockCount;
+			tmpVars.blocksCount_Material = this.blocksCount_Material;
+			tmpVars.blocksCount_counts = this.blocksCount_counts;
+			
+			tmpVars.getPlayer().sendMessage(ChatColor.WHITE + "Total content: " + ChatColor.GOLD + blockCount + ChatColor.WHITE + " Blocks" + ChatColor.GRAY + " (exept air)");		
+		}
 		
 		threadEndRechearched = true;
 		Massband.log.info(Massband.consoleOutputHeader + " Block-counting Thread from " + threadOwner.getName() + " was Interrupted");
@@ -85,9 +97,21 @@ public class CountBlocks extends Thread{
 					if (interrupted) break;
 					
 					//get Block
-					Block b = Massband.server.getWorld(world.getName()).getBlockAt(xIndex, yIndex, zIndex);
+					Block block = Massband.server.getWorld(world.getName()).getBlockAt(xIndex, yIndex, zIndex);
 					//count blocks except air ...
-					if (b.getTypeId() != 0) blockCount++;
+					if (block.getTypeId() != 0) blockCount++;
+					
+					
+					Material blockType = block.getType();
+					
+					if (blocksCount_Material.contains(blockType)) {
+						int index = blocksCount_Material.indexOf(blockType);
+						blocksCount_counts.set(index, blocksCount_counts.get(index) + 1); //add 1 to the given material ...
+						
+					}else{
+						blocksCount_Material.add(blockType);
+						blocksCount_counts.add(1);				//add a new Material ...
+					}
 				
 					//measure speed	...							
 					if (measureSpeed) percindex += 1;
@@ -206,5 +230,17 @@ public class CountBlocks extends Thread{
 			Massband.log.info(Massband.consoleOutputHeader + " Could not interrupt some Threads ! (count: " + Massband.threads.size() + "). Please try again.");
 		}
 	}
-		
+	
+	public void printArray() {
+		Massband.log.warning("MASSBAND COUNTS:");
+		for (int materialIndex = 0; materialIndex < blocksCount_Material.size(); materialIndex++) {
+			Material material = blocksCount_Material.get(materialIndex);
+			int count = blocksCount_counts.get(materialIndex);
+			
+			Massband.log.warning("  + " +material + ":  " + count);
+			
+		}
+		Massband.log.warning("----------------");
+	}
+	
 }

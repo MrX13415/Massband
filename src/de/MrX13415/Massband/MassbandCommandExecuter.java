@@ -120,6 +120,18 @@ public class MassbandCommandExecuter implements CommandExecutor{
 				if (hasPermission_stopall) {
 					CountBlocks.interuptAll(sender);
 				}
+			}else if (args[0].equalsIgnoreCase("blocklist") || args[0].equalsIgnoreCase(Massband.configFile.commandShortForm_blockList)) {
+				
+				int page = 1;
+				
+				if (args.length == 2) {
+					try {
+						page = Integer.valueOf(args[1]);
+					} catch (Exception e){};
+				}
+				
+				if (page >= 1) tmpVars.printArray(page);
+
 			}else{
 				printHelpMsg(command, player);
 			}

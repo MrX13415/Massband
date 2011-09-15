@@ -3,7 +3,7 @@
 =================
     
 Title:        Massband
-Version:      2.6.6 r52
+Version:      2.6.7 r55
 
 Description:  A Measuring-tape for Bukkit Minecraft-Server
 
@@ -22,7 +22,9 @@ if not, see <http://www.gnu.org/licenses/>.
 
 
 Changelog:
-
+    Version: 2.6.7
+	    * ADD: '/massband BlockList' command
+		
     Version: 2.6.6
         * ADD: Command short-forms are configable now (Thanks to bukkit-user: baunegaard)
         * FIX: '/massband stopall' command doesn't work correctly 

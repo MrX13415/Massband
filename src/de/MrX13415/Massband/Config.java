@@ -13,6 +13,7 @@ public class Config {
 	
 	private static final String keyItemID = "ItemID";
 	private static final String keyItemName = "ItemName";
+	private static final String keyCommandShortForm_blockList = "BlockListCommand_ShortForm";
 	private static final String keyCommandShortForm_clear = "ClearCommand_ShortForm";
 	private static final String keyCommandShortForm_lenght = "LenghtCommand_ShortForm";
 	private static final String keyCommandShortForm_dimensions = "DimensionsCommand_ShortForm";
@@ -34,6 +35,7 @@ public class Config {
 	public boolean usePermissions = false;
 	public boolean blockCountingSpeedLimit = false;
 	//-- shortforms --
+	public String commandShortForm_blockList = "bl";
 	public String commandShortForm_clear = "clr";
 	public String commandShortForm_lenght = "l";
 	public String commandShortForm_dimensions = "d";
@@ -111,6 +113,10 @@ public class Config {
 					if (line[0].equalsIgnoreCase(keyCommandShortForm_stopall)) {
 						commandShortForm_stopall = line[1];
 					}
+					
+					if (line[0].equalsIgnoreCase(keyCommandShortForm_blockList)) {
+						commandShortForm_blockList = line[1];
+					}
 				}			
 
 				if (reader.getLineNumber() < minLineCount) write();
@@ -169,6 +175,7 @@ public class Config {
 			writer.write(String.format(fileFormat, keyCommandShortForm_expand, commandShortForm_expand) + "\n");
 			writer.write(String.format(fileFormat, keyCommandShortForm_stop, commandShortForm_stop) + "\n");
 			writer.write(String.format(fileFormat, keyCommandShortForm_stopall, commandShortForm_stopall) + "\n");
+			writer.write(String.format(fileFormat, keyCommandShortForm_blockList, commandShortForm_blockList) + "\n");
 			
 			writer.close();
 		
