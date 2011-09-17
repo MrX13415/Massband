@@ -8,9 +8,11 @@ import java.io.LineNumberReader;
 
 public class Config {
 	
+	public String version = "2.6.8";	//config version
 	private String configFileName = "config.yml";
 	private String configFilePath = "plugins/" + Massband.pluginName + "/";
 	
+	private static final String keyConfigFileVersion = "ConfigFileVersion";
 	private static final String keyItemID = "ItemID";
 	private static final String keyItemName = "ItemName";
 	private static final String keyCommandShortForm_blockList = "BlockListCommand_ShortForm";
@@ -30,6 +32,7 @@ public class Config {
 	
 	private int minLineCount = 4;
 	//#-- file content --#
+	public String configFileVersion = "----";
 	public int itemID = 268;
 	public String itemName = "wood-sword";
 	public boolean usePermissions = false;
@@ -117,6 +120,10 @@ public class Config {
 					if (line[0].equalsIgnoreCase(keyCommandShortForm_blockList)) {
 						commandShortForm_blockList = line[1];
 					}
+					
+					if (line[0].equalsIgnoreCase(keyConfigFileVersion)) {
+						configFileVersion = line[1];
+					}
 				}			
 
 				if (reader.getLineNumber() < minLineCount) write();
@@ -156,6 +163,9 @@ public class Config {
 			
 			writer = new FileWriter(configFilePath + configFileName);
 			
+			writer.write("#" + Massband.pdfFile.getFullName() + "  by: " + Massband.pdfFile.getAuthors() + "\n");
+			writer.write(String.format(fileFormat, keyConfigFileVersion, configFileVersion) + "\n");
+			writer.write("\n");
 			writer.write(String.format(fileFormat, keyItemID, itemID) + "\n");
 			writer.write(String.format(fileFormat, keyItemName, itemName) + "\n");
 			writer.write("\n");

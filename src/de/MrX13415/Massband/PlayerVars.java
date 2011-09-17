@@ -163,7 +163,12 @@ public class PlayerVars{
 //		return this.blockCount = blockCount;
 	}
 	
-	public void printArray(int page) {
+	public boolean printArray(int page) {
+		if (blocksCount_Material.size() <= 0){
+			player.sendMessage(ChatColor.RED + "Use the Command '/massband countBlocks' or '/mb cb' first ..");
+			return false;
+		}
+		
 		int linesPerPage = 7;
 		double pages = (double) blocksCount_Material.size() / (double) linesPerPage;
 		if((int) pages < pages) pages +=1; //correct pages count if pages is a double value 
@@ -182,6 +187,7 @@ public class PlayerVars{
 		player.sendMessage(ChatColor.GRAY + "----------------------------------------------------");
 		player.sendMessage(ChatColor.WHITE + " Total content: " + ChatColor.GOLD + blockCount + ChatColor.WHITE + " Blocks" + ChatColor.GRAY + " (exept air)");
 		player.sendMessage(ChatColor.GRAY + "----------------------------------------------------");
+		return true;
 	}
 		
 	/**ignors the Y axe

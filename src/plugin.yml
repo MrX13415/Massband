@@ -1,7 +1,7 @@
 main: de.MrX13415.Massband.Massband
 
 name: Massband
-version: 2.6.7 (MC 1.8.1)
+version: 2.6.8 (MC 1.8.1)
 description: Measuring-tape for Bukkit
 author: MrX13415
 
@@ -10,7 +10,7 @@ commands:
     aliases: mb
     description: Manages a measuring Tape
     usage: |
-           Massband 2.6.7 - A Measuring Tape
+           Massband 2.6.8 - A Measuring Tape
            Right-click with a <%item> on any Block to start measuring.
            /massband - This help message
            /massband clear - Clears all measuring points
@@ -22,8 +22,7 @@ commands:
            /massband stop - Interrupt Block-counting ...
            /massband stopall - Interrupts all running Block-countings
            /massband length - Returns the last measured length 
-           - Surface-mode only ----------------------------------
-           /massband dimensions - Returns the dimensions of the cuboid
-           /massband countBlocks - Returns the count of Blocks in a cuboid (exept air)  
+           /massband dimensions - Returns the dimensions of the volume
+           /massband countBlocks - Returns the count of Blocks in a volume (exept air)  
            /massband expand <<amount> <up|down>|vert> - expands the selection in the given direction. (vert = from bottom to the top)
-           /massband blockList [page] - Returns a List of all Blocks in the cuboid           
+           /massband blockList [page] - Returns a List of all Blocks in the volume

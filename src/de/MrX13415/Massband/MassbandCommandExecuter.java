@@ -14,6 +14,7 @@ public class MassbandCommandExecuter implements CommandExecutor{
 
 	boolean hasPermission_use = false;
 	boolean hasPermission_stopall = false;
+	boolean hasPermission_blocklist = false;
 	
 	@Override
 	public boolean onCommand(CommandSender sender, Command command, String label, String[] args) {		
@@ -25,10 +26,11 @@ public class MassbandCommandExecuter implements CommandExecutor{
 				//use Permission
 				if (Massband.permissionHandler.permission(player, Massband.PERMISSION_NODE_Massband_use)) hasPermission_use = true;
 				if (Massband.permissionHandler.permission(player, Massband.PERMISSION_NODE_Massband_stop_all)) hasPermission_stopall = true;
+				if (Massband.permissionHandler.permission(player, Massband.PERMISSION_NODE_Massband_blocklist)) hasPermission_blocklist = true;
 				
 				if (hasPermission_use) command(sender, command, label, args);
 			}else{
-				
+
 				if (player.isOp()) {
 					hasPermission_stopall = true;
 				}
@@ -36,6 +38,7 @@ public class MassbandCommandExecuter implements CommandExecutor{
 				//no Permission installed ! (everyone has access)
 				command(sender, command, label, args);
 			}
+			hasPermission_blocklist = false;
 			hasPermission_use = false;
 			hasPermission_stopall = false;
 			return true;
@@ -121,21 +124,25 @@ public class MassbandCommandExecuter implements CommandExecutor{
 					CountBlocks.interuptAll(sender);
 				}
 			}else if (args[0].equalsIgnoreCase("blocklist") || args[0].equalsIgnoreCase(Massband.configFile.commandShortForm_blockList)) {
-				
-				int page = 1;
-				
-				if (args.length == 2) {
-					try {
-						page = Integer.valueOf(args[1]);
-					} catch (Exception e){};
+				if (hasPermission_blocklist){
+					onCommandBlockList(tmpVars, args);
 				}
-				
-				if (page >= 1) tmpVars.printArray(page);
-
 			}else{
 				printHelpMsg(command, player);
 			}
 		}
+	}
+	
+	private void onCommandBlockList(PlayerVars tmpVars, String[] args){
+		int page = 1;
+		
+		if (args.length == 2) {
+			try {
+				page = Integer.valueOf(args[1]);
+			} catch (Exception e){};
+		}
+		
+		if (page >= 1) tmpVars.printArray(page);
 	}
 	
 	private void onCommandExpand(PlayerVars tmpVars, Player player, int modeSurface, int expandsize, String direction ) {

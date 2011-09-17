@@ -23,7 +23,7 @@ import org.bukkit.plugin.Plugin;
  * Massband (bukkit plugin)
  * A mesuring tape
  *
- * @version 2.6.6 r52
+ * @version 2.6.8 r57
  * @author MrX13415
  * 
  * Copyright (C) 2011 MrX13415
@@ -42,6 +42,7 @@ import org.bukkit.plugin.Plugin;
 
 public class Massband extends JavaPlugin {
 	
+	public static PluginDescriptionFile pdfFile = null;
 	public static Server server = null;
 	public static Logger log = null;
 	public static String pluginName = null;
@@ -52,6 +53,7 @@ public class Massband extends JavaPlugin {
 	public static PermissionHandler permissionHandler;
 	public static final String PERMISSION_NODE_Massband_use = "Massband.use";
 	public static final String PERMISSION_NODE_Massband_stop_all = "Massband.stopall";
+	public static final String PERMISSION_NODE_Massband_blocklist = "Massband.blocklist";
 	
 	//holds information for all Players.
 	public static ArrayList<PlayerVars> playerlist = new ArrayList<PlayerVars>();
@@ -78,7 +80,7 @@ public class Massband extends JavaPlugin {
 		server = this.getServer();
 		log = server.getLogger();
 		
-		PluginDescriptionFile pdfFile = this.getDescription();
+		pdfFile = this.getDescription();
 		pluginName = pdfFile.getName();
 		consoleOutputHeader = "[" + pluginName + "]";
 
@@ -86,6 +88,12 @@ public class Massband extends JavaPlugin {
   
         configFile = new Config();
         configFile.read();
+        
+        if (! configFile.configFileVersion.equalsIgnoreCase(configFile.version)){
+        	configFile.configFileVersion = configFile.version;
+        	log.info(consoleOutputHeader + " Config file updated ...");
+        	configFile.write();
+        }
         //---------------------
                 
         //register events ...
