@@ -4,6 +4,7 @@ name: Massband
 version: 2.6.8 (MC 1.8.1)
 description: Measuring-tape for Bukkit
 author: MrX13415
+website: http://dev.bukkit.org/server-mods/buttonlock/
 
 commands:
   massband:
