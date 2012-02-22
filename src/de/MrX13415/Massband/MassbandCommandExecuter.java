@@ -21,14 +21,22 @@ public class MassbandCommandExecuter implements CommandExecutor{
 		if (sender instanceof Player) {
 			Player player = (Player) sender;
 			
-			if (Massband.permissionHandler != null) {	
-								
-				//use Permission
-				if (Massband.permissionHandler.permission(player, Massband.PERMISSION_NODE_Massband_use)) hasPermission_use = true;
-				if (Massband.permissionHandler.permission(player, Massband.PERMISSION_NODE_Massband_stop_all)) hasPermission_stopall = true;
-				if (Massband.permissionHandler.permission(player, Massband.PERMISSION_NODE_Massband_blocklist)) hasPermission_blocklist = true;
+			if (Massband.permissions()) {					
+    			//use Permission
+				if (Massband.hasPermission(player, Massband.PERMISSION_NODE_Massband_use)) hasPermission_use = true;
+				if (Massband.hasPermission(player, Massband.PERMISSION_NODE_Massband_stop_all)) hasPermission_stopall = true;
+				if (Massband.hasPermission(player, Massband.PERMISSION_NODE_Massband_blocklist)) hasPermission_blocklist = true;
 				
-				if (hasPermission_use) command(sender, command, label, args);
+				if (hasPermission_use) command(sender, command, label, args);			
+			
+//			if (Massband.permissionHandler != null) {	
+//								
+//				//use Permission
+//				if (Massband.permissionHandler.permission(player, Massband.PERMISSION_NODE_Massband_use)) hasPermission_use = true;
+//				if (Massband.permissionHandler.permission(player, Massband.PERMISSION_NODE_Massband_stop_all)) hasPermission_stopall = true;
+//				if (Massband.permissionHandler.permission(player, Massband.PERMISSION_NODE_Massband_blocklist)) hasPermission_blocklist = true;
+//				
+//				if (hasPermission_use) command(sender, command, label, args);
 			}else{
 
 				if (player.isOp()) {
@@ -42,6 +50,7 @@ public class MassbandCommandExecuter implements CommandExecutor{
 			hasPermission_use = false;
 			hasPermission_stopall = false;
 			return true;
+						
 	    }else{
 	    	if (args.length > 0) {
 		    	if (args[0].equalsIgnoreCase("stopall") || args[0].equalsIgnoreCase(Massband.configFile.commandShortForm_stopall)) {
@@ -122,10 +131,14 @@ public class MassbandCommandExecuter implements CommandExecutor{
 				//stopall Permission
 				if (hasPermission_stopall) {
 					CountBlocks.interuptAll(sender);
+				}else{
+					player.sendMessage(String.format(ChatColor.RED + "You don't have the required Permission (" + ChatColor.GOLD + "%s" + ChatColor.RED + ")", Massband.PERMISSION_NODE_Massband_stop_all));
 				}
 			}else if (args[0].equalsIgnoreCase("blocklist") || args[0].equalsIgnoreCase(Massband.configFile.commandShortForm_blockList)) {
 				if (hasPermission_blocklist){
 					onCommandBlockList(tmpVars, args);
+				}else{
+					player.sendMessage(String.format(ChatColor.RED + "You don't have the required Permission (" + ChatColor.GOLD + "%s" + ChatColor.RED + ")", Massband.PERMISSION_NODE_Massband_blocklist));
 				}
 			}else{
 				printHelpMsg(command, player);
@@ -154,7 +167,7 @@ public class MassbandCommandExecuter implements CommandExecutor{
 			if (direction.equalsIgnoreCase("up")) {
 				point1.setY(point1.getY() + expandsize);
 			
-				if (point1.getY() > 128) point1.setY(128);
+				if (point1.getY() > player.getWorld().getMaxHeight()) point1.setY(player.getWorld().getMaxHeight());
 				if (point1.getY() < 0) point1.setY(0);
 				
 				player.sendMessage(ChatColor.GRAY + "Selection expanded ... (" + expandsize + " Blocks up)");
@@ -162,18 +175,18 @@ public class MassbandCommandExecuter implements CommandExecutor{
 			}else if (direction.equalsIgnoreCase("down")) {
 				point2.setY(point2.getY() - expandsize);
 				
-				if (point2.getY() > 127) point2.setY(127);
+				if (point2.getY() > player.getWorld().getMaxHeight() - 1) point2.setY(player.getWorld().getMaxHeight() - 1);
 				if (point2.getY() < 0) point2.setY(0);
 				
 				player.sendMessage(ChatColor.GRAY + "Selection expanded ... (" + expandsize + " Block down)");
 				
 				
 			}else if (direction.equalsIgnoreCase("vert")) {
-				point1.setY(128);
+				point1.setY(player.getWorld().getMaxHeight());
 				point2.setY(0);
 			
-				if (point1.getY() > 127) point1.setY(127);
-				if (point2.getY() > 127) point2.setY(127);
+				if (point1.getY() > (player.getWorld().getMaxHeight() - 1)) point1.setY(player.getWorld().getMaxHeight() - 1);
+				if (point2.getY() > (player.getWorld().getMaxHeight() - 1)) point2.setY(player.getWorld().getMaxHeight() - 1);
 				if (point1.getY() < 0) point1.setY(0);
 				if (point2.getY() < 0) point2.setY(0);
 				

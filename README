@@ -3,12 +3,12 @@
 =================
     
 Title:        Massband
-Version:      2.6.8 r57
+Version:      2.7 r59
 
 Description:  A Measuring-tape for Bukkit Minecraft-Server
 website:      http://dev.bukkit.org/server-mods/massband/
 
-Copyright (C) 2011 MrX13415
+Copyright (C) 2012 MrX13415
 
 
 License:
@@ -21,7 +21,11 @@ License:
     
 
 Changelog:
-
+    
+    Version: 2.7
+        * FIX: Code clean-up: removed deprecated code
+	    * ADD: PermissionBukkit Support
+		
     Version: 2.6.8
 	    * ADD: Permission for the block list feature
 		

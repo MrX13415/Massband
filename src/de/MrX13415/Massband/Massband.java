@@ -6,16 +6,11 @@ import java.util.logging.Logger;
 
 import org.bukkit.Server;
 import org.bukkit.entity.Player;
-import org.bukkit.event.Event;
-import org.bukkit.event.Event.Priority;
-import org.bukkit.event.player.PlayerListener;
 import org.bukkit.plugin.PluginDescriptionFile;
-import org.bukkit.plugin.PluginManager;
 import org.bukkit.plugin.java.JavaPlugin;
-
+import org.bukkit.event.Listener;
 import com.nijiko.permissions.PermissionHandler;
 import com.nijikokun.bukkit.Permissions.Permissions;
-
 
 import org.bukkit.plugin.Plugin;
 
@@ -23,7 +18,7 @@ import org.bukkit.plugin.Plugin;
  * Massband (bukkit plugin)
  * A mesuring tape
  *
- * @version 2.6.8 r57
+ * @version 2.7 r59
  * @author MrX13415
  * 
  * Website:      http://dev.bukkit.org/server-mods/massband/
@@ -48,7 +43,9 @@ public class Massband extends JavaPlugin {
 	public static Config configFile = null;
 
 	//permissions
-	public static PermissionHandler permissionHandler;
+	private static PermissionHandler permissionHandler;
+	private static boolean defaultPermission;
+
 	public static final String PERMISSION_NODE_Massband_use = "Massband.use";
 	public static final String PERMISSION_NODE_Massband_stop_all = "Massband.stopall";
 	public static final String PERMISSION_NODE_Massband_blocklist = "Massband.blocklist";
@@ -59,7 +56,7 @@ public class Massband extends JavaPlugin {
 	//holds all Counting Threads ..
 	public static ArrayList<CountBlocks> threads = new ArrayList<CountBlocks>();
 	
-	private final PlayerListener pListener = new MassbandPlayerListener();
+	private final Listener pListener = new MassbandPlayerListener();
 //	private final HashMap<Player, Boolean> debugees = new HashMap<Player, Boolean>();
 
 
@@ -82,7 +79,7 @@ public class Massband extends JavaPlugin {
 		pluginName = pdfFile.getName();
 		consoleOutputHeader = "[" + pluginName + "]";
 
-        log.info(consoleOutputHeader + " v" + pdfFile.getVersion() + " " + pdfFile.getAuthors() + " is enabled.");
+//        log.info(consoleOutputHeader + " v" + pdfFile.getVersion() + " " + pdfFile.getAuthors() + " is enabled.");
   
         configFile = new Config();
         configFile.read();
@@ -95,9 +92,10 @@ public class Massband extends JavaPlugin {
         //---------------------
                 
         //register events ...
-		PluginManager pm = getServer().getPluginManager();
-		pm.registerEvent(Event.Type.PLAYER_INTERACT, pListener, Priority.Normal, this);
-		pm.registerEvent(Event.Type.PLAYER_QUIT, pListener, Priority.Normal, this);
+//		PluginManager pm = getServer().getPluginManager();
+		getServer().getPluginManager().registerEvents(pListener, this);
+//		pm.registerEvent(Event.Type.PLAYER_INTERACT, pListener, Priority.Normal, this);
+//		pm.registerEvent(Event.Type.PLAYER_QUIT, pListener, Priority.Normal, this);
 		
 		//register commands ...
 		try {
@@ -121,18 +119,72 @@ public class Massband extends JavaPlugin {
 //        debugees.put(player, value);
 //    }
     
-    private void setupPermissions() {
-	      Plugin permissionsPlugin = this.getServer().getPluginManager().getPlugin("Permissions");
+	public static boolean permissions(){
+		if ((Massband.permissionHandler != null || defaultPermission) && Massband.configFile.usePermissions){
+			return true;
+		}
+		return false;
+	}
+	
+	public static boolean hasPermission(Player player, String permission){
+		
+		if (Massband.permissionHandler != null){
+			if (Massband.permissionHandler.permission(player, permission)){
+				return true;
+			}
+		}
+		
+		if (player.hasPermission(permission)){
+			return true;
+		}
+		
+		return false;
+	}
 
-	      if (Massband.permissionHandler == null) {
-	          if (permissionsPlugin != null) {
-	        	  Massband.permissionHandler = ((Permissions) permissionsPlugin).getHandler();
-	        	  log.info(consoleOutputHeader + " Permission system detected: " + permissionsPlugin.getDescription().getFullName());
-	          } else {
-	        	  log.warning(consoleOutputHeader + " Permission system NOT detected! (everyone will have permissions to use it.)");
-	          }
-	      }
-	  }
+	private void setupPermissions() {
+		Plugin permissionsPlugin = this.getServer().getPluginManager()
+				.getPlugin("Permissions");
+		Plugin permissionsBukkitPlugin = this.getServer().getPluginManager()
+				.getPlugin("PermissionsBukkit");
+
+		if (Massband.permissionHandler == null) {
+			if (permissionsPlugin != null) {
+				Massband.permissionHandler = ((Permissions) permissionsPlugin)
+						.getHandler();
+				log.info(consoleOutputHeader + " Permission system detected: "
+						+ permissionsPlugin.getDescription().getFullName());
+			} else if (Massband.configFile.usePermissions) {
+				defaultPermission = true;
+
+				String pluginName = "";
+
+				if (permissionsBukkitPlugin != null) {
+					pluginName = ": "
+							+ permissionsBukkitPlugin.getDescription()
+									.getFullName();
+				}
+
+				log.info(consoleOutputHeader + " Permission system detected"
+						+ pluginName);
+			} else {
+				log.warning(consoleOutputHeader
+						+ " Permission system NOT detected OR disabled! (everyone will have permissions to use it.)");
+			}
+		}
+	}
+	 
+//    private void setupPermissionsO() {
+//	      Plugin permissionsPlugin = this.getServer().getPluginManager().getPlugin("Permissions");
+//
+//	      if (Massband.permissionHandler == null) {
+//	          if (permissionsPlugin != null) {
+//	        	  Massband.permissionHandler = ((Permissions) permissionsPlugin).getHandler();
+//	        	  log.info(consoleOutputHeader + " Permission system detected: " + permissionsPlugin.getDescription().getFullName());
+//	          } else {
+//	        	  log.warning(consoleOutputHeader + " Permission system NOT detected! (everyone will have permissions to use it.)");
+//	          }
+//	      }
+//	  }
   	
 	/** remove PlayerVars from the current Player, to keep
 	 *  the ArrayList short.

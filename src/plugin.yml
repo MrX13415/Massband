@@ -1,7 +1,7 @@
 main: de.MrX13415.Massband.Massband
 
 name: Massband
-version: 2.6.8 (MC 1.8.1)
+version: 2.7
 description: Measuring-tape for Bukkit
 author: MrX13415
 website: http://dev.bukkit.org/server-mods/buttonlock/
@@ -11,7 +11,7 @@ commands:
     aliases: mb
     description: Manages a measuring Tape
     usage: |
-           Massband 2.6.8 - A Measuring Tape
+           Massband 2.7 - A Measuring Tape
            Right-click with a <%item> on any Block to start measuring.
            /massband - This help message
            /massband clear - Clears all measuring points

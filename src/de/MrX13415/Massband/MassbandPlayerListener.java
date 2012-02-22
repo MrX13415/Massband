@@ -3,26 +3,53 @@ package de.MrX13415.Massband;
 import org.bukkit.ChatColor;
 import org.bukkit.block.Block;
 import org.bukkit.entity.Player;
+import org.bukkit.event.EventHandler;
 import org.bukkit.event.block.Action;
 import org.bukkit.event.player.*;
 import org.bukkit.inventory.ItemStack;
+import org.bukkit.event.Listener;
 
-public class MassbandPlayerListener extends org.bukkit.event.player.PlayerListener {
+
+public class MassbandPlayerListener implements Listener {
         
-    public void onPlayerInteract(PlayerInteractEvent event){
+	@EventHandler
+	public void onPlayerInteract(PlayerInteractEvent event){
     	if ((event.getAction() == Action.RIGHT_CLICK_BLOCK)) {
     		Player player = event.getPlayer();
     		Block block = event.getClickedBlock();
     	
-    		if (Massband.permissionHandler != null && Massband.configFile.usePermissions) {
+    		
+    		
+    		if (Massband.permissions()) {					
     			//use Permission
-    			if (Massband.permissionHandler.permission(player, Massband.PERMISSION_NODE_Massband_use)) {
-        			playerInteract(player, block);
+    			if (Massband.hasPermission(player, Massband.PERMISSION_NODE_Massband_use)) {
+    				playerInteract(player, block);
+    			}else{
+    				player.sendMessage(String.format(ChatColor.RED + "You don't have the required Permission (" + ChatColor.GOLD + "%s" + ChatColor.RED + ")", Massband.PERMISSION_NODE_Massband_use));//ButtonLock.getCurrentLanguage().PERMISSIONS_NOT,  ButtonLock.PERMISSION_NODE_ButtonLock_use));
+    				event.setCancelled(true);	
     			}
 			}else{
-				//no Permission installed ! (everyone has access)
+				//no Permission installed ! (op only)
+//				if (player.isOp() && ButtonLock.getButtonLockConfig().oPOnly) {
+//					playerInteract(player, block);
+//				}else if (! ButtonLock.getButtonLockConfig().oPOnly){
+//					playerInteract(player, block);
+//				}else{
+//				    event.setCancelled(true);	
+//				}
 				playerInteract(player, block);
 			}
+    		
+    		
+//    		if (Massband.permissionHandler != null && Massband.configFile.usePermissions) {
+//    			//use Permission
+//    			if (Massband.permissionHandler.permission(player, Massband.PERMISSION_NODE_Massband_use)) {
+//        			playerInteract(player, block);
+//    			}
+//			}else{
+//				//no Permission installed ! (everyone has access)
+//				playerInteract(player, block);
+//			}
     	}
     }
     
@@ -113,6 +140,7 @@ public class MassbandPlayerListener extends org.bukkit.event.player.PlayerListen
 		}
     }
    
+    @EventHandler
     public void onPlayerQuit(PlayerQuitEvent event) {
     	Massband.removePlayer(event.getPlayer());
 	}

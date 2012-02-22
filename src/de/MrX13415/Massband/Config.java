@@ -8,7 +8,7 @@ import java.io.LineNumberReader;
 
 public class Config {
 	
-	public String version = "2.6.8";	//config version
+	public String version = "2.7";	//config version
 	private String configFileName = "config.yml";
 	private String configFilePath = "plugins/" + Massband.pluginName + "/";
 	
@@ -35,7 +35,7 @@ public class Config {
 	public String configFileVersion = "----";
 	public int itemID = 268;
 	public String itemName = "wood-sword";
-	public boolean usePermissions = false;
+	public boolean usePermissions = true;
 	public boolean blockCountingSpeedLimit = false;
 	//-- shortforms --
 	public String commandShortForm_blockList = "bl";
