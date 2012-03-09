@@ -10,13 +10,14 @@ import org.bukkit.util.Vector;
 
 
 public class PlayerVars{
-
+	
 	public static final int MODE_SIMPLE = 0;
 	public static final int MODE_LENGTH = 1;
 	public static final int MODE_SURFACE = 2;
 
 	private Player player;
 	private int mode = MODE_SIMPLE;	//default
+	private boolean isEnabled = true;
 	
 	private CountBlocks myThread = null;
 	
@@ -99,6 +100,14 @@ public class PlayerVars{
 		this.mode = mode;
 	}
 	
+	public boolean isEnabled() {
+		return isEnabled;
+	}
+
+	public void setEnabled(boolean isEnabled) {
+		this.isEnabled = isEnabled;
+	}
+
 	public double computingVectors(){
 		if (getWayPointListSize() >= 2) {
 			lenght = 0;

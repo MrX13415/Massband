@@ -1,10 +1,14 @@
-package de.MrX13415.Massband;
+package de.MrX13415.Massband.CommandExecuter;
 
 import org.bukkit.ChatColor;
 import org.bukkit.entity.Player;
 import org.bukkit.command.Command;
 import org.bukkit.command.CommandExecutor;
 import org.bukkit.command.CommandSender;
+
+import de.MrX13415.Massband.CountBlocks;
+import de.MrX13415.Massband.Massband;
+import de.MrX13415.Massband.PlayerVars;
 
 /**
 * Handler for the 'massband' command.
@@ -75,7 +79,15 @@ public class MassbandCommandExecuter implements CommandExecutor{
 
 		}else if (tmpVars != null){
 			
-			if (args[0].equalsIgnoreCase("clear") || args[0].equalsIgnoreCase(Massband.configFile.commandShortForm_clear)) {
+			if (args[0].equalsIgnoreCase("enable") || args[0].equalsIgnoreCase(Massband.configFile.commandShortForm_MassbandEnable)) {
+		    	tmpVars.setEnabled(true);
+		    	player.sendMessage(ChatColor.GRAY + "Massband is now " + ChatColor.GOLD + "Enabled" + ChatColor.GRAY + " for you");
+		    	
+			}else if (args[0].equalsIgnoreCase("disable") || args[0].equalsIgnoreCase(Massband.configFile.commandShortForm_MassbandDisable)) {
+		    	tmpVars.setEnabled(false);
+		    	player.sendMessage(ChatColor.GRAY + "Massband is now " + ChatColor.GOLD + "Disabled"+ ChatColor.GRAY + " for you");
+		    	
+			}else if (args[0].equalsIgnoreCase("clear") || args[0].equalsIgnoreCase(Massband.configFile.commandShortForm_clear)) {
 		    	onCommandClear(tmpVars, player);
 		    	
 			}else if (args[0].equalsIgnoreCase("length") || args[0].equalsIgnoreCase(Massband.configFile.commandShortForm_lenght)) {
@@ -268,12 +280,27 @@ public class MassbandCommandExecuter implements CommandExecutor{
 	}
 	
 	public static void printHelpMsg(Command command, CommandSender sender){
-		String[] usage = command.getUsage().split("" + (char) 10);
+//		String[] usage = command.getUsage().split("" + (char) 10);
+//		
+//		for (String line : usage) {
+//			if (line.contains("<%item>")) line = line.replaceAll("<%item>", Massband.configFile.itemName);	
+//			sender.sendMessage(ChatColor.GRAY + line);
+//		}
 		
-		for (String line : usage) {
-			if (line.contains("<%item>")) line = line.replaceAll("<%item>", Massband.configFile.itemName);	
-			sender.sendMessage(ChatColor.GRAY + line);
-		}
+		String[] helpMsg =  {ChatColor.GREEN + "Massband 2.7.1 - A Measuring Tape - Command: " + ChatColor.RED + "/massband" + ChatColor.GREEN + " or " + ChatColor.RED + "/mb ",
+							   ChatColor.RED + "/mb "						+ ChatColor.GOLD + "<enable|disable> "						+ ChatColor.GRAY + "Enables/Disables Massband for your self",
+							   ChatColor.RED + "/mb "						+ ChatColor.GOLD + "<2D|3D> "								+ ChatColor.GRAY + "Switchs between the 2D/3D mode",
+							   ChatColor.RED + "/mb " 						+ ChatColor.GOLD + "<simplemode|lengthmode|surfacemode> "	+ ChatColor.GRAY + "Switchs between the different measure mods",
+							   ChatColor.RED + "/mb clear " 				+ ChatColor.GOLD + ""										+ ChatColor.GRAY + "Clears all measuring points",
+							   ChatColor.RED + "/mb stop " 					+ ChatColor.GOLD + ""										+ ChatColor.GRAY + "Interrupt your current Block-counting",
+							   ChatColor.RED + "/mb stopall " 				+ ChatColor.GOLD + ""										+ ChatColor.GRAY + "Interrupts all Block-countings of the server",
+							   ChatColor.RED + "/mb length "				+ ChatColor.GOLD + ""										+ ChatColor.GRAY + "Returns the last measured length",
+							   ChatColor.RED + "/mb dimensions "			+ ChatColor.GOLD + ""										+ ChatColor.GRAY + "Returns the dimensions of the selection",
+							   ChatColor.RED + "/mb countBlocks "			+ ChatColor.GOLD + ""										+ ChatColor.GRAY + "Returns the count of Blocks in the selection (exept air)",
+							   ChatColor.RED + "/mb expand "				+ ChatColor.GOLD + "<<amount> <up|down>|vert> "				+ ChatColor.GRAY + "expands the selection in the given direction. (vert = from bottom to the top)",
+							   ChatColor.RED + "/mb blockList "				+ ChatColor.GOLD + "[page] "								+ ChatColor.GRAY + "Returns a List of all Blocks in the selection"};
+		
+		sender.sendMessage(helpMsg);
 	}
 
 }

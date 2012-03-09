@@ -1,4 +1,4 @@
-package de.MrX13415.Massband;
+package de.MrX13415.Massband.Listener;
 
 import org.bukkit.ChatColor;
 import org.bukkit.block.Block;
@@ -9,6 +9,10 @@ import org.bukkit.event.player.*;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.event.Listener;
 
+import de.MrX13415.Massband.Massband;
+import de.MrX13415.Massband.PlayerVars;
+import de.MrX13415.Massband.CommandExecuter.MassbandCommandExecuter;
+
 
 public class MassbandPlayerListener implements Listener {
         
@@ -18,29 +22,32 @@ public class MassbandPlayerListener implements Listener {
     		Player player = event.getPlayer();
     		Block block = event.getClickedBlock();
     	
-    		
-    		
-    		if (Massband.permissions()) {					
-    			//use Permission
-    			if (Massband.hasPermission(player, Massband.PERMISSION_NODE_Massband_use)) {
-    				playerInteract(player, block);
+        	//define tool that is used for Massband from the ID in the config-file.
+        	ItemStack item = new ItemStack(Massband.configFile.itemID, player.getItemInHand().getAmount());
+        	
+        	//Player holds Item ...
+        	if (player.getItemInHand().equals(item)) {
+        		if (Massband.permissions()) {					
+        			//use Permission
+        			if (Massband.hasPermission(player, Massband.PERMISSION_NODE_Massband_use)) {
+        				playerInteract(player, block);
+        			}else{
+        				player.sendMessage(String.format(ChatColor.RED + "You don't have the required Permission (" + ChatColor.GOLD + "%s" + ChatColor.RED + ")", Massband.PERMISSION_NODE_Massband_use));//ButtonLock.getCurrentLanguage().PERMISSIONS_NOT,  ButtonLock.PERMISSION_NODE_ButtonLock_use));
+        				//event.setCancelled(true);	
+        			}
     			}else{
-    				player.sendMessage(String.format(ChatColor.RED + "You don't have the required Permission (" + ChatColor.GOLD + "%s" + ChatColor.RED + ")", Massband.PERMISSION_NODE_Massband_use));//ButtonLock.getCurrentLanguage().PERMISSIONS_NOT,  ButtonLock.PERMISSION_NODE_ButtonLock_use));
-    				event.setCancelled(true);	
+    				//no Permission installed ! (op only)
+//    				if (player.isOp() && ButtonLock.getButtonLockConfig().oPOnly) {
+//    					playerInteract(player, block);
+//    				}else if (! ButtonLock.getButtonLockConfig().oPOnly){
+//    					playerInteract(player, block);
+//    				}else{
+//    				    event.setCancelled(true);	
+//    				}
+    				playerInteract(player, block);
     			}
-			}else{
-				//no Permission installed ! (op only)
-//				if (player.isOp() && ButtonLock.getButtonLockConfig().oPOnly) {
-//					playerInteract(player, block);
-//				}else if (! ButtonLock.getButtonLockConfig().oPOnly){
-//					playerInteract(player, block);
-//				}else{
-//				    event.setCancelled(true);	
-//				}
-				playerInteract(player, block);
-			}
-    		
-    		
+        	}
+        		
 //    		if (Massband.permissionHandler != null && Massband.configFile.usePermissions) {
 //    			//use Permission
 //    			if (Massband.permissionHandler.permission(player, Massband.PERMISSION_NODE_Massband_use)) {
@@ -54,14 +61,11 @@ public class MassbandPlayerListener implements Listener {
     }
     
     private void playerInteract(Player player, Block block){
-    	//define tool that is used for Massband from the ID in the config-file.
-    	ItemStack item = new ItemStack(Massband.configFile.itemID, player.getItemInHand().getAmount());
-    	
-    	//Player holds Item ...
-    	if (player.getItemInHand().equals(item)) {
-    		//get Vars for the current Player or create it.
-			PlayerVars tmpVars = Massband.getPlayerVars(player);
-		
+
+		//get Vars for the current Player or create it.
+		PlayerVars tmpVars = Massband.getPlayerVars(player);
+	
+		if (tmpVars.isEnabled()){
 			//mode ?
 			if (tmpVars.getMode() == PlayerVars.MODE_SIMPLE) {
 				onModeSimple(tmpVars, player, block);

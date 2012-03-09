@@ -1,4 +1,4 @@
-package de.MrX13415.Massband;
+package de.MrX13415.Massband.Config;
 
 import java.io.File;
 import java.io.FileNotFoundException;
@@ -6,15 +6,19 @@ import java.io.FileReader;
 import java.io.FileWriter;
 import java.io.LineNumberReader;
 
+import de.MrX13415.Massband.Massband;
+
 public class Config {
 	
-	public String version = "2.7";	//config version
+	public String version = "2.7.1";	//config version
 	private String configFileName = "config.yml";
 	private String configFilePath = "plugins/" + Massband.pluginName + "/";
 	
 	private static final String keyConfigFileVersion = "ConfigFileVersion";
 	private static final String keyItemID = "ItemID";
 	private static final String keyItemName = "ItemName";
+	private static final String keyCommandShortForm_MassbandEnable = "MassbandEnable_ShortForm";
+	private static final String keyCommandShortForm_MassbandDisable = "MassbandDisable_ShortForm";
 	private static final String keyCommandShortForm_blockList = "BlockListCommand_ShortForm";
 	private static final String keyCommandShortForm_clear = "ClearCommand_ShortForm";
 	private static final String keyCommandShortForm_lenght = "LenghtCommand_ShortForm";
@@ -38,6 +42,8 @@ public class Config {
 	public boolean usePermissions = true;
 	public boolean blockCountingSpeedLimit = false;
 	//-- shortforms --
+	public String commandShortForm_MassbandEnable = "ea";
+	public String commandShortForm_MassbandDisable = "da";
 	public String commandShortForm_blockList = "bl";
 	public String commandShortForm_clear = "clr";
 	public String commandShortForm_lenght = "l";
@@ -75,6 +81,14 @@ public class Config {
 
 					if (line[0].equalsIgnoreCase(keyBlockCountingSpeedLimit)) {
 						blockCountingSpeedLimit = getBoolean(line[1]);
+					}
+					
+					if (line[0].equalsIgnoreCase(keyCommandShortForm_MassbandEnable)) {
+						commandShortForm_MassbandEnable = line[1];
+					}
+					
+					if (line[0].equalsIgnoreCase(keyCommandShortForm_MassbandDisable)) {
+						commandShortForm_MassbandDisable = line[1];
 					}
 					
 					if (line[0].equalsIgnoreCase(keyCommandShortForm_clear)) {
@@ -186,6 +200,8 @@ public class Config {
 			writer.write(String.format(fileFormat, keyCommandShortForm_stop, commandShortForm_stop) + "\n");
 			writer.write(String.format(fileFormat, keyCommandShortForm_stopall, commandShortForm_stopall) + "\n");
 			writer.write(String.format(fileFormat, keyCommandShortForm_blockList, commandShortForm_blockList) + "\n");
+			writer.write(String.format(fileFormat, keyCommandShortForm_MassbandEnable, commandShortForm_MassbandEnable) + "\n");
+			writer.write(String.format(fileFormat, keyCommandShortForm_MassbandDisable, commandShortForm_MassbandDisable) + "\n");
 			
 			writer.close();
 		
