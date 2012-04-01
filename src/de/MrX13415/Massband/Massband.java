@@ -22,7 +22,7 @@ import org.bukkit.plugin.Plugin;
  * Massband (bukkit plugin)
  * A mesuring tape
  *
- * @version 2.7.1 r60
+ * @version 2.7.2 r61
  * @author MrX13415
  * 
  * Website:      http://dev.bukkit.org/server-mods/massband/
@@ -52,6 +52,7 @@ public class Massband extends JavaPlugin {
 
 	public static final String PERMISSION_NODE_Massband_use = "Massband.use";
 	public static final String PERMISSION_NODE_Massband_stop_all = "Massband.stopall";
+	public static final String PERMISSION_NODE_Massband_countblocks = "Massband.countblocks";
 	public static final String PERMISSION_NODE_Massband_blocklist = "Massband.blocklist";
 	
 	//holds information for all Players.

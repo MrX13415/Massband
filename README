@@ -3,7 +3,7 @@
 =================
     
 Title:        Massband
-Version:      2.7.1 60
+Version:      2.7.2 61
 
 Description:  A Measuring-tape for Bukkit Minecraft-Server
 website:      http://dev.bukkit.org/server-mods/massband/
@@ -21,7 +21,9 @@ License:
     
 
 Changelog:
-
+    Version: 2.7.2
+        * ADD: Permissions for the 'CountBlock' command
+        
     Version: 2.7.1
         * FIX: Improved help message
         * FIX: Can't rightclick bug if no permissions

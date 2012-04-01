@@ -18,6 +18,7 @@ public class MassbandCommandExecuter implements CommandExecutor{
 
 	boolean hasPermission_use = false;
 	boolean hasPermission_stopall = false;
+	boolean hasPermission_countblocks = false;
 	boolean hasPermission_blocklist = false;
 	
 	@Override
@@ -29,6 +30,7 @@ public class MassbandCommandExecuter implements CommandExecutor{
     			//use Permission
 				if (Massband.hasPermission(player, Massband.PERMISSION_NODE_Massband_use)) hasPermission_use = true;
 				if (Massband.hasPermission(player, Massband.PERMISSION_NODE_Massband_stop_all)) hasPermission_stopall = true;
+				if (Massband.hasPermission(player, Massband.PERMISSION_NODE_Massband_countblocks)) hasPermission_countblocks = true;
 				if (Massband.hasPermission(player, Massband.PERMISSION_NODE_Massband_blocklist)) hasPermission_blocklist = true;
 				
 				if (hasPermission_use) command(sender, command, label, args);			
@@ -44,12 +46,16 @@ public class MassbandCommandExecuter implements CommandExecutor{
 			}else{
 
 				if (player.isOp()) {
+					hasPermission_countblocks = true;
+					hasPermission_blocklist = true;
+					hasPermission_use = true;
 					hasPermission_stopall = true;
 				}
 				
 				//no Permission installed ! (everyone has access)
 				command(sender, command, label, args);
 			}
+			hasPermission_countblocks = false;
 			hasPermission_blocklist = false;
 			hasPermission_use = false;
 			hasPermission_stopall = false;
@@ -103,8 +109,11 @@ public class MassbandCommandExecuter implements CommandExecutor{
 				onCommandDimensions(tmpVars, player);
 					
 			}else if (args[0].equalsIgnoreCase("countblocks") || args[0].equalsIgnoreCase(Massband.configFile.commandShortForm_countblocks)) {
-				onCommandCountBlocks(tmpVars, player);
-			
+				if (hasPermission_countblocks){
+					onCommandCountBlocks(tmpVars, player);
+				}else{
+					player.sendMessage(String.format(ChatColor.RED + "You don't have the required Permission (" + ChatColor.GOLD + "%s" + ChatColor.RED + ")", Massband.PERMISSION_NODE_Massband_countblocks));
+				}
 			}else if (args[0].equalsIgnoreCase("lengthmode") || args[0].equalsIgnoreCase(Massband.configFile.commandShortForm_lengthmode)) {
 				onCommandMode(tmpVars, player, PlayerVars.MODE_LENGTH);
 				
