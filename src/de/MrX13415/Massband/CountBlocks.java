@@ -2,7 +2,6 @@ package de.MrX13415.Massband;
 
 import java.util.ArrayList;
 
-import org.bukkit.ChatColor;
 import org.bukkit.Material;
 import org.bukkit.World;
 import org.bukkit.block.Block;
@@ -51,7 +50,7 @@ public class CountBlocks extends Thread{
 			tmpVars.blocksCount_Material = this.blocksCount_Material;
 			tmpVars.blocksCount_counts = this.blocksCount_counts;
 			
-			tmpVars.getPlayer().sendMessage(ChatColor.WHITE + "Total content: " + ChatColor.GOLD + blockCount + ChatColor.WHITE + " Blocks" + ChatColor.GRAY + " (exept air)");		
+			tmpVars.getPlayer().sendMessage(String.format(Massband.getLanguage().COUNTBLOCK_TOTAL, blockCount));		
 		}
 		
 		threadEndRechearched = true;
@@ -118,7 +117,7 @@ public class CountBlocks extends Thread{
 					if ((System.currentTimeMillis()) >= timeAfter && measureSpeed) {
 						measureSpeed = false;
 						speed = percindex;	
-						tmpVars.getPlayer().sendMessage("Speed: " + ChatColor.GOLD + speed + ChatColor.WHITE + " Blocks/s");
+						tmpVars.getPlayer().sendMessage(String.format(Massband.getLanguage().COUNTBLOCK_SPEED, speed));
 					}
 
 					if (Massband.configFile.blockCountingSpeedLimit) {
@@ -138,7 +137,7 @@ public class CountBlocks extends Thread{
 		
 		if (! interrupted) {
 			time = System.currentTimeMillis() - timeBefore;
-			tmpVars.getPlayer().sendMessage("Time: " + ChatColor.GOLD + time + ChatColor.WHITE + " ms");
+			tmpVars.getPlayer().sendMessage(String.format(Massband.getLanguage().COUNTBLOCK_TIME, time));
 		}
 	
 		return blockCount;
@@ -153,7 +152,7 @@ public class CountBlocks extends Thread{
 	}
 	
 	public void interrupt() {
-		threadOwner.sendMessage(ChatColor.GRAY + "Tray to Interrrupt Block-counting ...");
+		threadOwner.sendMessage(Massband.getLanguage().THREADS_INTERUPT_TRY);
 		interrupted = true;
 	}
 	
@@ -163,7 +162,7 @@ public class CountBlocks extends Thread{
 				Massband.getPlayerVars(threadOwner).setBlockCountingThread(null);
 			}
 			
-			if (interrupted) threadOwner.sendMessage(ChatColor.GRAY + "Block counting Interrupted");
+			if (interrupted) threadOwner.sendMessage(Massband.getLanguage().THREADS_INTERUPT);
 			threadEndRechearched = false;
 			
 			Massband.threads.remove(this);
@@ -178,7 +177,7 @@ public class CountBlocks extends Thread{
 	 * 
 	 */
 	public static void interuptAll(CommandSender commandSender){
-		String sender = "[SERVER]";
+		String sender = "";
 		Player player = null;
 		
 		if (commandSender instanceof Player) {
@@ -187,9 +186,10 @@ public class CountBlocks extends Thread{
 		}
 		
 		if (player != null) {
-			player.sendMessage(Massband.consoleOutputHeader + ChatColor.RED + " Try to interrupt all Threads ... (count: " + Massband.threads.size() + ")");
+			player.sendMessage(String.format(Massband.getLanguage().THREADS_INTERUPT_TRY_ALL, Massband.threads.size()));
 		}
-		Massband.log.info(Massband.consoleOutputHeader + ChatColor.RED + " " + sender + " trys to interrupt all Threads ... (count: " + Massband.threads.size() + ")");
+		if (sender.length() > 0)Massband.log.info(Massband.consoleOutputHeader + " " + sender + " trys to interrupt all Block countings ... (count: " + Massband.threads.size() + ")");
+		else Massband.log.info(Massband.consoleOutputHeader + " Interrupting all Block countings ... (count: " + Massband.threads.size() + ")");
 		
 		//create a clone of the threads array ...
 		@SuppressWarnings("unchecked")
@@ -209,7 +209,7 @@ public class CountBlocks extends Thread{
 					}
 				}
 
-				if (thread.getOwner() != null) thread.getOwner().sendMessage(Massband.consoleOutputHeader + ChatColor.RED + " Your block-counting was interrupted by " + ChatColor.GOLD + sender);
+				if (thread.getOwner() != null) thread.getOwner().sendMessage(String.format(Massband.getLanguage().THREADS_INTERUPT_FROM_PLAYER, sender));
 			}
 		}
 		
@@ -217,14 +217,14 @@ public class CountBlocks extends Thread{
 		
 		if (Massband.threads.isEmpty()) {
 			if (player != null) {
-				player.sendMessage(Massband.consoleOutputHeader +  ChatColor.RED + " All running Threads interrupted ! (count: " + Massband.threads.size() + ")");
+				player.sendMessage(String.format(Massband.getLanguage().THREADS_INTERUPT_OK, Massband.threads.size()));
 			}
 			
-			Massband.log.info(Massband.consoleOutputHeader + " All running Threads interrupted ! (count: " + Massband.threads.size() + ")");
+			Massband.log.info(Massband.consoleOutputHeader + " All running Threads interrupted ! (left: " + Massband.threads.size() + ")");
 		
 		}else{
 			if (player != null) {
-				player.sendMessage(Massband.consoleOutputHeader +  ChatColor.RED + " Could not interrupt some Threads ! (count: " + Massband.threads.size() + "). Please try again.");
+				player.sendMessage(String.format(Massband.getLanguage().THREADS_INTERUPT_ERROR1, Massband.threads.size()));
 			}
 			
 			Massband.log.info(Massband.consoleOutputHeader + " Could not interrupt some Threads ! (count: " + Massband.threads.size() + "). Please try again.");

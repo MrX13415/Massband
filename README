@@ -3,7 +3,7 @@
 =================
     
 Title:        Massband
-Version:      2.7.2 61
+Version:      2.8 65
 
 Description:  A Measuring-tape for Bukkit Minecraft-Server
 website:      http://dev.bukkit.org/server-mods/massband/
@@ -21,6 +21,13 @@ License:
     
 
 Changelog:
+    Version: 2.8
+        * ADD: Langauge supoort
+        * ADD: German language
+        * ADD: /mb ignoreaxes command (replaces /mb 2d and /mb 3d)
+        * ADD: Action setting in config
+        * FIX; Various small bugs
+        
     Version: 2.7.2
         * ADD: Permissions for the 'CountBlock' command
         

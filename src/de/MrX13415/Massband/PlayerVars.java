@@ -2,7 +2,6 @@ package de.MrX13415.Massband;
 
 import java.util.ArrayList;
 
-import org.bukkit.ChatColor;
 import org.bukkit.Material;
 import org.bukkit.World;
 import org.bukkit.entity.Player;
@@ -10,6 +9,10 @@ import org.bukkit.util.Vector;
 
 
 public class PlayerVars{
+	
+	public enum AXIS{
+		X, Y, Z, NONE;
+	}
 	
 	public static final int MODE_SIMPLE = 0;
 	public static final int MODE_LENGTH = 1;
@@ -33,11 +36,12 @@ public class PlayerVars{
 	
 	private ArrayList<Vector> wayPoints = new ArrayList<Vector>();
 	
-	private boolean ignoreHeight = true;	//Y-axe
+	private ArrayList<AXIS> ignoredaxes = new ArrayList<AXIS>();
 	
 	public PlayerVars(Player player){
 		this.player = player;
 		removeAllWayPoints();
+		ignoredaxes.add(AXIS.Y); //ignore height by default
 	}
 	
 	public void addPoint(int x, int y, int z) {
@@ -108,6 +112,27 @@ public class PlayerVars{
 		this.isEnabled = isEnabled;
 	}
 
+	public ArrayList<AXIS> getIgnoredAxes() {
+		return ignoredaxes;
+	}
+	
+	public String getIgnoredAxesAsString() {
+		String raxes = "";
+		for (AXIS axis : ignoredaxes) {
+			if (axis.equals(AXIS.X)) raxes += Massband.getLanguage().AXIS_X;
+			if (axis.equals(AXIS.Y)) raxes += Massband.getLanguage().AXIS_Y;
+			if (axis.equals(AXIS.Z)) raxes += Massband.getLanguage().AXIS_Z;
+			raxes += ", ";
+		}
+		if (raxes.endsWith(", ")) raxes = raxes.substring(0, raxes.length() - 2);
+		if (ignoredaxes.isEmpty()) raxes = Massband.getLanguage().AXIS_NONE;
+		return raxes;
+	}
+	
+	public void setAxes(ArrayList<AXIS> axes) {
+		this.ignoredaxes = axes;
+	}
+
 	public double computingVectors(){
 		if (getWayPointListSize() >= 2) {
 			lenght = 0;
@@ -116,11 +141,10 @@ public class PlayerVars{
 				Vector firstV = getVector(vectorIndex);
 				Vector nextV = getVector(vectorIndex + 1);
 				
-				if (ignoreHeight){
-					firstV.setY(0);
-					nextV.setY(0);
-				}
-				
+				if (ignoredaxes.contains(AXIS.X)){firstV.setX(0);nextV.setX(0);}
+				if (ignoredaxes.contains(AXIS.Y)){firstV.setY(0);nextV.setY(0);}
+				if (ignoredaxes.contains(AXIS.Z)){firstV.setZ(0);nextV.setZ(0);}
+						
 				lenght += firstV.distance(nextV);
 			}
 			lenght += 1;	//add last point
@@ -128,12 +152,11 @@ public class PlayerVars{
 		return lenght;
 	}
 	
-	public void calculateDiminsions(){
-		if (ignoreHeight){
-			wayPoints.get(0).setY(0);
-			wayPoints.get(1).setY(0);
-		}
-		
+	public void calculateDiminsions(){		
+		if (ignoredaxes.contains(AXIS.X)){wayPoints.get(0).setX(0);wayPoints.get(1).setX(0);}
+		if (ignoredaxes.contains(AXIS.Y)){wayPoints.get(0).setY(0);wayPoints.get(1).setY(0);}
+		if (ignoredaxes.contains(AXIS.Z)){wayPoints.get(0).setZ(0);wayPoints.get(1).setZ(0);}
+			
 		//calculate dimensions
 		dimensionWith = Math.abs(wayPoints.get(0).getX() - wayPoints.get(1).getX()) + 1;		
 		dimensionLength = Math.abs(wayPoints.get(0).getZ() - wayPoints.get(1).getZ()) + 1;
@@ -172,9 +195,9 @@ public class PlayerVars{
 //		return this.blockCount = blockCount;
 	}
 	
-	public boolean printArray(int page) {
+	public boolean printBlockListPage(int page) {
 		if (blocksCount_Material.size() <= 0){
-			player.sendMessage(ChatColor.RED + "Use the Command '/massband countBlocks' or '/mb cb' first ..");
+			player.sendMessage(Massband.getLanguage().COUNTBLOCK_CMD_FIRST);
 			return false;
 		}
 		
@@ -183,31 +206,60 @@ public class PlayerVars{
 		if((int) pages < pages) pages +=1; //correct pages count if pages is a double value 
 		int startIndex = (page - 1) * linesPerPage;
 		
-		player.sendMessage(ChatColor.GRAY + "- Block counts --- page " + page + "/" + (int) pages + " ------------------------");
+		player.sendMessage(String.format(Massband.getLanguage().COUNTBLOCK_BLPAGE_HEADER1, page, (int) pages));
 		
 		for (int materialIndex = startIndex; materialIndex < blocksCount_Material.size(); materialIndex++) {
 			Material material = blocksCount_Material.get(materialIndex);
 			int count = blocksCount_counts.get(materialIndex);
 			
-			player.sendMessage(ChatColor.WHITE + "  + " + material + ": " + ChatColor.GOLD + count);
+			player.sendMessage(String.format(Massband.getLanguage().COUNTBLOCK_BLPAGE_LINE, material, count));
 			
 			if (materialIndex >= (startIndex + linesPerPage - 1)) break;
 		}
-		player.sendMessage(ChatColor.GRAY + "----------------------------------------------------");
-		player.sendMessage(ChatColor.WHITE + " Total content: " + ChatColor.GOLD + blockCount + ChatColor.WHITE + " Blocks" + ChatColor.GRAY + " (exept air)");
-		player.sendMessage(ChatColor.GRAY + "----------------------------------------------------");
+		player.sendMessage(Massband.getLanguage().COUNTBLOCK_BLPAGE_BREAK_LINE);
+		player.sendMessage(String.format(Massband.getLanguage().COUNTBLOCK_TOTAL, blockCount));
+		player.sendMessage(Massband.getLanguage().COUNTBLOCK_BLPAGE_FOOTER);
 		return true;
 	}
-		
-	/**ignors the Y axe
-	 * 
-	 * @param bool
-	 */
-	public void setignoreHeight(boolean bool) {
-		ignoreHeight = bool;
-	}
 	
-	public boolean getignoreHeight() {
-		return ignoreHeight;
+	public boolean findMaterial(ArrayList<String> materialnames) {
+		if (blocksCount_Material.size() <= 0){
+			player.sendMessage(Massband.getLanguage().COUNTBLOCK_CMD_FIRST);
+			return false;
+		}
+		
+		player.sendMessage(Massband.getLanguage().COUNTBLOCK_BLPAGE_HEADER2);
+		
+		for (String materialname : materialnames) {
+			
+			ArrayList<Material> requestedMaterials = new ArrayList<Material>();
+						
+			for (Material mat : Material.values()) {
+				if (mat.name().toLowerCase().startsWith(materialname.toLowerCase())) requestedMaterials.add(mat);
+			}
+			if (requestedMaterials.size() <= 0) player.sendMessage(String.format(Massband.getLanguage().COUNTBLOCK_BLPAGE_NO_MAT, materialname));
+			
+			for (Material requestedMaterial : requestedMaterials) {
+				int count = 0;	
+				
+				for (int materialIndex = 0; materialIndex < blocksCount_Material.size(); materialIndex++) {
+					Material material = blocksCount_Material.get(materialIndex);
+					
+					if (material.equals(requestedMaterial)){
+						count = blocksCount_counts.get(materialIndex);
+						break;
+					}
+				}
+
+				player.sendMessage(String.format(Massband.getLanguage().COUNTBLOCK_BLPAGE_LINE, requestedMaterial.name(), count));
+			}
+			
+			player.sendMessage(Massband.getLanguage().COUNTBLOCK_BLPAGE_BREAK_LINE);
+		}
+		
+		player.sendMessage(Massband.getLanguage().COUNTBLOCK_BLPAGE_FOOTER);
+		
+		return true;
 	}
+
 }

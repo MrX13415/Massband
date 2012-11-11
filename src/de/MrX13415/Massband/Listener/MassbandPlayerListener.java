@@ -1,6 +1,5 @@
 package de.MrX13415.Massband.Listener;
 
-import org.bukkit.ChatColor;
 import org.bukkit.block.Block;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
@@ -12,13 +11,21 @@ import org.bukkit.event.Listener;
 import de.MrX13415.Massband.Massband;
 import de.MrX13415.Massband.PlayerVars;
 import de.MrX13415.Massband.CommandExecuter.MassbandCommandExecuter;
+import de.MrX13415.Massband.Config.Config;
 
 
 public class MassbandPlayerListener implements Listener {
         
 	@EventHandler
 	public void onPlayerInteract(PlayerInteractEvent event){
-    	if ((event.getAction() == Action.RIGHT_CLICK_BLOCK)) {
+		Action action = Action.valueOf(new Config().defaultAction);
+		try {
+			action = Action.valueOf(Massband.configFile.defaultAction);
+		} catch (IllegalArgumentException e) {
+			Massband.log.warning(Massband.getConsoleOutputHeader() + " The value of the key 'Action', in the config is invalid. using default ...");
+		}
+		
+    	if (event.getAction() == action) {
     		Player player = event.getPlayer();
     		Block block = event.getClickedBlock();
     	
@@ -32,7 +39,7 @@ public class MassbandPlayerListener implements Listener {
         			if (Massband.hasPermission(player, Massband.PERMISSION_NODE_Massband_use)) {
         				playerInteract(player, block);
         			}else{
-        				player.sendMessage(String.format(ChatColor.RED + "You don't have the required Permission (" + ChatColor.GOLD + "%s" + ChatColor.RED + ")", Massband.PERMISSION_NODE_Massband_use));//ButtonLock.getCurrentLanguage().PERMISSIONS_NOT,  ButtonLock.PERMISSION_NODE_ButtonLock_use));
+        				player.sendMessage(String.format(Massband.language.PERMISSION_NOT, Massband.PERMISSION_NODE_Massband_use));
         				//event.setCancelled(true);	
         			}
     			}else{
@@ -127,21 +134,15 @@ public class MassbandPlayerListener implements Listener {
     	
     	if (size == 1){ 
     		if (tmpVars.getMode() == PlayerVars.MODE_LENGTH) {
-    			player.sendMessage(ChatColor.GRAY + "- Length-mode --------------------------------------");
+    			player.sendMessage(Massband.language.MODE_LENGTH);
 			}else if(tmpVars.getMode() == PlayerVars.MODE_SURFACE){
-				player.sendMessage(ChatColor.GRAY + "- Surface-mode -------------------------------------");
+				player.sendMessage(Massband.language.MODE_SURFACE);
+//			}else if(tmpVars.getMode() == PlayerVars.MODE_SIMPLE){
+//				player.sendMessage(Massband.language.MODE_SIMPLE);
 			}
     	}
     	
-    	if (tmpVars.getignoreHeight()) {
-			player.sendMessage("Point #" + ChatColor.GRAY + size + ChatColor.WHITE + ": " +
-					ChatColor.RED + block.getX() + ChatColor.WHITE + "," + ChatColor.RED + block.getY() + ChatColor.WHITE + "," + 
-					ChatColor.RED + block.getZ() + ChatColor.WHITE + " mode: " + ChatColor.GRAY + " 2D");
-		}else{
-			player.sendMessage("Point #" + ChatColor.GRAY + size + ChatColor.WHITE + ": " +
-					ChatColor.RED + block.getX() + ChatColor.WHITE + "," + ChatColor.RED + block.getY() + ChatColor.WHITE + "," + 
-					ChatColor.RED + block.getZ() + ChatColor.WHITE + " mode: " + ChatColor.GRAY + " 3D");
-		}
+			player.sendMessage(String.format(Massband.language.POINT, size, block.getX(), block.getY(), block.getZ(), tmpVars.getIgnoredAxesAsString()));
     }
    
     @EventHandler

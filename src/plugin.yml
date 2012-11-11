@@ -1,16 +1,16 @@
 main: de.MrX13415.Massband.Massband
 
 name: Massband
-version: 2.7.2
+version: 2.8
 description: Measuring-tape for Bukkit
 author: MrX13415
-website: http://dev.bukkit.org/server-mods/buttonlock/
+website: http://dev.bukkit.org/server-mods/massband/
 
 commands:
   massband:
     aliases: mb
     description: Manages a measuring Tape
     usage: |
-           Massband 2.7.1 - A Measuring Tape
+           Massband 2.7.2 - A Measuring Tape
            /massband - This help message
            /massband stopall - Interrupts all running Block-countings of the server

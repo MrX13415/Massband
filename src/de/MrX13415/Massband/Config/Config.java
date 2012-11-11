@@ -4,19 +4,25 @@ import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.FileReader;
 import java.io.FileWriter;
+import java.io.IOException;
 import java.io.LineNumberReader;
 
+import org.bukkit.event.block.Action;
+
 import de.MrX13415.Massband.Massband;
+import de.MrX13415.Massband.Language.LanguageLoader;
 
 public class Config {
 	
-	public String version = "2.7.1";	//config version
+	public String version = "2.7.2.1";	//config version
 	private String configFileName = "config.yml";
 	private String configFilePath = "plugins/" + Massband.pluginName + "/";
 	
 	private static final String keyConfigFileVersion = "ConfigFileVersion";
 	private static final String keyItemID = "ItemID";
 	private static final String keyItemName = "ItemName";
+	private static final String keyAction = "Action";
+	private static final String keyLanguage = "Language";
 	private static final String keyCommandShortForm_MassbandEnable = "MassbandEnable_ShortForm";
 	private static final String keyCommandShortForm_MassbandDisable = "MassbandDisable_ShortForm";
 	private static final String keyCommandShortForm_blockList = "BlockListCommand_ShortForm";
@@ -25,6 +31,7 @@ public class Config {
 	private static final String keyCommandShortForm_dimensions = "DimensionsCommand_ShortForm";
 	private static final String keyCommandShortForm_countblocks = "CountblocksCommand_ShortForm";
 	private static final String keyCommandShortForm_lengthmode = "LengthmodeCommand_ShortForm";
+	private static final String keyCommandShortForm_ignoreaxes = "IgnoreAxesCommand_ShortForm";
 	private static final String keyCommandShortForm_surfacemode = "SurfacemodeCommand_ShortForm";
 	private static final String keyCommandShortForm_simplemode = "SimplemodeCommand_ShortForm";
 	private static final String keyCommandShortForm_expand = "ExpandCommand_ShortForm";
@@ -39,6 +46,8 @@ public class Config {
 	public String configFileVersion = "----";
 	public int itemID = 268;
 	public String itemName = "wood-sword";
+	public String defaultAction = Action.RIGHT_CLICK_BLOCK.toString(); 
+	public String language = LanguageLoader.getDefaultLanguage()._languageName;
 	public boolean usePermissions = true;
 	public boolean blockCountingSpeedLimit = false;
 	//-- shortforms --
@@ -50,6 +59,7 @@ public class Config {
 	public String commandShortForm_dimensions = "d";
 	public String commandShortForm_countblocks = "cb";
 	public String commandShortForm_lengthmode = "lm";
+	public String commandShortForm_ignoreaxes = "ix";
 	public String commandShortForm_surfacemode = "sfm";
 	public String commandShortForm_simplemode = "sim";
 	public String commandShortForm_expand = "ex";
@@ -58,7 +68,7 @@ public class Config {
 	//#-----------------#
 	
 	public void read() {
-		LineNumberReader reader;
+		LineNumberReader reader = null;
 		
 		try {
 			reader = new LineNumberReader(new FileReader(configFilePath + configFileName));
@@ -73,6 +83,28 @@ public class Config {
 
 					if (line[0].equalsIgnoreCase(keyItemName)) {
 						itemName = line[1];
+					}
+					
+					if (line[0].equalsIgnoreCase(keyAction)) {
+						defaultAction = line[1];
+					}
+					
+					if (line[0].equalsIgnoreCase(keyLanguage)) {
+						String newLanguage = line[1];
+						
+						if (newLanguage.isEmpty()) newLanguage = LanguageLoader.getDefaultLanguage()._languageName;							
+						
+						if (LanguageLoader.langExists(newLanguage)){
+							String oldLanguage = language;
+							if (! oldLanguage.equalsIgnoreCase(newLanguage)) {
+								language = newLanguage;
+								//load lang...
+								Massband.setLanguage(LanguageLoader.loadLanguage(language));
+								Massband.getLog().info(Massband.getConsoleOutputHeader() + " Language set to: \"" + language + "\"");
+							}	
+						}else{
+							Massband.getLog().info(Massband.getConsoleOutputHeader() + " Language not found: \"" + newLanguage + "\"");
+						}		
 					}
 					
 					if (line[0].equalsIgnoreCase(keyUsePermissions)) {
@@ -97,6 +129,10 @@ public class Config {
 					
 					if (line[0].equalsIgnoreCase(keyCommandShortForm_lenght)) {
 						commandShortForm_lenght = line[1];
+					}
+					
+					if (line[0].equalsIgnoreCase(keyCommandShortForm_ignoreaxes)) {
+						commandShortForm_ignoreaxes = line[1];
 					}
 					
 					if (line[0].equalsIgnoreCase(keyCommandShortForm_dimensions)) {
@@ -152,6 +188,10 @@ public class Config {
 			if (write()) { //create new File
 				System.out.println(Massband.consoleOutputHeader + " New Config file created. (" + Massband.pluginName + "/config.yml)");
 			}
+		}finally{
+			try {
+				if (reader != null)reader.close();
+			} catch (IOException e) {}
 		}
 	}
 	
@@ -170,7 +210,7 @@ public class Config {
 	}
 	
 	public boolean write() {
-		FileWriter writer;
+		FileWriter writer = null;
 		try {
 			File directory = new File(configFilePath);
 			if (! directory.exists()) directory.mkdir();
@@ -183,6 +223,11 @@ public class Config {
 			writer.write(String.format(fileFormat, keyItemID, itemID) + "\n");
 			writer.write(String.format(fileFormat, keyItemName, itemName) + "\n");
 			writer.write("\n");
+			writer.write("# " + String.format(fileFormat, keyAction, Action.LEFT_CLICK_BLOCK) + "\n");
+			writer.write(String.format(fileFormat, keyAction, defaultAction) + "\n");
+			writer.write("\n");
+			writer.write(String.format(fileFormat, keyLanguage, language) + "\n");
+			writer.write("\n");
 			writer.write(String.format(fileFormat, keyUsePermissions, usePermissions) + "\n");
 			writer.write("\n");
 			writer.write("#This can infect the Server performance ...\n");
@@ -194,6 +239,7 @@ public class Config {
 			writer.write(String.format(fileFormat, keyCommandShortForm_dimensions, commandShortForm_dimensions) + "\n");
 			writer.write(String.format(fileFormat, keyCommandShortForm_countblocks, commandShortForm_countblocks) + "\n");
 			writer.write(String.format(fileFormat, keyCommandShortForm_lengthmode, commandShortForm_lengthmode) + "\n");
+			writer.write(String.format(fileFormat, keyCommandShortForm_ignoreaxes, commandShortForm_ignoreaxes) + "\n");
 			writer.write(String.format(fileFormat, keyCommandShortForm_surfacemode, commandShortForm_surfacemode) + "\n");
 			writer.write(String.format(fileFormat, keyCommandShortForm_simplemode, commandShortForm_simplemode) + "\n");
 			writer.write(String.format(fileFormat, keyCommandShortForm_expand, commandShortForm_expand) + "\n");
@@ -208,6 +254,10 @@ public class Config {
 			return true;
 		} catch (Exception e1) {
 			System.err.println(Massband.consoleOutputHeader + " Error: can't create new config file.");		
+		}finally{
+			try {
+				if (writer != null)writer.close();
+			} catch (IOException e) {}
 		}
 		return false;
 	}

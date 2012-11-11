@@ -14,6 +14,8 @@ import com.nijikokun.bukkit.Permissions.Permissions;
 
 import de.MrX13415.Massband.CommandExecuter.MassbandCommandExecuter;
 import de.MrX13415.Massband.Config.Config;
+import de.MrX13415.Massband.Language.Language;
+import de.MrX13415.Massband.Language.LanguageLoader;
 import de.MrX13415.Massband.Listener.MassbandPlayerListener;
 
 import org.bukkit.plugin.Plugin;
@@ -22,7 +24,7 @@ import org.bukkit.plugin.Plugin;
  * Massband (bukkit plugin)
  * A mesuring tape
  *
- * @version 2.7.2 r61
+ * @version 2.8 r65
  * @author MrX13415
  * 
  * Website:      http://dev.bukkit.org/server-mods/massband/
@@ -45,7 +47,8 @@ public class Massband extends JavaPlugin {
 	public static String pluginName = null;
 	public static String consoleOutputHeader = null;
 	public static Config configFile = null;
-
+	public static Language language;
+	
 	//permissions
 	private static PermissionHandler permissionHandler;
 	private static boolean defaultPermission;
@@ -74,8 +77,52 @@ public class Massband extends JavaPlugin {
 		CountBlocks.interuptAll(null);
 	}
 
+	public static PluginDescriptionFile getPluginDescriptionFile() {
+		return pdfFile;
+	}
+
+	public static Logger getLog() {
+		return log;
+	}
+
+	public static String getPluginName() {
+		return pluginName;
+	}
+
+	public static String getConsoleOutputHeader() {
+		return consoleOutputHeader;
+	}
+
+	public static Config getConfigFile() {
+		return configFile;
+	}
+
+	public static PermissionHandler getPermissionHandler() {
+		return permissionHandler;
+	}
+
+	public static ArrayList<PlayerVars> getPlayerlist() {
+		return playerlist;
+	}
+
+	public static ArrayList<CountBlocks> getThreads() {
+		return threads;
+	}
+
+	public Listener getpListener() {
+		return pListener;
+	}
+
+	public static Language getLanguage() {
+		return language;
+	}
+
+	public static void setLanguage(Language language) {
+		Massband.language = language;
+	}
+
 	@Override
-	public void onEnable() {
+	public void onLoad() {
 		//set static vars ...
 		server = this.getServer();
 		log = server.getLogger();
@@ -84,6 +131,9 @@ public class Massband extends JavaPlugin {
 		pluginName = pdfFile.getName();
 		consoleOutputHeader = "[" + pluginName + "]";
 
+		LanguageLoader.updateLanguages(false);
+		language = LanguageLoader.loadDefaultLanguage();
+		
 //        log.info(consoleOutputHeader + " v" + pdfFile.getVersion() + " " + pdfFile.getAuthors() + " is enabled.");
   
         configFile = new Config();
@@ -96,6 +146,13 @@ public class Massband extends JavaPlugin {
         }
         //---------------------
                 
+        //lang loaded from config ...
+        log.info(consoleOutputHeader + " Language set to: " + language._languageName);
+        if (! language.isUptoDate()) log.warning(consoleOutputHeader + " Your current language is not up to date! (file: " + language.getLanguageFileName() + ")");   
+	}
+	
+	@Override
+	public void onEnable() {        
         //register events ...
 //		PluginManager pm = getServer().getPluginManager();
 		getServer().getPluginManager().registerEvents(pListener, this);
