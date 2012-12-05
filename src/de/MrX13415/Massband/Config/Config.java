@@ -14,7 +14,7 @@ import de.MrX13415.Massband.Language.LanguageLoader;
 
 public class Config {
 	
-	public String version = "2.7.2.1";	//config version
+	public String version = "2.8";	//config version
 	private String configFileName = "config.yml";
 	private String configFilePath = "plugins/" + Massband.pluginName + "/";
 	

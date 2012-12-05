@@ -24,7 +24,7 @@ import org.bukkit.plugin.Plugin;
  * Massband (bukkit plugin)
  * A mesuring tape
  *
- * @version 2.8 r65
+ * @version 2.8.1 r66
  * @author MrX13415
  * 
  * Website:      http://dev.bukkit.org/server-mods/massband/

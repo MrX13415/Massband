@@ -37,7 +37,7 @@ public class MassbandPlayerListener implements Listener {
         		if (Massband.permissions()) {					
         			//use Permission
         			if (Massband.hasPermission(player, Massband.PERMISSION_NODE_Massband_use)) {
-        				playerInteract(player, block);
+        				playerInteract(player, block, event);
         			}else{
         				player.sendMessage(String.format(Massband.language.PERMISSION_NOT, Massband.PERMISSION_NODE_Massband_use));
         				//event.setCancelled(true);	
@@ -51,7 +51,7 @@ public class MassbandPlayerListener implements Listener {
 //    				}else{
 //    				    event.setCancelled(true);	
 //    				}
-    				playerInteract(player, block);
+    				playerInteract(player, block, event);
     			}
         	}
         		
@@ -67,12 +67,13 @@ public class MassbandPlayerListener implements Listener {
     	}
     }
     
-    private void playerInteract(Player player, Block block){
+    private void playerInteract(Player player, Block block, PlayerInteractEvent event){
 
 		//get Vars for the current Player or create it.
 		PlayerVars tmpVars = Massband.getPlayerVars(player);
 	
 		if (tmpVars.isEnabled()){
+			event.setCancelled(true);
 			//mode ?
 			if (tmpVars.getMode() == PlayerVars.MODE_SIMPLE) {
 				onModeSimple(tmpVars, player, block);
