@@ -44,6 +44,7 @@ public class Language {
 	public String EXPANDED_UP;
 	public String EXPANDED_DOWN;
 	public String EXPANDED_VERT;
+	public String EXPANDED_DIRECTION;
 	
 	public String SELECTION_FIRST;
 	

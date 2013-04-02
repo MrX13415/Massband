@@ -8,9 +8,9 @@ import de.MrX13415.Massband.Massband;
 public class German extends Language{
 
 	public German(){
-		_LastVersion = "1.5"; 
+		_LastVersion = "1.5.1"; 
 		_languageName = "german";
-		_version = "1.5";
+		_version = "1.5.1";
 		
 		MB_ENABLED = ChatColor.GRAY + "Massband ist jetzt " + ChatColor.GOLD + "Aktiviert";
     	MB_DISABLED = ChatColor.GRAY + "Massband ist jetzt " + ChatColor.GOLD + "Deaktiviert";
@@ -45,6 +45,7 @@ public class German extends Language{
     	EXPANDED_UP = ChatColor.GRAY + "Auswahl erweitert ... (%s Blöcke nach oben)";
     	EXPANDED_DOWN = ChatColor.GRAY + "Auswahl erweitert ... (%s Blöcke nach unten)";
     	EXPANDED_VERT = ChatColor.GRAY + "Auswahl erweitert ... (unten bis oben)";
+    	EXPANDED_DIRECTION = ChatColor.GRAY + "Auswahl erweitert ... (%s Blöcke Richtung %s)";
     	
     	SELECTION_FIRST = ChatColor.RED + "Keine Auswahl vorhanden ... (Befehl %s)";
     	
@@ -83,8 +84,8 @@ public class German extends Language{
 									   ChatColor.RED + "/mb length "				+ ChatColor.GOLD + ""										+ ChatColor.GRAY + "Gibt die letzte gemessene länge zurück" + "\n" +
 									   ChatColor.RED + "/mb dimensions "			+ ChatColor.GOLD + ""										+ ChatColor.GRAY + "Gibt die Dimensionen der Auswahl zurück" + "\n" +
 									   ChatColor.RED + "/mb countBlocks "			+ ChatColor.GOLD + ""										+ ChatColor.GRAY + "Gibt die Anzahl der Blöcke in der Auswahl zurück (ausßer Luft)" + "\n" +
-									   ChatColor.RED + "/mb expand "				+ ChatColor.GOLD + "<<Anzahl> <up|down>|vert> "				+ ChatColor.GRAY + "Erweitert die Auswahl in die angegebene Eichtung (vert = von unten bis ganz oben)" + "\n" +
-									   ChatColor.RED + "/mb blockList "				+ ChatColor.GOLD + "[<Seite>|<Material> [...]] "					+ ChatColor.GRAY + "Gibt eine Liste mit der Anzahl der einzelnen Blöcken in der auswahl zurück";
+									   ChatColor.RED + "/mb expand "				+ ChatColor.GOLD + "<<Anzahl>|vert|[<Anzahl> <up|down>]>"	+ ChatColor.GRAY + "Erweitert die Auswahl in die angegebene Eichtung (vert = von unten bis ganz oben)" + "\n" +
+									   ChatColor.RED + "/mb blockList "				+ ChatColor.GOLD + "[<Seite>|<Material> [...]] "			+ ChatColor.GRAY + "Gibt eine Liste mit der Anzahl der einzelnen Blöcken in der auswahl zurück";
 		
 		COMMAND_MASSBAND_DESCRIPTION = "Verwaltet das Massband Plugin";
 	}

@@ -8,9 +8,9 @@ import de.MrX13415.Massband.Massband;
 public class English extends Language{
 
 	public English(){
-		 _LastVersion = "1.5"; 
+		 _LastVersion = "1.5.1"; 
 		_languageName = "english";
-		_version = "1.5";
+		_version = "1.5.1";
 		
     	MB_ENABLED = ChatColor.GRAY + "Massband is now " + ChatColor.GOLD + "Enabled" + ChatColor.GRAY + " for you";
     	MB_DISABLED = ChatColor.GRAY + "Massband is now " + ChatColor.GOLD + "Disabled"+ ChatColor.GRAY + " for you";
@@ -45,6 +45,7 @@ public class English extends Language{
     	EXPANDED_UP = ChatColor.GRAY + "Selection expanded ... (%s Blocks up)";
     	EXPANDED_DOWN = ChatColor.GRAY + "Selection expanded ... (%s Blocks down)";
     	EXPANDED_VERT = ChatColor.GRAY + "Selection expanded ... (bottom - top)";
+    	EXPANDED_DIRECTION = ChatColor.GRAY + "Selection expanded ... (%s Blocks towards %s)";
     	
     	SELECTION_FIRST = ChatColor.RED + "Make a Selection first ... (use %s)";
     	
@@ -76,15 +77,15 @@ public class English extends Language{
 		COMMAND_MASSBAND_USAGE = ChatColor.GREEN + "Massband 2.8 - A Measuring Tape - Command: " + ChatColor.RED + "/massband" + ChatColor.GREEN + " or " + ChatColor.RED + "/mb " + "\n" +
 									   ChatColor.RED + "/mb "						+ ChatColor.GOLD + "<enable|disable> "						+ ChatColor.GRAY + "Enables/Disables Massband for your self" + "\n" +
 									   ChatColor.RED + "/mb " 						+ ChatColor.GOLD + "<simplemode|lengthmode|surfacemode> "	+ ChatColor.GRAY + "Switchs between the different measure mods" + "\n" +
-									   ChatColor.RED + "/mb ignoreaxes "				+ ChatColor.GOLD + "<none|<axis> [axis] [axis]>"			+ ChatColor.GRAY + "Sets the axis to ignore" + "\n" +
+									   ChatColor.RED + "/mb ignoreaxes "			+ ChatColor.GOLD + "<none|<axis> [axis] [axis]>"		+ ChatColor.GRAY + "Sets the axis to ignore" + "\n" +
 									   ChatColor.RED + "/mb clear " 				+ ChatColor.GOLD + ""										+ ChatColor.GRAY + "Clears all measuring points" + "\n" +
 									   ChatColor.RED + "/mb stop " 					+ ChatColor.GOLD + ""										+ ChatColor.GRAY + "Interrupt your current Block-counting" + "\n" +
 									   ChatColor.RED + "/mb stopall " 				+ ChatColor.GOLD + ""										+ ChatColor.GRAY + "Interrupts all Block-countings of the server" + "\n" +
 									   ChatColor.RED + "/mb length "				+ ChatColor.GOLD + ""										+ ChatColor.GRAY + "Returns the last measured length" + "\n" +
 									   ChatColor.RED + "/mb dimensions "			+ ChatColor.GOLD + ""										+ ChatColor.GRAY + "Returns the dimensions of the selection" + "\n" +
 									   ChatColor.RED + "/mb countBlocks "			+ ChatColor.GOLD + ""										+ ChatColor.GRAY + "Returns the count of Blocks in the selection (exept air)" + "\n" +
-									   ChatColor.RED + "/mb expand "				+ ChatColor.GOLD + "<<amount> <up|down>|vert> "				+ ChatColor.GRAY + "expands the selection in the given direction. (vert = from bottom to the top)" + "\n" +
-									   ChatColor.RED + "/mb blockList "				+ ChatColor.GOLD + "[<page>|<material> [...]] "					+ ChatColor.GRAY + "Returns a List of all Blocks in the selection";
+									   ChatColor.RED + "/mb expand "				+ ChatColor.GOLD + "<<amount>|vert|[<amount> <up|down>]>"	+ ChatColor.GRAY + "expands the selection in the given direction. (vert = from bottom to the top)" + "\n" +
+									   ChatColor.RED + "/mb blockList "				+ ChatColor.GOLD + "[<page>|<material> [...]] "				+ ChatColor.GRAY + "Returns a List of all Blocks in the selection";
 		
 		COMMAND_MASSBAND_DESCRIPTION = "Manages Massband";
 	}

@@ -127,8 +127,11 @@ public class MassbandCommandExecuter implements CommandExecutor{
 						int expandSize = 0;
 						String direction = args[1];
 						
-						if (args.length == 3) {
+						try{
 							expandSize = Integer.valueOf(args[1]);
+						}catch(Exception e){}
+						
+						if (args.length == 3) {
 							direction = args[2];
 						}
 						
@@ -203,7 +206,7 @@ public class MassbandCommandExecuter implements CommandExecutor{
 			}else if (direction.equalsIgnoreCase("down")) {
 				point2.setY(point2.getY() - expandsize);
 				
-				if (point2.getY() > player.getWorld().getMaxHeight() - 1) point2.setY(player.getWorld().getMaxHeight() - 1);
+				if (point2.getY() > player.getWorld().getMaxHeight()) point2.setY(player.getWorld().getMaxHeight());
 				if (point2.getY() < 0) point2.setY(0);
 				
 				player.sendMessage(String.format(Massband.language.EXPANDED_DOWN, expandsize));
@@ -213,12 +216,51 @@ public class MassbandCommandExecuter implements CommandExecutor{
 				point1.setY(player.getWorld().getMaxHeight());
 				point2.setY(0);
 			
-				if (point1.getY() > (player.getWorld().getMaxHeight() - 1)) point1.setY(player.getWorld().getMaxHeight() - 1);
-				if (point2.getY() > (player.getWorld().getMaxHeight() - 1)) point2.setY(player.getWorld().getMaxHeight() - 1);
+				if (point1.getY() > (player.getWorld().getMaxHeight())) point1.setY(player.getWorld().getMaxHeight());
+				if (point2.getY() > (player.getWorld().getMaxHeight())) point2.setY(player.getWorld().getMaxHeight());
 				if (point1.getY() < 0) point1.setY(0);
 				if (point2.getY() < 0) point2.setY(0);
 				
 				player.sendMessage(Massband.language.EXPANDED_VERT);
+			}else{
+				if (expandsize > 0){
+					direction = getCardinalDirection(player);
+					
+					double p1z = point1.getZ();
+					double p2z = point2.getZ();
+					double p1x = point1.getX();
+					double p2x = point2.getX();
+
+					if (direction.equals("N")){
+	
+						if (p1z < p2z) point1.setZ(p1z - expandsize);	
+						else if (p1z > p2z) point2.setZ(p2z - expandsize);
+						else point1.setZ(p1z - expandsize);
+
+					}else if (direction.equals("S")){
+						
+						if (p1z > p2z) point1.setZ(p1z + expandsize);	
+						else if (p1z < p2z) point2.setZ(p2z + expandsize);
+						else point1.setZ(p1z + expandsize);
+						
+					}else if (direction.equals("E")){
+						point1.setX(point1.getX() + expandsize);
+						
+						if (p1x > p2x) point1.setX(p1x + expandsize);	
+						else if (p1x < p2x) point2.setX(p2x + expandsize);
+						else point1.setX(p1x + expandsize);
+						
+					}else if (direction.equals("W")){
+						
+						if (p1x < p2x) point1.setX(p1x - expandsize);	
+						else if (p1x > p2x) point2.setX(p2x - expandsize);
+						else point1.setX(p1x - expandsize);
+						
+					}
+				
+					player.sendMessage(String.format(Massband.language.EXPANDED_DIRECTION, expandsize, direction));
+									
+				}
 			}
 			
 
@@ -230,6 +272,34 @@ public class MassbandCommandExecuter implements CommandExecutor{
 		}
 	}
 
+	public static String getCardinalDirection(Player player) {
+		double rotation = (player.getLocation().getYaw() -180) % 360;
+		if (rotation < 0) {
+			rotation += 360.0;
+		}
+		if (0 <= rotation && rotation < 22.5) {
+			return "N";
+		} else if (22.5 <= rotation && rotation < 67.5) {
+			return "NE";
+		} else if (67.5 <= rotation && rotation < 112.5) {
+			return "E";
+		} else if (112.5 <= rotation && rotation < 157.5) {
+			return "SE";
+		} else if (157.5 <= rotation && rotation < 202.5) {
+			return "S";
+		} else if (202.5 <= rotation && rotation < 247.5) {
+			return "SW";
+		} else if (247.5 <= rotation && rotation < 292.5) {
+			return "W";
+		} else if (292.5 <= rotation && rotation < 337.5) {
+			return "NW";
+		} else if (337.5 <= rotation && rotation < 360.0) {
+			return "N";
+		} else {
+			return null;
+		}
+	}
+	
 	public void onCommandMode(PlayerVars tmpVars, Player player, int mode){
 		tmpVars.setMode(mode);
 		tmpVars.removeAllWayPoints();
