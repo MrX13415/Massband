@@ -34,7 +34,7 @@ public class MassbandPlayerListener implements Listener {
         	
         	//Player holds Item ...
         	if (player.getItemInHand().equals(item)) {
-        		if (Massband.permissions()) {					
+        		if (Massband.permissionsEnabled()) {					
         			//use Permission
         			if (Massband.hasPermission(player, Massband.PERMISSION_NODE_Massband_use)) {
         				playerInteract(player, block, event);
@@ -81,6 +81,8 @@ public class MassbandPlayerListener implements Listener {
 				onModeLength(tmpVars, player, block);
 			}else if(tmpVars.getMode() == PlayerVars.MODE_SURFACE){
 				onModeSurface(tmpVars, player, block);
+			}else if(tmpVars.getMode() == PlayerVars.MODE_FIXED){
+				onModeFixedLength(tmpVars, player, block);
 			}
 		}
     }
@@ -92,7 +94,7 @@ public class MassbandPlayerListener implements Listener {
 		
 		if (tmpVars.getWayPointListSize() >= 2) {
 			tmpVars.computingVectors();
-			MassbandCommandExecuter.onCommandLength(tmpVars, player); //output
+			MassbandCommandExecuter.onCommandLastLength(tmpVars, player); //output
 			tmpVars.removeAllWayPoints();	//clear all Points
 		}
     }
@@ -104,10 +106,25 @@ public class MassbandPlayerListener implements Listener {
 		
 		if (tmpVars.getWayPointListSize() >= 2) {
 			tmpVars.computingVectors();
-			MassbandCommandExecuter.onCommandLength(tmpVars, player); //output
+			MassbandCommandExecuter.onCommandLastLength(tmpVars, player); //output
 		}
     }
-    
+        
+    public void onModeFixedLength(PlayerVars tmpVars, Player player, Block block){
+    	tmpVars.addPoint(block.getX(), block.getY(), block.getZ());
+		
+		printPoints(tmpVars, player, block);
+		
+		if (tmpVars.getWayPointListSize() >= 2) {
+			
+			double l = tmpVars.computingVectors();
+			tmpVars.setLenght(tmpVars.getFixedLenght() - l);
+			
+			MassbandCommandExecuter.onCommandLastLength(tmpVars, player); //output
+			tmpVars.removeAllWayPoints();	//clear all Points
+		}
+    }    
+
     public void onModeSurface(PlayerVars tmpVars, Player player, Block block){
 		tmpVars.addPoint(block.getX(), block.getY(), block.getZ());
 		if (tmpVars.getWayPointListSize() >= 3) {

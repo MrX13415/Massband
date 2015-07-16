@@ -27,7 +27,7 @@ public class MassbandCommandExecuter implements CommandExecutor{
 		if (sender instanceof Player) {
 			Player player = (Player) sender;
 			
-			if (Massband.permissions()) {					
+			if (Massband.permissionsEnabled()) {					
     			//use Permission
 				if (Massband.hasPermission(player, Massband.PERMISSION_NODE_Massband_use)) hasPermission_use = true;
 				if (Massband.hasPermission(player, Massband.PERMISSION_NODE_Massband_stop_all)) hasPermission_stopall = true;
@@ -98,7 +98,7 @@ public class MassbandCommandExecuter implements CommandExecutor{
 		    	onCommandClear(tmpVars, player);
 		    	
 			}else if (args[0].equalsIgnoreCase("length") || args[0].equalsIgnoreCase(Massband.configFile.commandShortForm_lenght)) {
-	        	onCommandLength(tmpVars, player);
+	        	onCommandLastLength(tmpVars, player);
 	        	
 			}else if (args[0].equalsIgnoreCase("ígnoreaxes") || args[0].equalsIgnoreCase(Massband.configFile.commandShortForm_ignoreaxes)) {
 				onCommandSwitchMode(tmpVars, player, args);
@@ -114,6 +114,21 @@ public class MassbandCommandExecuter implements CommandExecutor{
 				}
 			}else if (args[0].equalsIgnoreCase("lengthmode") || args[0].equalsIgnoreCase(Massband.configFile.commandShortForm_lengthmode)) {
 				onCommandMode(tmpVars, player, PlayerVars.MODE_LENGTH);
+			
+			}else if (args[0].equalsIgnoreCase("fixedmode") || args[0].equalsIgnoreCase(Massband.configFile.commandShortForm_fixedmode)) {
+				
+				if (args.length == 2){
+					try{
+						double flength = Double.valueOf(args[1]);
+						tmpVars.setFixedLenght(flength);
+						onCommandMode(tmpVars, player, PlayerVars.MODE_FIXED, String.valueOf(flength));
+					}catch(Exception e){
+						player.sendMessage(Massband.getLanguage().FIXED_MODE_ERROR);
+						printHelpMsg(command, player);
+					}					
+				}else{
+					printHelpMsg(command, player);
+				}
 				
 			}else if (args[0].equalsIgnoreCase("surfacemode") || args[0].equalsIgnoreCase(Massband.configFile.commandShortForm_surfacemode)) {
 				onCommandMode(tmpVars, player, PlayerVars.MODE_SURFACE);
@@ -156,9 +171,13 @@ public class MassbandCommandExecuter implements CommandExecutor{
 				}else{
 					player.sendMessage(String.format(Massband.language.PERMISSION_NOT, Massband.PERMISSION_NODE_Massband_stop_all));
 				}
-			}else if (args[0].equalsIgnoreCase("blocklist") || args[0].equalsIgnoreCase(Massband.configFile.commandShortForm_blockList)) {
+			}else if (args[0].equalsIgnoreCase("blocklist") || args[0].equalsIgnoreCase(Massband.configFile.commandShortForm_blockList)) {				
 				if (hasPermission_blocklist){
-					onCommandBlockList(tmpVars, args);
+					if (args.length >= 3 && args[1].equalsIgnoreCase("book")){
+						onCommandBlocklistBook(tmpVars, args);
+					}else{
+						onCommandBlockList(tmpVars, args);
+					}
 				}else{
 					player.sendMessage(String.format(Massband.language.PERMISSION_NOT, Massband.PERMISSION_NODE_Massband_blocklist));
 				}
@@ -187,6 +206,19 @@ public class MassbandCommandExecuter implements CommandExecutor{
 		
 		if (page >= 1 && mats.size() == 0) tmpVars.printBlockListPage(page);
 		else tmpVars.findMaterial(mats);
+	}
+	
+	public void onCommandBlocklistBook(PlayerVars tmpVars, String[] args){
+
+		String projectName = args[2];
+		String objName = projectName;
+		
+		String author = tmpVars.getPlayer().getName();
+		
+		if (args.length >= 4) objName = args[3];
+		if (args.length >= 5) author = args[4];
+
+		tmpVars.createBlocklistBook(projectName, objName, author);
 	}
 	
 	private void onCommandExpand(PlayerVars tmpVars, Player player, int modeSurface, int expandsize, String direction ) {
@@ -271,7 +303,7 @@ public class MassbandCommandExecuter implements CommandExecutor{
 			player.sendMessage(String.format(Massband.language.SELECTION_FIRST, Massband.configFile.itemName));
 		}
 	}
-
+	
 	public static String getCardinalDirection(Player player) {
 		double rotation = (player.getLocation().getYaw() -180) % 360;
 		if (rotation < 0) {
@@ -301,6 +333,10 @@ public class MassbandCommandExecuter implements CommandExecutor{
 	}
 	
 	public void onCommandMode(PlayerVars tmpVars, Player player, int mode){
+		onCommandMode(tmpVars, player, mode, "");
+	}
+	
+	public void onCommandMode(PlayerVars tmpVars, Player player, int mode, String value){
 		tmpVars.setMode(mode);
 		tmpVars.removeAllWayPoints();
 		
@@ -310,6 +346,8 @@ public class MassbandCommandExecuter implements CommandExecutor{
 			player.sendMessage(Massband.language.MODE_LENGTH2);
 		}else if(mode == PlayerVars.MODE_SURFACE){
 			player.sendMessage(Massband.language.MODE_SURFACE2);
+		}else if(mode == PlayerVars.MODE_FIXED){
+			player.sendMessage(String.format(Massband.language.MODE_FIXED2, value));
 		}
 	}
 	
@@ -318,8 +356,11 @@ public class MassbandCommandExecuter implements CommandExecutor{
     	player.sendMessage(Massband.language.POINT_CLR);
 	}
 	
-	public static void onCommandLength(PlayerVars tmpVars, Player player){
-		player.sendMessage(String.format(Massband.language.LENGTH, tmpVars.getLenght()));
+	public static void onCommandLastLength(PlayerVars tmpVars, Player player){
+		if (tmpVars.getMode() == PlayerVars.MODE_FIXED)
+			player.sendMessage(String.format(Massband.language.DIFF, tmpVars.getLenght() * -1 + tmpVars.getFixedLenght(), tmpVars.getFixedLenght(), tmpVars.getLenght()));
+		else
+			player.sendMessage(String.format(Massband.language.LENGTH, tmpVars.getLenght()));
 	}
 	
 	public static void onCommandSwitchMode(PlayerVars tmpVars, Player player, String[] args){

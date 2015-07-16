@@ -9,8 +9,6 @@ import org.bukkit.entity.Player;
 import org.bukkit.plugin.PluginDescriptionFile;
 import org.bukkit.plugin.java.JavaPlugin;
 import org.bukkit.event.Listener;
-import com.nijiko.permissions.PermissionHandler;
-import com.nijikokun.bukkit.Permissions.Permissions;
 
 import de.MrX13415.Massband.CommandExecuter.MassbandCommandExecuter;
 import de.MrX13415.Massband.Config.Config;
@@ -40,7 +38,8 @@ import org.bukkit.plugin.Plugin;
  */
 
 public class Massband extends JavaPlugin {
-		
+	
+	public static JavaPlugin thisPlugin;
 	public static PluginDescriptionFile pdfFile = null;
 	public static Server server = null;
 	public static Logger log = null;
@@ -50,7 +49,7 @@ public class Massband extends JavaPlugin {
 	public static Language language;
 	
 	//permissions
-	private static PermissionHandler permissionHandler;
+//	private static PermissionHandler permissionHandler;
 	private static boolean defaultPermission;
 
 	public static final String PERMISSION_NODE_Massband_use = "Massband.use";
@@ -97,9 +96,9 @@ public class Massband extends JavaPlugin {
 		return configFile;
 	}
 
-	public static PermissionHandler getPermissionHandler() {
-		return permissionHandler;
-	}
+//	public static PermissionHandler getPermissionHandler() {
+//		return permissionHandler;
+//	}
 
 	public static ArrayList<PlayerVars> getPlayerlist() {
 		return playerlist;
@@ -120,10 +119,11 @@ public class Massband extends JavaPlugin {
 	public static void setLanguage(Language language) {
 		Massband.language = language;
 	}
-
+	
 	@Override
 	public void onLoad() {
 		//set static vars ...
+		thisPlugin = this;
 		server = this.getServer();
 		log = server.getLogger();
 		
@@ -145,7 +145,7 @@ public class Massband extends JavaPlugin {
         	configFile.write();
         }
         //---------------------
-                
+           
         //lang loaded from config ...
         log.info(consoleOutputHeader + " Language set to: " + language._languageName);
         if (! language.isUptoDate()) log.warning(consoleOutputHeader + " Your current language is not up to date! (file: " + language.getLanguageFileName() + ")");   
@@ -181,20 +181,12 @@ public class Massband extends JavaPlugin {
 //        debugees.put(player, value);
 //    }
     
-	public static boolean permissions(){
-		if ((Massband.permissionHandler != null || defaultPermission) && Massband.configFile.usePermissions){
-			return true;
-		}
+	public static boolean permissionsEnabled(){
+		if (Massband.configFile.usePermissions) return true;
 		return false;
 	}
 	
 	public static boolean hasPermission(Player player, String permission){
-		
-		if (Massband.permissionHandler != null){
-			if (Massband.permissionHandler.permission(player, permission)){
-				return true;
-			}
-		}
 		
 		if (player.hasPermission(permission)){
 			return true;
@@ -204,35 +196,33 @@ public class Massband extends JavaPlugin {
 	}
 
 	private void setupPermissions() {
-		Plugin permissionsPlugin = this.getServer().getPluginManager()
-				.getPlugin("Permissions");
-		Plugin permissionsBukkitPlugin = this.getServer().getPluginManager()
-				.getPlugin("PermissionsBukkit");
+//		Plugin permissionsPlugin = this.getServer().getPluginManager()
+//				.getPlugin("Permissions");
+//		Plugin permissionsBukkitPlugin = this.getServer().getPluginManager()
+//				.getPlugin("PermissionsBukkit");
 
-		if (Massband.permissionHandler == null) {
-			if (permissionsPlugin != null) {
-				Massband.permissionHandler = ((Permissions) permissionsPlugin)
-						.getHandler();
-				log.info(consoleOutputHeader + " Permission system detected: "
-						+ permissionsPlugin.getDescription().getFullName());
-			} else if (Massband.configFile.usePermissions) {
+		//if (Massband.permissionHandler == null) {
+//			if (permissionsPlugin != null) {
+//				Massband.permissionHandler = ((Permissions) permissionsPlugin)
+//						.getHandler();
+//				log.info(consoleOutputHeader + " Permission system detected: "
+//						+ permissionsPlugin.getDescription().getFullName());
+			if (Massband.configFile.usePermissions) {
 				defaultPermission = true;
 
 				String pluginName = "";
 
-				if (permissionsBukkitPlugin != null) {
-					pluginName = ": "
-							+ permissionsBukkitPlugin.getDescription()
-									.getFullName();
-				}
+//				if (permissionsBukkitPlugin != null) {
+//					pluginName = ": "
+//							+ permissionsBukkitPlugin.getDescription()
+//									.getFullName();
+//				}
 
-				log.info(consoleOutputHeader + " Permission system detected"
-						+ pluginName);
+				log.info(consoleOutputHeader + " Permission system detected" + pluginName);
 			} else {
-				log.warning(consoleOutputHeader
-						+ " Permission system NOT detected OR disabled! (everyone will have permissions to use it.)");
+				log.warning(consoleOutputHeader + " Permission system NOT detected OR disabled! (everyone will have permissions to use it.)");
 			}
-		}
+		//}
 	}
 	 
 //    private void setupPermissionsO() {

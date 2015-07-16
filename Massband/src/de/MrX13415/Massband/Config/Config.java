@@ -14,7 +14,7 @@ import de.MrX13415.Massband.Language.LanguageLoader;
 
 public class Config {
 	
-	public String version = "2.8";	//config version
+	public String version = "2.9";	//config version
 	private String configFileName = "config.yml";
 	private String configFilePath = "plugins/" + Massband.pluginName + "/";
 	
@@ -38,7 +38,7 @@ public class Config {
 	private static final String keyCommandShortForm_stop = "StopCommand_ShortForm";
 	private static final String keyCommandShortForm_stopall = "StopallCommand_ShortForm";
 	private static final String keyUsePermissions = "UsePermissions";
-	private static final String keyBlockCountingSpeedLimit = "BlockCountingSpeedLimit";
+	private static final String keyBlockCountingSpeed = "BlockCountingSpeed";
 	private static final String fileFormat = "%s: %s"; 
 	
 	private int minLineCount = 4;
@@ -49,7 +49,7 @@ public class Config {
 	public String defaultAction = Action.RIGHT_CLICK_BLOCK.toString(); 
 	public String language = LanguageLoader.getDefaultLanguage()._languageName;
 	public boolean usePermissions = true;
-	public boolean blockCountingSpeedLimit = false;
+	public int blockCountingSpeed = 1000;
 	//-- shortforms --
 	public String commandShortForm_MassbandEnable = "ea";
 	public String commandShortForm_MassbandDisable = "da";
@@ -58,6 +58,7 @@ public class Config {
 	public String commandShortForm_lenght = "l";
 	public String commandShortForm_dimensions = "d";
 	public String commandShortForm_countblocks = "cb";
+	public String commandShortForm_fixedmode = "flm";
 	public String commandShortForm_lengthmode = "lm";
 	public String commandShortForm_ignoreaxes = "ix";
 	public String commandShortForm_surfacemode = "sfm";
@@ -111,8 +112,8 @@ public class Config {
 						usePermissions = getBoolean(line[1]);
 					}
 
-					if (line[0].equalsIgnoreCase(keyBlockCountingSpeedLimit)) {
-						blockCountingSpeedLimit = getBoolean(line[1]);
+					if (line[0].equalsIgnoreCase(keyBlockCountingSpeed)) {
+						blockCountingSpeed = Integer.valueOf(line[1]);
 					}
 					
 					if (line[0].equalsIgnoreCase(keyCommandShortForm_MassbandEnable)) {
@@ -230,8 +231,11 @@ public class Config {
 			writer.write("\n");
 			writer.write(String.format(fileFormat, keyUsePermissions, usePermissions) + "\n");
 			writer.write("\n");
-			writer.write("#This can infect the Server performance ...\n");
-			writer.write(String.format(fileFormat, keyBlockCountingSpeedLimit, blockCountingSpeedLimit) + "\n");
+			writer.write("#Speed for Block counting\n");
+			writer.write("#Higher values are faster. default: 1000\n");
+			writer.write("#If you have problems with huge areas, lower this value.\n"); 
+			writer.write("#WARNING: To high values can crash the server!\n");
+			writer.write(String.format(fileFormat, keyBlockCountingSpeed, blockCountingSpeed) + "\n");
 			writer.write("\n");
 			writer.write("#Command short-forms ...\n");
 			writer.write(String.format(fileFormat, keyCommandShortForm_clear, commandShortForm_clear) + "\n");

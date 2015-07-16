@@ -2,16 +2,18 @@ package de.MrX13415.Massband;
 
 import java.util.ArrayList;
 
+import org.bukkit.Chunk;
 import org.bukkit.Material;
 import org.bukkit.World;
 import org.bukkit.block.Block;
 import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
+import org.bukkit.scheduler.BukkitRunnable;
 import org.bukkit.util.Vector;
 
-public class CountBlocks extends Thread{
+public class CountBlocks extends BukkitRunnable{
 	
-	private World world = null;
+	private volatile World world = null;
 	private ArrayList<Vector> wayPoints = null;
 	private PlayerVars tmpVars;
 	
@@ -41,6 +43,8 @@ public class CountBlocks extends Thread{
 	public void run(){
 		Massband.threads.add(this);
 		
+		tmpVars.lastWorld = world;
+		
 		//count ...
 		blockCount = countBlocks(world, wayPoints);
 //		System.out.println("count: " + blockCount);
@@ -60,7 +64,7 @@ public class CountBlocks extends Thread{
 //		System.out.println("Thread died: " + this.isAlive());
 	}
 		
-	private int countBlocks(World world, ArrayList<Vector> wayPoints){
+	private synchronized int countBlocks(World world, ArrayList<Vector> wayPoints){
 		int yStart = (int) Math.min(wayPoints.get(0).getY(), wayPoints.get(1).getY());
 		int yEnd = (int) Math.max(wayPoints.get(0).getY(), wayPoints.get(1).getY());
 		
@@ -71,37 +75,61 @@ public class CountBlocks extends Thread{
 		int xEnd = (int) Math.max(wayPoints.get(0).getX(), wayPoints.get(1).getX());
 
 		int blockCount = 0;
-		
-//		//perc-----------------
+				
+		//perc-----------------
 		//calculate dimensions
-//		double dimensionWith = Math.abs(wayPoints.get(0).getX() - wayPoints.get(1).getX()) + 1;		
-//		double dimensionLength = Math.abs(wayPoints.get(0).getZ() - wayPoints.get(1).getZ()) + 1;
-//		double dimensionHieght = Math.abs(wayPoints.get(0).getY() - wayPoints.get(1).getY()) + 1;
-//
-//		int maxblocks = (int)(dimensionHieght * dimensionWith * dimensionLength);
+		double dimensionWith = Math.abs(wayPoints.get(0).getX() - wayPoints.get(1).getX()) + 1;		
+		double dimensionLength = Math.abs(wayPoints.get(0).getZ() - wayPoints.get(1).getZ()) + 1;
+		double dimensionHieght = Math.abs(wayPoints.get(0).getY() - wayPoints.get(1).getY()) + 1;
+
+		int maxblocks = (int)(dimensionHieght * dimensionWith * dimensionLength);
+		
 		int percindex = 0;
 		long timeBefore = System.currentTimeMillis();
-		long timeAfter = timeBefore + 1000; //one second after ...
+		long timeAfter = timeBefore + 2500; //one second after ...
 		long time = 0;
+		long timeLastPercMessage = timeBefore;
 		int speed = 0;
 		boolean measureSpeed = true;
-//		double perc = 0;
-//		//perc--------------
+		int sleepCounter = 0;
+
+		//perc--------------
 		
-		for (int yIndex = yStart; yIndex <= yEnd; yIndex++)  {
+		//y
+		//
+		//
+		
+		
+		
+		for (int zIndex = zStart; zIndex <= zEnd; zIndex++) {
 			if (interrupted) break;
-			for (int zIndex = zStart; zIndex <= zEnd; zIndex++) {
+			
+			for (int xIndex = xStart; xIndex <= xEnd; xIndex++) {
 				if (interrupted) break;
-				for (int xIndex = xStart; xIndex <= xEnd; xIndex++) {
+						
+				for (int yIndex = yStart; yIndex <= yEnd; yIndex++)  {
 					if (interrupted) break;
+	
+//					//get Block
+//					Chunk chunk = world.getChunkAt(xIndex, zIndex);
+//					if (!chunk.isLoaded()){
+//						System.out.println("CUNK LOADED: " + chunk.isLoaded());
+//						boolean suc = chunk.load();
+//						System.out.println("CHUNK LOADED SUCCESSFULLY? " + chunk.isLoaded() + " (" + suc + ")");
+//					}
+										
+					Block block = world.getBlockAt(xIndex, yIndex, zIndex);
+					//System.out.println("Y: " + yIndex + " X: " + xIndex + " Z: " + zIndex);
 					
-					//get Block
-					Block block = Massband.server.getWorld(world.getName()).getBlockAt(xIndex, yIndex, zIndex);
 					//count blocks except air ...
-					if (block.getTypeId() != 0) blockCount++;
-					
-					
+					if (block.getType() != Material.AIR) blockCount++;
+										
 					Material blockType = block.getType();
+
+					if (blockType.toString().endsWith("_ON")){
+						String newMatN = blockType.toString().substring(0, blockType.toString().lastIndexOf("_ON")) + "_OFF";
+						blockType = Material.getMaterial(newMatN);
+					}
 					
 					if (blocksCount_Material.contains(blockType)) {
 						int index = blocksCount_Material.indexOf(blockType);
@@ -112,27 +140,34 @@ public class CountBlocks extends Thread{
 						blocksCount_counts.add(1);				//add a new Material ...
 					}
 				
+					percindex += 1;
+					
 					//measure speed	...							
-					if (measureSpeed) percindex += 1;
 					if ((System.currentTimeMillis()) >= timeAfter && measureSpeed) {
 						measureSpeed = false;
-						speed = percindex;	
+						speed = (int) Math.round(percindex / 2.5d);
+						System.out.println(percindex);
 						tmpVars.getPlayer().sendMessage(String.format(Massband.getLanguage().COUNTBLOCK_SPEED, speed));
 					}
+					
+					//perc ---------------------
+					if(System.currentTimeMillis() - timeLastPercMessage > 5000){
+						double perc = 100d / (double)maxblocks * (double)percindex;
+						tmpVars.getPlayer().sendMessage(String.format(Massband.getLanguage().COUNTBLOCK_PERCENTAGE, Math.round(perc * 1000d) / 1000d));
+						timeLastPercMessage = System.currentTimeMillis();
+					}
 
-					if (Massband.configFile.blockCountingSpeedLimit) {
+					sleepCounter++;
+					
+					if (sleepCounter >= Massband.configFile.blockCountingSpeed){
+						sleepCounter = 0;
 						try {
-							Thread.sleep(0, 1);
+							Thread.sleep(0, 100000);
 						} catch (Exception e) {
 						}
 					}
 				}
 			}
-			
-//			//perc ---------------------
-//			perc = 100d / (double)maxblocks * (double)percindex;
-//			System.out.println("counting ... " + perc + "% (" + percindex + "/" + maxblocks + ")");
-//			//perc --------------------
 		}
 		
 		if (! interrupted) {
@@ -196,7 +231,7 @@ public class CountBlocks extends Thread{
 		ArrayList<CountBlocks> threads = (ArrayList<CountBlocks>) Massband.threads.clone();
 
 		for (CountBlocks thread : threads) {
-			if (thread.isAlive()){				
+			if (!thread.getEndRecharched()){				
 				thread.interrupt();
 				
 				int timeout = 5000; // in millis

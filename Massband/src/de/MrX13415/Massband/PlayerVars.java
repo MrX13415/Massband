@@ -5,6 +5,8 @@ import java.util.ArrayList;
 import org.bukkit.Material;
 import org.bukkit.World;
 import org.bukkit.entity.Player;
+import org.bukkit.inventory.ItemStack;
+import org.bukkit.inventory.meta.BookMeta;
 import org.bukkit.util.Vector;
 
 
@@ -17,6 +19,7 @@ public class PlayerVars{
 	public static final int MODE_SIMPLE = 0;
 	public static final int MODE_LENGTH = 1;
 	public static final int MODE_SURFACE = 2;
+	public static final int MODE_FIXED = 3;
 
 	private Player player;
 	private int mode = MODE_SIMPLE;	//default
@@ -25,15 +28,17 @@ public class PlayerVars{
 	private CountBlocks myThread = null;
 	
 	private double lenght = 0;
+	private double fixedLenght = 0;
 	
 	private double dimensionLength = 0;
-	private double dimensionWith = 0;
+	private double dimensionWidth = 0;
 	private double dimensionHieght = 0;
 	
 	public int blockCount = 0;
 	public ArrayList<Material> blocksCount_Material = new ArrayList<Material>();
 	public ArrayList<Integer> blocksCount_counts = new ArrayList<Integer>();
-	
+	public World lastWorld; 
+			
 	private ArrayList<Vector> wayPoints = new ArrayList<Vector>();
 	
 	private ArrayList<AXIS> ignoredaxes = new ArrayList<AXIS>();
@@ -76,8 +81,16 @@ public class PlayerVars{
 		return lenght;
 	}
 		
+	public double getFixedLenght() {
+		return fixedLenght;
+	}
+
+	public void setFixedLenght(double fixedLenght) {
+		this.fixedLenght = fixedLenght;
+	}
+
 	public double getDimensionWith() {
-		return dimensionWith;
+		return dimensionWidth;
 	}
 	
 	public double getDimensionLength() {
@@ -158,7 +171,7 @@ public class PlayerVars{
 		if (ignoredaxes.contains(AXIS.Z)){wayPoints.get(0).setZ(0);wayPoints.get(1).setZ(0);}
 			
 		//calculate dimensions
-		dimensionWith = Math.abs(wayPoints.get(0).getX() - wayPoints.get(1).getX()) + 1;		
+		dimensionWidth = Math.abs(wayPoints.get(0).getX() - wayPoints.get(1).getX()) + 1;		
 		dimensionLength = Math.abs(wayPoints.get(0).getZ() - wayPoints.get(1).getZ()) + 1;
 		dimensionHieght = Math.abs(wayPoints.get(0).getY() - wayPoints.get(1).getY()) + 1;
 
@@ -166,7 +179,7 @@ public class PlayerVars{
 	
 	public void countBlocks(World world){	
 		myThread = new CountBlocks(this);
-		myThread.start();
+		Massband.server.getScheduler().runTaskAsynchronously(Massband.thisPlugin, myThread);
 		
 //		int blockCount = ;
 		
@@ -220,6 +233,184 @@ public class PlayerVars{
 		player.sendMessage(String.format(Massband.getLanguage().COUNTBLOCK_TOTAL, blockCount));
 		player.sendMessage(Massband.getLanguage().COUNTBLOCK_BLPAGE_FOOTER);
 		return true;
+	}
+	
+	public boolean createBlocklistBook(String projectName, String objectName, String author){
+		if (blocksCount_Material.size() <= 0){
+			player.sendMessage(Massband.getLanguage().COUNTBLOCK_CMD_FIRST);
+			return false;
+		}
+		
+		final ItemStack item = new ItemStack(Material.WRITTEN_BOOK);
+	    BookMeta book = (BookMeta)item.getItemMeta();
+	
+		book.setAuthor(author);
+		
+		String title = projectName + ": " + objectName;
+		if (projectName.equalsIgnoreCase(objectName)) title = projectName;
+		title +=  " - Bill of materials";
+		
+		book.setTitle(title);		
+		
+		//              1234567890123456789
+		
+		
+		String pageMain = String.format(
+				
+			       "\n"
+			     + "\n"
+			     + "§4§l§nBill of Materials\n\n"
+			     + "\n"			
+			     + "§0by §4%s\n"				
+			     + "\n"
+			     + "\n"
+			     + "\n"
+			     + "\n"
+			     + "§8%s\n"
+			     + "§8%s"
+			     , author, Massband.pdfFile.getName(), Massband.pdfFile.getVersion());
+	
+		book.addPage(pageMain);
+		
+		String page1 = String.format(
+				       "§4§nProject:\n\n"			
+				     + "§0 %s§0\n"				
+				     + "\n"				
+				     , projectName);
+		
+		//if (projectName.equalsIgnoreCase(objectName)){
+			page1 += String.format(
+				       "§4§nObject:\n\n"
+				     + "§0 %s§0\n"
+				     + "\n"
+				     , objectName);
+		//}
+		
+		book.addPage(page1);
+		
+		String page2 = String.format(
+				   "§4§nLocation:\n"
+				 + "\n"
+				 + "§0 World: §4%s\n\n"
+			     + "§0 X: §4%s\n"
+				 + "§0 Y: §4%s\n"
+				 + "§0 Z: §4%s\n"
+				 + "\n",
+				 lastWorld.getName(),
+			     wayPoints.get(0).getBlockX(),
+			     wayPoints.get(0).getBlockY(),
+			     wayPoints.get(0).getBlockZ());
+		
+		book.addPage(page2);
+		
+	    String page3 = String.format(
+				   "§4§nDimensions:\n"
+				 + "\n"
+				 + "§0 W: §4%s\n"
+				 + "§0 L: §4%s\n"
+				 + "§0 H: §4%s\n"
+				 + "\n"
+				 + "§0Cuboid volume:\n"
+				 + "%s\n"
+				 + "Block count:\n"
+				 + "%s\n",
+			     dimensionWidth,
+			     dimensionLength,
+			     dimensionHieght,
+			     formatBookNumberLine((int)(dimensionWidth * dimensionLength * dimensionHieght), 9, 10),
+			     formatBookNumberLine(blockCount, 9, 10));
+		
+		book.addPage(page3);
+		
+		int pageIndex = 0;
+		int materialIndex = 0; 
+		
+		while(materialIndex < blocksCount_Material.size()) {
+			
+			String page = "";
+			
+			if (pageIndex == 0) page = "§4§nMaterials:\n\n";
+			
+			//on the first material page only 5 will fit ...
+			for (int i = 0; i < (pageIndex == 0 ? 5 : 6); i++) {
+				
+				if (materialIndex >= blocksCount_Material.size()){
+					break;
+				}
+				
+				Material material = blocksCount_Material.get(materialIndex);
+				String matN = material.toString();
+				//matN = matN.replace("BLOCK", "");
+				//matN = matN.replace("ORE", "");
+				//matN = matN.replace("STATIONARY", "STAT~");
+				//matN = matN.replace("STONE", "ST~ ");
+				//matN = matN.replace("DOUBLE", "DBL~");
+				matN = matN.replace("_OFF", "");	
+				matN = matN.replace("_", " ");
+				matN = matN.replace("  ", " ");
+				matN = matN.trim();
+				
+				//if (matN.equalsIgnoreCase("ST~")) matN = "STONE";
+				
+				//if (matN.length() > 16) matN = matN.substring(0, 16) + "~";
+					
+				int count = blocksCount_counts.get(materialIndex);
+				
+				//make first char upper and the rest lower case ...
+				String materialName = matN.substring(0, 1).toUpperCase() + matN.substring(1).toLowerCase();
+				
+				if (matN.contains(" ")){
+					materialName = "";
+					for (String elem : matN.split(" ")) {
+						materialName += elem.substring(0, 1).toUpperCase() + elem.substring(1).toLowerCase() + " ";
+					}
+					materialName.trim();
+				}
+				
+				String nameLine = String.format("§0%s\n", materialName);				
+				String countLine = formatBookNumberLine(count, 7, 12);
+				
+				//only 256 chars per page ...
+				if (page.length() + nameLine.length() + countLine.length() <= 256){
+					page += nameLine;
+					page += countLine;
+					materialIndex++;
+				}
+			}
+			
+			book.addPage(page);
+			pageIndex++;
+		}
+			
+	
+		item.setItemMeta(book);
+		
+		this.getPlayer().getInventory().addItem(item);
+		
+		return true;
+	}
+	
+	private String formatBookNumberLine(int inputVal, int zeroCount, int leadingSpaceCount){
+		String inputStr =  String.valueOf(inputVal);
+		String leadingZeroStr = "";
+		
+		if (inputStr.length() < zeroCount){
+			String pattern = "";
+			for (int i = 0; i < zeroCount; i++) {
+				pattern += "0";
+			}
+			leadingZeroStr = pattern.substring(inputStr.length());
+		}
+		
+		String resultLine = String.format("§7%s§4%s§0\n", leadingZeroStr, inputVal);
+
+		String leadingSpaces = "";
+		for (int j = 0; j < leadingSpaceCount; j++) {
+			leadingSpaces += " ";
+		}
+		resultLine = leadingSpaces + resultLine;
+		
+		return resultLine;	
 	}
 	
 	public boolean findMaterial(ArrayList<String> materialnames) {

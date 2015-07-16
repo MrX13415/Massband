@@ -23,7 +23,7 @@ public class English extends Language{
 		THREADS_INTERUPT_OK = Massband.consoleOutputHeader + ChatColor.RED + " All running block-countings interrupted ! (left: %s)";
     	THREADS_INTERUPT_NOTHING = ChatColor.RED + " Nothing to Interrupt ...";
 	
-		COUNTBLOCK_TOTAL = ChatColor.WHITE + "Total content: " + ChatColor.GOLD + "%s" + ChatColor.WHITE + " Blocks" + ChatColor.GRAY + " (exept air)";
+		COUNTBLOCK_TOTAL = ChatColor.GREEN + "Total content: " + ChatColor.GOLD + "%s" + ChatColor.GREEN + " Blocks" + ChatColor.GRAY + " (exept air)";
 		COUNTBLOCK_SPEED = ChatColor.WHITE + "Speed: " + ChatColor.GOLD + "%s" + ChatColor.WHITE + " Blocks/s";
 		COUNTBLOCK_TIME = ChatColor.WHITE + "Time: " + ChatColor.GOLD + "%s" + ChatColor.WHITE + " ms";
     	COUNTBLOCK = ChatColor.GRAY + "Counting Blocks ...  (could take some time)";
@@ -36,6 +36,7 @@ public class English extends Language{
 		COUNTBLOCK_BLPAGE_LINE = ChatColor.WHITE + "  + %s: " + ChatColor.GOLD + "%s";
 		COUNTBLOCK_BLPAGE_NO_MAT = ChatColor.WHITE + "  + " + ChatColor.RED + "Invalid Material: " + ChatColor.WHITE + "%s";
 		COUNTBLOCK_CMD_FIRST = ChatColor.RED + "Use the Command '/massband countBlocks' or '/mb cb' first ...";
+		COUNTBLOCK_PERCENTAGE = ChatColor.GRAY + "Counting Blocks ... %s%%";
 		SFM_ONLY = ChatColor.RED + "This command is only in the 'surface-mode' available - see help (/massband)";
 				
 		D_WIDTH = ChatColor.WHITE +  "Width: " + ChatColor.GOLD + "%s" + ChatColor.WHITE + " Blocks";
@@ -53,15 +54,20 @@ public class English extends Language{
 		
 		MODE_SIMPLE = ChatColor.GRAY + "- Simple-mode --------------------------------------";
 		MODE_LENGTH = ChatColor.GRAY + "- Length-mode --------------------------------------";
+		MODE_FIXED = ChatColor.GRAY +  "- Fixed-Length-mode --------------------Lenght: " + ChatColor.GOLD + "%s" + ChatColor.GRAY + "--";
 		MODE_SURFACE = ChatColor.GRAY + "- Surface-mode -------------------------------------";
 		
 		MODE_SIMPLE2 = ChatColor.GRAY + "Simple-mode selected ...";
 		MODE_LENGTH2 = ChatColor.GRAY + "Length-mode selected ...";
+		MODE_FIXED2 = ChatColor.GRAY + "Fixed-Length-mode selected ... Lenght: " + ChatColor.GOLD + "%s";
 		MODE_SURFACE2 = ChatColor.GRAY + "Surface-mode selected ...";
 		
-		LENGTH = ChatColor.WHITE + "Length: " + ChatColor.GOLD + "%s" + ChatColor.WHITE + " Blocks";
+		FIXED_MODE_ERROR = ChatColor.RED + "Invalid value ...";
 		
-		POINT_CLR = ChatColor.RED + "Points-list cleared.";
+		LENGTH = ChatColor.WHITE + "Length: " + ChatColor.GOLD + "%s" + ChatColor.WHITE + " Blocks";
+		DIFF = "Length: " + ChatColor.GOLD + "%s" + ChatColor.WHITE + " from " + ChatColor.GOLD + "%s" + ChatColor.WHITE + " Blocks " + ChatColor.GRAY + "Difference: " + ChatColor.GOLD + "%s" + ChatColor.GRAY + " Blocks";
+		
+		POINT_CLR = ChatColor.GRAY + "Points-list cleared.";
 	    POINT = ChatColor.GREEN + "Point #" + ChatColor.GRAY + "%s" + ChatColor.GREEN + ": " + ChatColor.RED + "%s" + ChatColor.GREEN  + "," + ChatColor.RED + "%s" + ChatColor.GREEN  + "," + ChatColor.RED + "%s" + ChatColor.GREEN  + " Ignoring axes: " + ChatColor.GOLD + "%s";
 	   	AXIS_X = "X";
 		AXIS_Y = "Y";
@@ -74,10 +80,11 @@ public class English extends Language{
 		MASK_CHR = ChatColor.GRAY + "*";
 		SEPERATE_CHR = ", ";
 	
-		COMMAND_MASSBAND_USAGE = ChatColor.GREEN + "Massband 2.8 - A Measuring Tape - Command: " + ChatColor.RED + "/massband" + ChatColor.GREEN + " or " + ChatColor.RED + "/mb " + "\n" +
+		COMMAND_MASSBAND_USAGE = ChatColor.GREEN + "Massband 2.9 - A Measuring Tape - Command: " + ChatColor.RED + "/massband" + ChatColor.GREEN + " or " + ChatColor.RED + "/mb " + "\n" +
 									   ChatColor.RED + "/mb "						+ ChatColor.GOLD + "<enable|disable> "						+ ChatColor.GRAY + "Enables/Disables Massband for your self" + "\n" +
 									   ChatColor.RED + "/mb " 						+ ChatColor.GOLD + "<simplemode|lengthmode|surfacemode> "	+ ChatColor.GRAY + "Switchs between the different measure mods" + "\n" +
-									   ChatColor.RED + "/mb ignoreaxes "			+ ChatColor.GOLD + "<none|<axis> [axis] [axis]>"		+ ChatColor.GRAY + "Sets the axis to ignore" + "\n" +
+									   ChatColor.RED + "/mb fixedmode"				+ ChatColor.GOLD + "<value> "								+ ChatColor.GRAY + "Switchs to the fixed mode with the given value" + "\n" +
+									   ChatColor.RED + "/mb ignoreaxes "			+ ChatColor.GOLD + "<none|<axis> [axis] [axis]>"			+ ChatColor.GRAY + "Sets the axis to ignore" + "\n" +
 									   ChatColor.RED + "/mb clear " 				+ ChatColor.GOLD + ""										+ ChatColor.GRAY + "Clears all measuring points" + "\n" +
 									   ChatColor.RED + "/mb stop " 					+ ChatColor.GOLD + ""										+ ChatColor.GRAY + "Interrupt your current Block-counting" + "\n" +
 									   ChatColor.RED + "/mb stopall " 				+ ChatColor.GOLD + ""										+ ChatColor.GRAY + "Interrupts all Block-countings of the server" + "\n" +

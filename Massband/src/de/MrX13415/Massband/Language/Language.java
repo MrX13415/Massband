@@ -34,6 +34,7 @@ public class Language {
 	public String COUNTBLOCK_BLPAGE_NO_MAT;
 	public String COUNTBLOCK_BLPAGE_BREAK_LINE;
 	public String COUNTBLOCK_BLPAGE_FOOTER;
+	public String COUNTBLOCK_PERCENTAGE;
 	
 	public String SFM_ONLY;
 
@@ -51,14 +52,19 @@ public class Language {
 	public String PERMISSION_NOT;
 	
 	public String MODE_SIMPLE;
+	public String MODE_FIXED;
 	public String MODE_LENGTH;
 	public String MODE_SURFACE;
 
 	public String MODE_SIMPLE2;
 	public String MODE_LENGTH2;
+	public String MODE_FIXED2;
 	public String MODE_SURFACE2;
 	
+	public String FIXED_MODE_ERROR;
+	
 	public String LENGTH;
+	public String DIFF;
 	
 	public String POINT_CLR;
 	public String POINT;
