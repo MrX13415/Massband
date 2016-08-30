@@ -3,6 +3,7 @@ package net.icelane.massband.event;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
 import org.bukkit.event.player.PlayerInteractEvent;
+import org.bukkit.event.player.PlayerItemHeldEvent;
 import org.bukkit.inventory.ItemStack;
 
 import net.icelane.massband.core.Massband;
@@ -37,4 +38,11 @@ public class PlayerEvents implements Listener {
 		if (obj != null) obj.interact(event);
 		//TODO: else write error
 	}
+	
+	@EventHandler
+	public void onPlayerItemHeldEvents(PlayerItemHeldEvent event){
+		Massband obj = Massband.get(event.getPlayer());
+		if (obj != null) obj.itemChange(event);
+	}
+	
 }

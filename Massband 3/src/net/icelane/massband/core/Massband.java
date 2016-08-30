@@ -3,27 +3,31 @@ package net.icelane.massband.core;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Map.Entry;
-import java.util.Set;
 import java.util.UUID;
 
 import org.bukkit.Material;
 import org.bukkit.block.Block;
+import org.bukkit.block.BlockFace;
 import org.bukkit.entity.Player;
 import org.bukkit.event.player.PlayerInteractEvent;
+import org.bukkit.event.player.PlayerItemHeldEvent;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.util.Vector;
 
-import net.icelane.massband.minecraft.FloatingLabel;
+import net.icelane.massband.minecraft.HoloText;
 
 public class Massband {
 
 	private static HashMap<UUID, Massband> list = new HashMap<>();
 	
 	private Player player;
-
+	private Marker markers;
+	public int markerCount = 2;
+	public boolean specialMode = false;
 	
 	private Massband(Player player) {
 		this.player = player;
+		this.markers = new Marker(player);
 	}
 	
 	public static Massband newInsatnce(Player player){
@@ -50,54 +54,73 @@ public class Massband {
 		
 	}
 	
-	public static void clearAll(){
+	public static void cleanAll(){
 		for (Entry<UUID, Massband> entry : list.entrySet()){
-			entry.getValue().clear();
+			entry.getValue().clean();
 		}
 	}
 	
-	public void clear(){
-		label.getEntity().remove();
-		label2.getEntity().remove();
+	public void clean(){
+		this.markers.removeAll();
 	}
 	
-	FloatingLabel label;
-	FloatingLabel label2;
 	
 	public void interact(PlayerInteractEvent event){
 		
 		Block block    = event.getClickedBlock();
+		BlockFace face = event.getBlockFace();
 		ItemStack item = event.getItem();
 	
 		if (item == null) return;
 		if (item.getType() != Material.STICK) return;
-		
-		//player.sendMessage("INTERACT: " + block.getType() + " HAND: " + event.getHand());
-		
-		if (label != null){
-			label.getEntity().remove();
+
+		Block blocka = block;
+		Block blockb = blocka;
+		if (specialMode){
+			int size = (int)Math.sqrt(markerCount);
+			for (int indexa = 0; indexa < size; indexa++){
+				blockb = blocka;
+				for (int indexb = 0; indexb < size; indexb++){
+					addPoint(blockb.getX(), blockb.getY(), blockb.getZ());
+					computingVectors();
+					
+					markers.add(blockb, face, "Test: " + lenght);
+					blockb = blockb.getRelative(BlockFace.EAST);
+				}
+				blocka = blocka.getRelative(BlockFace.NORTH);
+			}
 		}
+		
+		double lastLenght = lenght;
 		
 		addPoint(block.getX(), block.getY(), block.getZ());
-		
 		computingVectors();
-		String text = "§c#";
-		if (lenght > 0) text = "§6" + lenght + "m";
 		
 		if (wayPoints.size() == 1) {
-			if (label2 != null){
-				label2.getEntity().remove();
-			}
-			label2 = FloatingLabel.create(player.getWorld(), block, text);
+			markers.changeFirst(block, face, "§c#", true);
 		}else{
-			label = FloatingLabel.create(player.getWorld(), block, text);
+			markers.changeLast(block, face, String.format("§6%sm", lenght), true);
+			if (markers.hasMore()){
+				markers.getLast().setText(String.format("§7(%s) §6%sm", markers.getCount() + 1, lenght));
+				markers.getLastBetween().setText(String.format("§7#%s: §a%sm", markers.getCount(), lastLenght));
+			}
 		}
 		
-		if (wayPoints.size() >= 2) {
+		
+		if (wayPoints.size() >= markerCount) {
 			wayPoints.clear();
 			lenght = 0;
-			
 		}		
+	}
+	
+	public void itemChange(PlayerItemHeldEvent event) {
+		ItemStack newItem = player.getInventory().getItem(event.getNewSlot());
+		
+		if (newItem == null || newItem.getType() != Material.STICK){
+			markers.hideAll();
+		}else{
+			markers.showAll();
+		}
 	}
 	
 	private double lenght = 0;
@@ -129,4 +152,5 @@ public class Massband {
 		}
 		return lenght;
 	}
+
 }

@@ -2,6 +2,7 @@ package net.icelane.massband;
 
 import java.util.logging.Logger;
 
+import org.bukkit.plugin.PluginManager;
 import org.bukkit.plugin.java.JavaPlugin;
 
 import net.icelane.massband.command.CommandBase;

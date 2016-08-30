@@ -2,8 +2,10 @@ package net.icelane.massband.command.commands;
 
 import org.bukkit.command.Command;
 import org.bukkit.command.CommandSender;
+import org.bukkit.entity.Player;
 
 import net.icelane.massband.command.CommandBase;
+import net.icelane.massband.core.Massband;
 
 public class MassbandCommand extends CommandBase{
 
@@ -20,6 +22,44 @@ public class MassbandCommand extends CommandBase{
 	@Override
 	public boolean command(CommandSender sender, Command cmd, String label, String[] args) {
 	
+		//**** DEBUG ****
+		if (args.length == 2 && args[0].equalsIgnoreCase("count")){
+			if (sender instanceof Player){
+				int value = 2;
+				try{
+					value = Integer.valueOf(args[1]);
+					if (value < 2) value = 2;
+					
+					Massband.get((Player) sender).markerCount = value;
+					sender.sendMessage("Waypoint count set to: " + value);
+				}catch (NumberFormatException ex){
+					sender.sendMessage("Error: incorrect argument!");
+				}
+			}else{
+				sender.sendMessage("Only for ingame usage!");
+			}
+			
+			return true;
+		}
+		//*******
+		
+		if (args.length == 2 && args[0].equalsIgnoreCase("spm")){
+			if (sender instanceof Player){
+				if (args[1].equalsIgnoreCase("true") || args[1].equalsIgnoreCase("1")){
+					Massband.get((Player) sender).specialMode = true;
+				}else{
+					Massband.get((Player) sender).specialMode = false;
+				}
+			}else{
+				sender.sendMessage("Only for ingame usage!");
+			}
+			
+			
+			return true;
+		}
+		
+		
+		
 		//**** DEBUG ****
 		if (args.length == 2 && args[0].equalsIgnoreCase("debug")){
 			if (args[1].equalsIgnoreCase("true") || args[1].equalsIgnoreCase("1")){

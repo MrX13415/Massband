@@ -31,7 +31,7 @@ public class Plugin extends JavaPlugin{
 	public void onDisable() {
 		super.onDisable();
 		
-		Massband.clearAll();
+		Massband.cleanAll();
 	}
 	
 }
