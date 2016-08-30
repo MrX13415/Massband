@@ -1,0 +1,15 @@
+main: net.icelane.massband.Plugin
+
+name: Massband
+version: 3.0.0.1
+description: Massband III
+author: MrX13415
+website: icelane.net
+
+commands:
+  massband:
+    aliases: [mb]
+    description: Manage Massband
+    usage: |
+           UpdateCraft
+           /updatecraft database|download [create|clear|remove|update][rec|btea|dev|<buildno>] <buildno>
