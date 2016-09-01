@@ -2,6 +2,7 @@ package net.icelane.massband.command;
 
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Comparator;
 import java.util.List;
 import java.util.Map;
 
@@ -28,11 +29,13 @@ public abstract class CommandBase implements TabExecutor{
 	protected PluginCommand pluginCommand;
 	
 	protected String name          = "";
-	protected String[] aliases      = {""};
+	protected String[] aliases      = {};
 	protected String description    = "";
+	protected String help           = "";
 	protected String usage          = "";
 	protected String permissionNode = "";
 	protected boolean op            = false; //fallback permission
+	protected String[] tabList      = {};
 	
 	protected ArrayList<CommandBase> commands = new ArrayList<>();
 	protected CommandBase parent = null;
@@ -188,15 +191,34 @@ public abstract class CommandBase implements TabExecutor{
 			}
 		}
 		
+		for (String value : tabList){
+			// search for "arg" in command names ...
+			if (arg.length() == 0 || value.toLowerCase().contains(arg)){
+				resultList.add(value);
+				continue;
+			}
+		}
+		
 		// add the "?" as command, cause its available on all commands
 		if (arg.length() == 0) resultList.add("?");
 		
+		resultList.sort(Comparator.naturalOrder());
 		return resultList;
 	}
 	
 	@Override
 	public List<String> onTabComplete(CommandSender sender, Command command, String alias, String[] args) {
-		return getTabList(args.length > 0 ? args[0] : "");
+		// check for sub commands ...
+		if (args.length > 0){			
+			for (CommandBase cmd : this.commands) {
+				if (cmd.isCommand(args[0])){
+					// call sub command
+					return cmd.onTabComplete(sender, command, alias, getArgsOnly(args));
+				}
+			}
+		}
+		
+		return getTabList(args.length > 0 ? args[args.length - 1] : "");
 	}
 	
 	@Override
@@ -313,6 +335,10 @@ public abstract class CommandBase implements TabExecutor{
 		return description;
 	}
 	
+	public String getHelp() {
+		return help;
+	}
+
 	public String getUsage() {
 		return usage;
 	}
@@ -340,6 +366,10 @@ public abstract class CommandBase implements TabExecutor{
 		return permissionNode;
 	}
 	
+	public String[] getTabList() {
+		return tabList;
+	}
+
 	public void setParent(CommandBase parentCommand) {
 		this.parent = parentCommand;
 	}
@@ -356,12 +386,20 @@ public abstract class CommandBase implements TabExecutor{
 		this.description = description;
 	}
 
+	public void setHelp(String help) {
+		this.help = help;
+	}
+	
 	public void setUsage(String usage) {
 		this.usage = usage;
 	}
 	
 	public void setPermissionNode(String permissionNode){
 		this.permissionNode = permissionNode;
+	}
+	
+	public void setTabList(String...tabValue){
+		tabList = tabValue;
 	}
 	
 	public boolean isOP(){
