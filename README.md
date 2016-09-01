@@ -13,7 +13,7 @@ Massband is a plugin for **Minecraft-Servers** based on **Bukkit**. It offers va
 #### **[DOWNLOAD](http://dev.bukkit.org/server-mods/massband/)** via Bukkit-Dev
 
 Servers running **Spigot** or **Bukkit** with Minecraft version **1.10**.
-For more information visit the [Bukkit-Dev](http://dev.bukkit.org/server-mods/massband/) webpage.
+For more informations visit the [Bukkit-Dev](http://dev.bukkit.org/server-mods/massband/) webpage.
 
 
 
