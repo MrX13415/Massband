@@ -1,5 +1,7 @@
 package net.icelane.massband.command;
 
+import net.icelane.massband.Plugin;
+
 public class CommandText {
 
 /*
@@ -32,12 +34,14 @@ Effects:
 
 	public static String getHelp(CommandBase command){
 		// output formats 
-		String format_header = "§aCommand: /%s§c%s §aAliases §c%s";
-		String format_desc   = "\n§aUsage: §6%s§7%s";
-		String format_cmd    = "§f - §c%s §6%s §7%s";
+		String format_header = "\n§aCommand: §7/%1$s§c%2$s §aAliases: §c%3$s";
+		String format_desc   = "\n§7%1$s";
+		String format_perm   = "\n  §aPermission: §c%1$s";
+		String format_usage  = "\n  §aUsage: §6%1$s";
+		String format_cmd    = "  §f - §c%1$s §6%2$s §7%3$s";
 		
 		// command info
-		String label   = command.getLabel();
+		String label   = command.getName();
 		String aliases = command.getAliasesString();
 		String usage   = command.getUsage();
 		String decs    = command.getDescription();
@@ -46,34 +50,41 @@ Effects:
 		String parents = "";
 		CommandBase parent = command.getParent();
 		while (parent != null) {
-			parents = parent.getLabel() + " " + parents;
+			parents = parent.getName() + " " + parents;
 			parent  = parent.getParent();
 		}
 		
 		// define header and basic output
 		String out_header = String.format(format_header, parents, label, aliases);
-		String out_desc = "";
-		String out_args = "";
-		
-		// define desc
-		if (usage.length() > 0){
-			if (!usage.endsWith(" ")) usage += " ";
-		}else if (command.getCommands().size() > 0 ){
-			usage = "<command> ";
+		String out_desc   = "";
+		String out_perm   = command.isOP() ? String.format(format_perm, "OP") : "";
+		String out_usage  = (command.getCommands().size() > 0) ? String.format(format_usage, "<command>") : "";
+		String out_args   = "";
+
+		// define description
+		if (decs.length() > 0){
+			out_desc = String.format(format_desc, decs); 
 		}
 		
-		if (decs.length() > 0){
-			out_desc = String.format(format_desc, usage, decs); 
+		// define permission
+		if ( Plugin.get().isPermissionsEnabled() && command.getPermission().length() > 0 ){
+			out_perm = String.format(format_perm, command.getPermission());
+		}
+				
+		// define usage
+		if (usage.length() > 0){
+			usage = usage.replace("<command>", command.getNames());
+			out_usage = String.format(format_usage, usage);
 		}
 
 		// define commands (args)
 		for (CommandBase cmd : command.getCommands()) {
-			out_args += String.format(format_cmd, cmd.getLabel(), cmd.getUsage(), cmd.getDescription());
+			out_args += String.format(format_cmd, cmd.getName(), cmd.getUsage(), cmd.getDescription());
 			
 			if (command.getCommands().size() - command.getCommands().indexOf(cmd) > 1) out_args += "\n";
 		}
 		
-		return out_header + out_desc + "\n" + out_args;
+		return out_header + out_desc + out_perm + out_usage + out_args;
 	}
 	
 	public static String getPermissionDenied(CommandBase command){
@@ -81,13 +92,13 @@ Effects:
 		String format_header = "§cDENIED §aCommand: /%s§c%s §aPermission: §c%s";
 		
 		// command info
-		String label   = command.getLabel();
+		String label   = command.getName();
 	
 		// get list of parent commands
 		String parents = "";
 		CommandBase parent = command.getParent();
 		while (parent != null) {
-			parents = parent.getLabel() + " " + parents;
+			parents = parent.getName() + " " + parents;
 			parent  = parent.getParent();
 		}
 		

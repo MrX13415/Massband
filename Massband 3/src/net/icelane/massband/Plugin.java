@@ -1,15 +1,23 @@
 package net.icelane.massband;
 
+import org.bukkit.Bukkit;
+import org.bukkit.configuration.file.FileConfiguration;
 import org.bukkit.plugin.java.JavaPlugin;
 
 import net.icelane.massband.core.Massband;
 
 public class Plugin extends JavaPlugin{
 
-	private static JavaPlugin plugin;
-
-	public static JavaPlugin get(){
+	private static Plugin plugin;
+	
+	private boolean permissionsEnabled = true;
+		
+	public static Plugin get(){
 		return plugin;
+	}
+	
+	public static FileConfiguration config(){
+		return get().getConfig();
 	}
 	
 	@Override
@@ -23,6 +31,9 @@ public class Plugin extends JavaPlugin{
 	public void onEnable() {
 		super.onEnable();
 		
+		Config.defaults();
+		Config.save();
+		
 		Server.registerEvents();
 		Server.registerCommands();
 	}
@@ -32,6 +43,18 @@ public class Plugin extends JavaPlugin{
 		super.onDisable();
 		
 		Massband.cleanAll();
+	}
+
+	public void disable(){
+		Bukkit.getPluginManager().disablePlugin(this);
+	}
+	
+	public boolean isPermissionsEnabled() {
+		return permissionsEnabled;
+	}
+
+	public void setPermissionsEnabled(boolean usePermissions) {
+		this.permissionsEnabled = usePermissions;
 	}
 	
 }

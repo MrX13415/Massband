@@ -1,36 +1,31 @@
 package net.icelane.massband.core;
 
-import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Map.Entry;
 import java.util.UUID;
 
-import org.bukkit.Material;
-import org.bukkit.block.Block;
-import org.bukkit.block.BlockFace;
+import org.bukkit.World;
 import org.bukkit.entity.Player;
+import org.bukkit.event.EventHandler;
 import org.bukkit.event.player.PlayerInteractEvent;
-import org.bukkit.event.player.PlayerItemHeldEvent;
-import org.bukkit.inventory.ItemStack;
-import org.bukkit.util.Vector;
-
-import net.icelane.massband.minecraft.HoloText;
+import org.bukkit.event.player.PlayerJoinEvent;
+import org.bukkit.event.player.PlayerMoveEvent;
+import org.bukkit.event.player.PlayerQuitEvent;
 
 public class Massband {
 
 	private static HashMap<UUID, Massband> list = new HashMap<>();
 	
 	private Player player;
-	private Marker markers;
-	public int markerCount = 2;
-	public boolean specialMode = false;
-	
+	private HashMap<String, Markers> worldMarkersList = new HashMap<>(); // String => World.Name
+	private Interact interact;
+
 	private Massband(Player player) {
 		this.player = player;
-		this.markers = new Marker(player);
+		this.interact = new Interact(this);
 	}
-	
-	public static Massband newInsatnce(Player player){
+		
+	public static Massband newInstance(Player player){
 		Massband obj = new Massband(player);
 		list.put(player.getUniqueId(), obj);
 		return obj;
@@ -38,7 +33,7 @@ public class Massband {
 	
 	public static Massband get(Player player){
 		Massband obj = get(player.getUniqueId());
-		if (obj == null) obj = newInsatnce(player);
+		if (obj == null) obj = newInstance(player);
 		return obj;
 	}
 	
@@ -61,96 +56,48 @@ public class Massband {
 	}
 	
 	public void clean(){
-		this.markers.removeAll();
+		this.worldMarkersList.clear();
 	}
 	
 	
 	public void interact(PlayerInteractEvent event){
-		
-		Block block    = event.getClickedBlock();
-		BlockFace face = event.getBlockFace();
-		ItemStack item = event.getItem();
+		this.interact.interact(event);
+	}
 	
-		if (item == null) return;
-		if (item.getType() != Material.STICK) return;
+	public void join(PlayerJoinEvent event){
+		load();
+	}
 
-		Block blocka = block;
-		Block blockb = blocka;
-		if (specialMode){
-			int size = (int)Math.sqrt(markerCount);
-			for (int indexa = 0; indexa < size; indexa++){
-				blockb = blocka;
-				for (int indexb = 0; indexb < size; indexb++){
-					addPoint(blockb.getX(), blockb.getY(), blockb.getZ());
-					computingVectors();
-					
-					markers.add(blockb, face, "Test: " + lenght);
-					blockb = blockb.getRelative(BlockFace.EAST);
-				}
-				blocka = blocka.getRelative(BlockFace.NORTH);
-			}
-		}
-		
-		double lastLenght = lenght;
-		
-		addPoint(block.getX(), block.getY(), block.getZ());
-		computingVectors();
-		
-		if (wayPoints.size() == 1) {
-			markers.changeFirst(block, face, "§c#", true);
-		}else{
-			markers.changeLast(block, face, String.format("§6%sm", lenght), true);
-			if (markers.hasMore()){
-				markers.getLast().setText(String.format("§7(%s) §6%sm", markers.getCount() + 1, lenght));
-				markers.getLastBetween().setText(String.format("§7#%s: §a%sm", markers.getCount(), lastLenght));
-			}
-		}
-		
-		
-		if (wayPoints.size() >= markerCount) {
-			wayPoints.clear();
-			lenght = 0;
-		}		
+	@EventHandler
+	public void quit(PlayerQuitEvent event){
+		save();
+		clean();
 	}
 	
-	public void itemChange(PlayerItemHeldEvent event) {
-		ItemStack newItem = player.getInventory().getItem(event.getNewSlot());
-		
-		if (newItem == null || newItem.getType() != Material.STICK){
-			markers.hideAll();
-		}else{
-			markers.showAll();
+	@EventHandler
+	public void move(PlayerMoveEvent event){
+		if (event.getFrom().getWorld() != event.getTo().getWorld()){
+			getMarker(event.getFrom().getWorld()).hideAll();
+			getMarker(event.getTo().getWorld()).showAll();
 		}
 	}
 	
-	private double lenght = 0;
-	private ArrayList<Vector> wayPoints = new ArrayList<Vector>();
 	
-	public void addPoint(int x, int y, int z) {
-		wayPoints.add(new Vector(x, y, z));
+	public Player getPlayer() {
+		return player;
 	}
-	
-	public Vector getVector(int index) {
-		return wayPoints.get(index);
-	}
-	
-	public double computingVectors(){
-		if (wayPoints.size() >= 2) {
-			lenght = 0;
-						
-			for (int vectorIndex = 0; vectorIndex < wayPoints.size() - 1; vectorIndex++) {
-				Vector firstV = getVector(vectorIndex);
-				Vector nextV = getVector(vectorIndex + 1);
-				
-//				if (ignoredaxes.contains(AXIS.X)){firstV.setX(0);nextV.setX(0);}
-//				if (ignoredaxes.contains(AXIS.Y)){firstV.setY(0);nextV.setY(0);}
-//				if (ignoredaxes.contains(AXIS.Z)){firstV.setZ(0);nextV.setZ(0);}
-					
-				lenght += firstV.distance(nextV);
-			}
-			lenght += 1;	//add last point
+
+	public Markers getMarker(World world){
+		Markers m = worldMarkersList.get(world.getName());
+		if (m == null){
+			m = new Markers(world);
+			worldMarkersList.put(world.getName(), m);
 		}
-		return lenght;
+		return m;
+	}
+
+	public Interact getInteract() {
+		return interact;
 	}
 
 }

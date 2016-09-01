@@ -1,8 +1,8 @@
 package net.icelane.massband;
 
+import java.util.logging.Level;
 import java.util.logging.Logger;
 
-import org.bukkit.plugin.PluginManager;
 import org.bukkit.plugin.java.JavaPlugin;
 
 import net.icelane.massband.command.CommandBase;
@@ -15,7 +15,7 @@ public class Server {
 		return Plugin.get().getServer();
 	}
 	
-	public static Logger getLogger(){
+	public static Logger logger(){
 		return get().getLogger();
 	}
 	
@@ -30,15 +30,16 @@ public class Server {
 		
 		// register commands
 		try {
-			CommandBase.SetPermissionRootNode("massband");
-			CommandBase.Initialize();
-			
+//			CommandBase.SetPermissionRootNode("massband");
+//			CommandBase.Initialize();
+
 			//register the main commands 
 			CommandBase.register(MassbandCommand.class);
 			
 			return true;
-		} catch (Exception e) {
-			getLogger().warning("[" + plugin.getDescription().getName() + "] Error: Commands not definated in 'plugin.yml'");
+		} catch (Exception ex) {
+			logger().severe("[" + plugin.getDescription().getName() + "] Error: Commands not definated in 'plugin.yml'");
+			logger().log(Level.SEVERE, "BOOM!", ex);
 		}
 		return false;
 	}

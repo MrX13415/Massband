@@ -10,7 +10,7 @@ import org.bukkit.entity.EntityType;
 public class HoloText {
 
 	private ArmorStand entity;
-	
+
 	public HoloText(ArmorStand entity){
 		this.entity   = entity;
 	}

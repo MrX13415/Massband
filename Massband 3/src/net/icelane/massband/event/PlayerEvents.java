@@ -4,6 +4,9 @@ import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
 import org.bukkit.event.player.PlayerInteractEvent;
 import org.bukkit.event.player.PlayerItemHeldEvent;
+import org.bukkit.event.player.PlayerJoinEvent;
+import org.bukkit.event.player.PlayerMoveEvent;
+import org.bukkit.event.player.PlayerQuitEvent;
 import org.bukkit.inventory.ItemStack;
 
 import net.icelane.massband.core.Massband;
@@ -40,9 +43,27 @@ public class PlayerEvents implements Listener {
 	}
 	
 	@EventHandler
-	public void onPlayerItemHeldEvents(PlayerItemHeldEvent event){
+	public void onPlayerItemHeld(PlayerItemHeldEvent event){
 		Massband obj = Massband.get(event.getPlayer());
-		if (obj != null) obj.itemChange(event);
+		if (obj != null) obj.getInteract().itemChange(event);
+	}
+	
+	@EventHandler
+	public void onPlayerJoin(PlayerJoinEvent event){
+		Massband obj = Massband.get(event.getPlayer());
+		if (obj != null) obj.join(event);
+	}
+
+	@EventHandler
+	public void onPlayerQuit(PlayerQuitEvent event){
+		Massband obj = Massband.get(event.getPlayer());
+		if (obj != null) obj.quit(event);
+	}
+	
+	@EventHandler
+	public void onPlayerMove(PlayerMoveEvent event){
+		Massband obj = Massband.get(event.getPlayer());
+		if (obj != null) obj.move(event);
 	}
 	
 }

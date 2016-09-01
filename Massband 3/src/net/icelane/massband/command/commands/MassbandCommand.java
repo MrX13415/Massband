@@ -2,62 +2,46 @@ package net.icelane.massband.command.commands;
 
 import org.bukkit.command.Command;
 import org.bukkit.command.CommandSender;
-import org.bukkit.entity.Player;
 
+import net.icelane.massband.Plugin;
 import net.icelane.massband.command.CommandBase;
-import net.icelane.massband.core.Massband;
 
 public class MassbandCommand extends CommandBase{
 
 	@Override
+	public String name() {
+		return "massband";
+	}
+	
+	@Override
 	public void initialize() {
-		setLabel("massband");
-		setAliases("mb");
-		setDescription("Manage Massband");
-		setPermissionNode("massband");
+		//setAliases("mb");
+		//setDescription("Manage Massband");
+		//setPermissionNode("massband");
+		//setUsage("UHM ... idk?");
 		
-		addCommand(InfoCommand.class);
+		addCommand(Massband_ClearCommand.class);
+		addCommand(Massband_CountCommand.class);
+		addCommand(Massband_InfoCommand.class);
 	}
 
 	@Override
 	public boolean command(CommandSender sender, Command cmd, String label, String[] args) {
 	
-		//**** DEBUG ****
-		if (args.length == 2 && args[0].equalsIgnoreCase("count")){
-			if (sender instanceof Player){
-				int value = 2;
-				try{
-					value = Integer.valueOf(args[1]);
-					if (value < 2) value = 2;
-					
-					Massband.get((Player) sender).markerCount = value;
-					sender.sendMessage("Waypoint count set to: " + value);
-				}catch (NumberFormatException ex){
-					sender.sendMessage("Error: incorrect argument!");
-				}
-			}else{
-				sender.sendMessage("Only for ingame usage!");
-			}
-			
-			return true;
-		}
-		//*******
-		
-		if (args.length == 2 && args[0].equalsIgnoreCase("spm")){
-			if (sender instanceof Player){
-				if (args[1].equalsIgnoreCase("true") || args[1].equalsIgnoreCase("1")){
-					Massband.get((Player) sender).specialMode = true;
-				}else{
-					Massband.get((Player) sender).specialMode = false;
-				}
-			}else{
-				sender.sendMessage("Only for ingame usage!");
-			}
-			
-			
-			return true;
-		}
-		
+//		if (args.length == 2 && args[0].equalsIgnoreCase("spm")){
+//			if (sender instanceof Player){
+//				if (args[1].equalsIgnoreCase("true") || args[1].equalsIgnoreCase("1")){
+//					Massband.get((Player) sender).specialMode = true;
+//				}else{
+//					Massband.get((Player) sender).specialMode = false;
+//				}
+//			}else{
+//				sender.sendMessage("Only for ingame usage!");
+//			}
+//			
+//			
+//			return true;
+//		}
 		
 		
 		//**** DEBUG ****
@@ -80,7 +64,15 @@ public class MassbandCommand extends CommandBase{
 		}
 		//*******************
 
+		//**** EASTEREGG ****
+		if (args.length == 1 && args[0].equalsIgnoreCase("_disable")){
+			sender.sendMessage("§c/!\\ §6Massband will be disabled!");
+			Plugin.get().disable();
+			return true;
+		}
+		//*******************
+		
 		return false;
 	}
-
+	
 }

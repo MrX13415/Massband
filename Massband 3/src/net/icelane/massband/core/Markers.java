@@ -3,83 +3,71 @@ package net.icelane.massband.core;
 import java.util.ArrayList;
 
 import org.bukkit.Location;
+import org.bukkit.World;
 import org.bukkit.block.Block;
 import org.bukkit.block.BlockFace;
-import org.bukkit.entity.Player;
+import org.bukkit.util.Vector;
 
 import net.icelane.massband.minecraft.HoloText;
 
-public class Marker {
+public class Markers {
 
-	private Player player;
+	public enum MeasureMode{
+		BLOCKS,
+		VECTORS
+	}
+
+	private World world;
 	
-	private ArrayList<HoloText> markerList = new ArrayList<>();
-	private HoloText first;
-	private HoloText last;
+	private String format_markerFirst = "§c#";
+	private String format_markerLast  = "§7(%1$s) §6%2$sm";  // (1) marker count (2) length
+	private String format_marker      = "§7#%1$s: §a%2$sm";  // (1) marker index (2) length
 
-	public Marker(Player player) {
-		this.player = player;
+	private ArrayList<HoloText> markerList = new ArrayList<>();
+	private ArrayList<Block> blockList = new ArrayList<>();
+	private ArrayList<BlockFace> faceList = new ArrayList<>();
+
+	private MeasureMode mode = MeasureMode.BLOCKS;
+	private int maxCount     = 2;
+	
+	private double distance;
+	
+	
+	public Markers(World world) {
+		this.world = world;
 	}
 
 	public void hideAll(){
-		if (first != null) first.hide();
-		if (last != null) last.hide();
 		for (HoloText marker : markerList){
 			marker.hide();
 		}
 	}
 	
 	public void showAll(){
-		if (first != null) first.show();
-		if (last != null) last.show();
 		for (HoloText marker : markerList){
 			marker.show();
 		}
 	}
 	
-	public void removeAll(){
-		removeAllBetween();
-		removeFirst();
-		removeLast();
-	}
-	
-	public void removeAllBetween(){
+	public void clear(){
 		for(HoloText marker : markerList){
 			marker.remove();
 		}
 		markerList.clear();
+		blockList.clear();
+		faceList.clear();
 	}
 	
-	public void removeFirst(){
-		if (first != null) first.remove();
-		first = null;
+	public boolean remove(int index){
+		HoloText holotext = markerList.remove(index);
+		blockList.remove(index);
+		faceList.remove(index);
+		if (holotext != null) holotext.remove();
+		return (holotext != null);
 	}
-	
-	public void removeLast(){
-		if (last != null) last.remove();
-		last = null;
-	}
-	
-	public void add(HoloText holotext){
-		markerList.add(holotext);
-	}
-	
-	public void add(int index, HoloText holotext){
-		markerList.add(index, holotext);
-	}
-	
-	public void add(Location location, String text){
-		markerList.add(HoloText.create(location, text));
-	}
-	
-	public void add(Block block, BlockFace face, String text){
-		markerList.add(HoloText.create(player.getWorld(), block, face, text));
-	}
-	
-	public HoloText addClone(HoloText holoText){
-		HoloText clone = holoText.clone();
-		add(clone);
-		return clone;
+
+	private boolean inBounds(int index){
+		return index > -1 && index < getCount();
 	}
 	
 	public int getCount(){
@@ -87,102 +75,156 @@ public class Marker {
 	}
 	
 	public HoloText get(int index){
-		return getCount() > 0 ? markerList.get(index) : null;
+		if (!inBounds(index)) return null;
+		return markerList.get(index);
 	}
 	
-	public void set(int index, HoloText holoText){
-		if (getCount() > 0) markerList.set(index, holoText);
-		else add(holoText);
+	public Block getBlock(int index){
+		if (!inBounds(index)) return null;
+		return blockList.get(index);
 	}
 	
-	public HoloText getLastBetween(){
-		return get(getCount() - 1);
-	}
-	
-	public void setLastBetweent(HoloText holoText){
-		if (getCount() > 0) set(getCount() - 1, holoText);
-		else add(holoText);
-	}
-	
-	public boolean hasAny(){
-		return hasMore() || hasFirst() || hasLast();
-	}
-	
-	public boolean hasMore(){
-		return markerList.size() > 0;
-	}
-	
-	public boolean hasFirst(){
-		return first != null && first.isValid();
-	}
-	
-	public boolean hasLast(){
-		return last != null && last.isValid();
-	}
-		
-	public HoloText getFirst(){
-		return first;
+	public BlockFace getBlockFace(int index){
+		if (!inBounds(index)) return null;
+		return faceList.get(index);
 	}
 	
 	public HoloText getLast(){
-		return last;
-	}
-
-	public void setFirst(HoloText holotext){
-		if (first != null) first.remove();
-		first = holotext;
+		return getCount() > 0 ? markerList.get(getCount() - 1) : null;
 	}
 	
-	public void setLast(HoloText holotext){
-		if (last != null) last.remove();
-		last = holotext;
+	public Block getLastBlock(){
+		return getCount() > 0 ? blockList.get(getCount() - 1) : null;
 	}
+	
+	public BlockFace getLastBlockFace(){
+		return getCount() > 0 ? faceList.get(getCount() - 1) : null;
+	}
+	
+	public int indexOf(Location location){
+		for (int index = 0; index < getCount(); index++){
+			Block block = getBlock(index);
 
-	public void changeFirst(Block block, BlockFace face, String text){
-		changeFirst(block, face, text, false);
+			if(location.getBlockX() == block.getX() && 
+			   location.getBlockY() == block.getY() &&
+			   location.getBlockZ() == block.getZ()) return index;
+		}
+		return -1;
 	}
-		
-	public void changeFirst(Block block, BlockFace face, String text, boolean removeOther){	
-		if (hasFirst()){
-			getFirst().move(block, face);
-			getFirst().setText(text);
-			getFirst().show();
+	
+	public boolean has(Location location){
+		return indexOf(location) > -1;
+	}	
+	
+	public void add(Block block, BlockFace face){
+		if (getCount() == 0){
+			markerList.add(HoloText.create(world, block, face, ""));
+			blockList.add(block);
+			faceList.add(face);
 		}else{
-			setFirst(HoloText.create(player.getWorld(), block, face, text));
+			// Create a clone from the last marker and insert it before the last item
+			markerList.add(getCount() - 1, getLast().clone());
+			// move "new" the last marker to the new location
+			getLast().move(block, face); 
+			blockList.add(block);
+			faceList.add(face);
 		}
 		
-		if (removeOther) {
-			removeAllBetween(); 
-			if (hasLast()){
-				getLast().hide();
-			}
-		}
+		recalculate();
 	}
-	
-	public void changeLast(Block block, BlockFace face, String text){
-		changeLast(block, face, text, false);
-	}
-	
-	public void changeLast(Block block, BlockFace face, String text, boolean clone){
-		if (hasLast()){
-			if (clone) addClone(getLast());
-		} else{
-			if (hasMore()){
-				// do not use "setLast(...)" here
-				last  = getLastBetween();
-				setLastBetweent(last.clone());
-			}else if (hasFirst()){
-				// do not use "setLast(...)" or "setFirst(...)" here
-				last  = getFirst();
-				first = last.clone();
-			}else{
-				setLast(HoloText.create(player.getWorld(), block, face, text));
-			}
-		}
 
-		getLast().show();
-		getLast().setText(text);
-		getLast().move(block, face);
+	public static Vector getVector(HoloText holotext){
+		return new Vector(
+				holotext.getEntity().getLocation().getBlockX(),
+				holotext.getEntity().getLocation().getBlockY(),
+				holotext.getEntity().getLocation().getBlockZ()
+				);
+	}
+	
+	public void recalculate(){
+		int index = 0;
+		int size  = getCount();
+		
+		double distance = mode == MeasureMode.BLOCKS ? 1 : 0;
+		Vector vecPrev  = null;
+		
+		for(HoloText holotext : markerList){
+
+			// calculate vector distance ...
+			Vector vec = getVector(holotext);
+			if (vecPrev != null){
+				if (mode == MeasureMode.VECTORS){
+					distance += vecPrev.distance(vec);
+				}else{
+					int distX = Math.abs(vecPrev.getBlockX() - vec.getBlockX());
+					int distZ = Math.abs(vecPrev.getBlockZ() - vec.getBlockZ());
+					if (distZ > distX) distance += distZ;
+					else distance += distX;
+				}
+			}
+			vecPrev = vec;
+			
+			// determine out format ...
+			String format = format_marker;			
+			if (index == size - 1) format = format_markerLast;  //last
+			if (index == 0) format = format_markerFirst;   //first
+			
+			// change HoloText entity ...
+			String out = String.format(format, index, distance);
+			holotext.setText(out);
+			holotext.show();
+			
+			index++;
+		}
+		
+		this.distance = distance;
+	}
+	
+	public String getFormat_markerFirst() {
+		return format_markerFirst;
+	}
+
+	public String getFormat_marker() {
+		return format_marker;
+	}
+
+	public void setFormat_markerFirst(String format_markerFirst) {
+		this.format_markerFirst = format_markerFirst;
+	}
+
+
+	public String getFormat_markerLast() {
+		return format_markerLast;
+	}
+
+
+	public void setFormat_markerLast(String format_markerLast) {
+		this.format_markerLast = format_markerLast;
+	}
+
+
+	public void setFormat_marker(String format_marker) {
+		this.format_marker = format_marker;
+	}
+
+	public double getDistance() {
+		return distance;
+	}
+
+	public MeasureMode getMode() {
+		return mode;
+	}
+
+	public void setMode(MeasureMode mode) {
+		this.mode = mode;
+	}
+
+	public int getMaxCount() {
+		return maxCount;
+	}
+
+	public void setMaxCount(int maxCount) {
+		this.maxCount = maxCount;
 	}
 	
 }

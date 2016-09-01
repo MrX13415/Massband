@@ -3,13 +3,18 @@ package net.icelane.massband.command.commands;
 import org.bukkit.command.Command;
 import org.bukkit.command.CommandSender;
 
+import net.icelane.massband.Plugin;
 import net.icelane.massband.command.CommandBase;
 
-public class InfoCommand extends CommandBase{
+public class Massband_InfoCommand extends CommandBase{
 
 	@Override
+	public String name() {
+		return "info";
+	}
+	
+	@Override
 	public void initialize() {
-		setLabel("info");
 		setAliases("i");
 		setDescription("Provides info");
 		setPermissionNode("info");
@@ -17,8 +22,9 @@ public class InfoCommand extends CommandBase{
 
 	@Override
 	public boolean command(CommandSender sender, Command cmd, String label, String[] args) {
-		// TODO Auto-generated method stub
-		return false;
+		Plugin plugin = Plugin.get();
+		sender.sendMessage("§a" + plugin.getName() + " §7version §c" + plugin.getDescription().getVersion());
+		return true;
 	}
-
+	
 }
