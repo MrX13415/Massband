@@ -17,9 +17,11 @@ public class Massband_CountCommand extends CommandBase{
 	@Override
 	public void initialize() {
 		setAliases("count", "markers", "cnt", "c");
-		setDescription("Set the number of markers to be placed");
+		setDescription("Set the number of markers to be placed. Set to -1 for no Limit.");
 		setPermissionNode("count");
 		setUsage("/<command> <marker count>");
+		
+		setTabList("2", "-1");
 	}
 
 	@Override
@@ -35,16 +37,18 @@ public class Massband_CountCommand extends CommandBase{
 		if (args.length == 1){
 			try{
 				int value = Integer.valueOf(args[0]);
-				if (value < 2) value = 2;  // min marker count is 2!
-				
+				if (value < 2 && value > -1 ) value = 2;  // min marker count is 2!
+				if (value < 0) value = -1;  // no "limit"
+
 				obj.getMarker(player.getWorld()).setMaxCount(value);
 				
-				player.sendMessage("§7Marker count set to: §c" + value);
+				player.sendMessage("§7Marker count set to: §c" +  (value == -1 ? "No Limit" : value));
 			}catch (NumberFormatException ex){
-				player.sendMessage("Error: incorrect argument!");
+				player.sendMessage("§cError: incorrect argument!");
 			}
 		}else{
-			player.sendMessage("§7Marker count: §c" + obj.getMarker(player.getWorld()).getMaxCount());		
+			int count = obj.getMarker(player.getWorld()).getMaxCount();
+			player.sendMessage("§7Marker count: §c" + (count == -1 ? "No Limit" : count));		
 		}
 		
 		return true;

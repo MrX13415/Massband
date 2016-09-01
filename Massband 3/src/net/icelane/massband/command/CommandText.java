@@ -35,7 +35,7 @@ Effects:
 	public static String getHelp(CommandBase command){
 		// output formats 
 		String format_header = "\n§aCommand: §7/%1$s§c%2$s §aAliases: §c%3$s";
-		String format_desc   = "\n§7%1$s";
+		String format_help   = "\n§7%1$s";
 		String format_perm   = "\n  §aPermission: §c%1$s";
 		String format_usage  = "\n  §aUsage: §6%1$s";
 		String format_cmd    = "  §f - §c%1$s §6%2$s §7%3$s";
@@ -45,6 +45,7 @@ Effects:
 		String aliases = command.getAliasesString();
 		String usage   = command.getUsage();
 		String decs    = command.getDescription();
+		String help    = command.getHelp();
 		 
 		// get list of parent commands
 		String parents = "";
@@ -56,14 +57,14 @@ Effects:
 		
 		// define header and basic output
 		String out_header = String.format(format_header, parents, label, aliases);
-		String out_desc   = "";
+		String out_help   = decs;
 		String out_perm   = command.isOP() ? String.format(format_perm, "OP") : "";
 		String out_usage  = (command.getCommands().size() > 0) ? String.format(format_usage, "<command>") : "";
 		String out_args   = "";
 
 		// define description
-		if (decs.length() > 0){
-			out_desc = String.format(format_desc, decs); 
+		if (help.length() > 0){
+			out_help = String.format(format_help, help); 
 		}
 		
 		// define permission
@@ -84,7 +85,7 @@ Effects:
 			if (command.getCommands().size() - command.getCommands().indexOf(cmd) > 1) out_args += "\n";
 		}
 		
-		return out_header + out_desc + out_perm + out_usage + out_args;
+		return out_header + out_help + out_perm + out_usage + out_args;
 	}
 	
 	public static String getPermissionDenied(CommandBase command){

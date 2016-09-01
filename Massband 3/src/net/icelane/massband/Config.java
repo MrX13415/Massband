@@ -11,6 +11,9 @@ public class Config {
 	public static Entry interact_preventAction = new Entry("interact.prevent-action", false);
 	public static Entry interact_mouseButton   = new Entry("interact.mouse-button", "");
 	
+	public static Entry player_maxVisibleMarkers = new Entry("player.max-visible-markers", 100);
+	
+	
 	public static void defaults(){
 		addDefault(interact_material);
 		addDefault(interact_preventAction);

@@ -56,9 +56,10 @@ public class Massband {
 	}
 	
 	public void clean(){
-		this.worldMarkersList.clear();
-	}
-	
+		for (String key : worldMarkersList.keySet()){
+			worldMarkersList.get(key).removeAll();
+		}
+	}	
 	
 	public void interact(PlayerInteractEvent event){
 		this.interact.interact(event);

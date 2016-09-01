@@ -23,6 +23,7 @@ public class MassbandCommand extends CommandBase{
 		addCommand(Massband_ClearCommand.class);
 		addCommand(Massband_CountCommand.class);
 		addCommand(Massband_InfoCommand.class);
+		addCommand(Massband_ModeCommand.class);
 	}
 
 	@Override

@@ -8,6 +8,7 @@ import org.bukkit.block.Block;
 import org.bukkit.block.BlockFace;
 import org.bukkit.util.Vector;
 
+import net.icelane.massband.Config;
 import net.icelane.massband.minecraft.HoloText;
 
 public class Markers {
@@ -19,17 +20,20 @@ public class Markers {
 
 	private World world;
 	
-	private String format_markerFirst = "§c#";
-	private String format_markerLast  = "§7(%1$s) §6%2$sm";  // (1) marker count (2) length
-	private String format_marker      = "§7#%1$s: §a%2$sm";  // (1) marker index (2) length
-
+	private String format_markerFirst  = "§c#";
+	private String format_markerLast   = "§7(%1$s) §6%2$s";  // (1) marker count (2) length
+	private String format_marker       = "§7#%1$s: §a%2$s";  // (1) marker index (2) length
+	private String format_markerOne    = "§6%2$s ";          // (2) length
+	private String format_mode_blocks  = "%1d §cblocks";
+	private String format_mode_vectors = "%.3f§cm";
+	
 	private ArrayList<HoloText> markerList = new ArrayList<>();
 	private ArrayList<Block> blockList = new ArrayList<>();
 	private ArrayList<BlockFace> faceList = new ArrayList<>();
 
 	private MeasureMode mode = MeasureMode.BLOCKS;
 	private int maxCount     = 2;
-	
+
 	private double distance;
 	
 	
@@ -37,6 +41,10 @@ public class Markers {
 		this.world = world;
 	}
 
+	public static int getMaxVisibleCount(){
+		return Integer.getInteger(Config.player_maxVisibleMarkers.valueStr());
+	}
+	
 	public void hideAll(){
 		for (HoloText marker : markerList){
 			marker.hide();
@@ -49,7 +57,7 @@ public class Markers {
 		}
 	}
 	
-	public void clear(){
+	public void removeAll(){
 		for(HoloText marker : markerList){
 			marker.remove();
 		}
@@ -117,6 +125,10 @@ public class Markers {
 	}	
 	
 	public void add(Block block, BlockFace face){
+		if (getMaxCount() > 0 && getCount() >= getMaxCount()){
+			removeAll();
+		}
+		
 		if (getCount() == 0){
 			markerList.add(HoloText.create(world, block, face, ""));
 			blockList.add(block);
@@ -167,10 +179,14 @@ public class Markers {
 			// determine out format ...
 			String format = format_marker;			
 			if (index == size - 1) format = format_markerLast;  //last
+			if (size == 2) format = format_markerOne;
 			if (index == 0) format = format_markerFirst;   //first
 			
 			// change HoloText entity ...
-			String out = String.format(format, index, distance);
+			String value = String.format(format_mode_blocks, (int) distance);
+			if (mode == MeasureMode.VECTORS) value = String.format(format_mode_vectors, distance);
+					
+			String out = String.format(format, index, value);
 			holotext.setText(out);
 			holotext.show();
 			
