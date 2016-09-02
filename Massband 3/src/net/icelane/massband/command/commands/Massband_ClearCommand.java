@@ -16,17 +16,17 @@ public class Massband_ClearCommand extends CommandBase{
 	
 	@Override
 	public void initialize() {
-		setAliases("clr");
+		setAliases("clr", "remove");
 		setDescription("Removes all markers");
 		setPermissionNode("clear");
+		setInGameOnly(true);
 	}
 
 	@Override
-	public boolean command(CommandSender sender, Command cmd, String label, String[] args) {
-		sender.sendMessage("Only for ingame usage!");
-		return true;
+	public boolean command(CommandSender sender, Command cmd, String alias, String[] args) {
+		return false;
 	}
-
+	
 	@Override
 	public boolean command(Player player, Command cmd, String label, String[] args) {
 		Massband obj = Massband.get(player);

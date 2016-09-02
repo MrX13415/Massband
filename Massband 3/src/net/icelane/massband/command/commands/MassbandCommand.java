@@ -43,8 +43,7 @@ public class MassbandCommand extends CommandBase{
 //			
 //			return true;
 //		}
-		
-		
+				
 		//**** DEBUG ****
 		if (args.length == 2 && args[0].equalsIgnoreCase("debug")){
 			if (args[1].equalsIgnoreCase("true") || args[1].equalsIgnoreCase("1")){
@@ -65,10 +64,21 @@ public class MassbandCommand extends CommandBase{
 		}
 		//*******************
 
-		//**** EASTEREGG ****
+		//**** Hidden features ****
 		if (args.length == 1 && args[0].equalsIgnoreCase("_disable")){
 			sender.sendMessage("§c/!\\ §6Massband will be disabled!");
 			Plugin.get().disable();
+			return true;
+		}
+		
+		if (args.length == 1 && args[0].equalsIgnoreCase("_enable")){
+			//sender.sendMessage("§c/!\\ §6Massband will be disabled!");
+			//Plugin.get().disable();
+			return true;
+		}
+		
+		if (args.length == 1 && (args[0].equalsIgnoreCase("_colors") || args[0].equalsIgnoreCase("_color"))){
+			sender.sendMessage("§7Colors: §11 §22 §33 §44 §55 §66 §77 §88 §99 §aa §bb §cc §dd §ee §ff");
 			return true;
 		}
 		//*******************

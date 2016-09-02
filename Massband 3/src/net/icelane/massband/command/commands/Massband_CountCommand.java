@@ -11,22 +11,21 @@ public class Massband_CountCommand extends CommandBase{
 
 	@Override
 	public String name() {
-		return "markercount";
+		return "count";
 	}
 	
 	@Override
 	public void initialize() {
-		setAliases("count", "markers", "cnt", "c");
+		setAliases("markers", "cnt", "c");
 		setDescription("Set the number of markers to be placed. Set to -1 for no Limit.");
 		setPermissionNode("count");
 		setUsage("/<command> <marker count>");
-		
-		setTabList("2", "-1");
+		setInGameOnly(true);
+		setTabList("10", "1", "-1");
 	}
 
 	@Override
 	public boolean command(CommandSender sender, Command cmd, String label, String[] args) {
-		sender.sendMessage("Only for ingame usage!");
 		return true;
 	}
 
@@ -37,7 +36,7 @@ public class Massband_CountCommand extends CommandBase{
 		if (args.length == 1){
 			try{
 				int value = Integer.valueOf(args[0]);
-				if (value < 2 && value > -1 ) value = 2;  // min marker count is 2!
+				if (value < 1 && value > -1 ) value = 1;  // min marker count is 1!
 				if (value < 0) value = -1;  // no "limit"
 
 				obj.getMarker(player.getWorld()).setMaxCount(value);

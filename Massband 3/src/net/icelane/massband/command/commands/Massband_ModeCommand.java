@@ -25,13 +25,12 @@ public class Massband_ModeCommand extends CommandBase{
 				+ "\n   §72: §cvectors   §7Measures the vector distance between the center points of blocks.");
 		setPermissionNode("mode");
 		setUsage("/<command> [blocks|vectors]");
-		
+		setInGameOnly(true);
 		setTabList("blocks", "vectors");
 	}
 
 	@Override
 	public boolean command(CommandSender sender, Command cmd, String label, String[] args) {
-		sender.sendMessage("Only for ingame usage!");
 		return true;
 	}
 

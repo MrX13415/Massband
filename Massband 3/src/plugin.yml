@@ -1,10 +1,10 @@
 main: net.icelane.massband.Plugin
 
 name: Massband
-version: 3.0 alpha 1
-description: Measuring tools for Minecraft
+version: 3.0.2 Alpha
+description: Variouse measuring tools for making the players bulding life a bit easier.
 author: MrX13415
-website: icelane.net
+website: https://dev.bukkit.org/bukkit-plugins/massband/
 
 commands:
   massband:
