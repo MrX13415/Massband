@@ -73,6 +73,15 @@ public class HoloText {
 		return entity;
 	}
 	
+	public boolean equals(HoloText holo) {
+		return this.getEntity().getEntityId() == holo.getEntity().getEntityId();
+	}
+	
+	@Override
+	public String toString() {
+		return getEntity().getCustomName();
+	}
+	
 	public HoloText clone(){
 		return create(entity.getLocation(), entity.getCustomName());
 	}

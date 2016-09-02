@@ -9,7 +9,6 @@ import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.player.PlayerInteractEvent;
 import org.bukkit.event.player.PlayerJoinEvent;
-import org.bukkit.event.player.PlayerMoveEvent;
 import org.bukkit.event.player.PlayerQuitEvent;
 
 public class Massband {
@@ -75,19 +74,18 @@ public class Massband {
 		clean();
 	}
 	
-	@EventHandler
-	public void move(PlayerMoveEvent event){
-		if (event.getFrom().getWorld() != event.getTo().getWorld()){
-			getMarker(event.getFrom().getWorld()).hideAll();
-			getMarker(event.getTo().getWorld()).showAll();
+	public void worldChange(World worldFrom){
+		if (player.getWorld() != worldFrom){
+			getMarker(worldFrom).hideAll();
+			getMarker(player.getWorld()).showAll();
 		}
 	}
-	
 	
 	public Player getPlayer() {
 		return player;
 	}
 
+	
 	public Markers getMarker(World world){
 		Markers m = worldMarkersList.get(world.getName());
 		if (m == null){

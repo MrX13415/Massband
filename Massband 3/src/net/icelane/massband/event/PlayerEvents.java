@@ -2,6 +2,8 @@ package net.icelane.massband.event;
 
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
+import org.bukkit.event.block.BlockBreakEvent;
+import org.bukkit.event.player.PlayerChangedWorldEvent;
 import org.bukkit.event.player.PlayerInteractEvent;
 import org.bukkit.event.player.PlayerItemHeldEvent;
 import org.bukkit.event.player.PlayerJoinEvent;
@@ -49,6 +51,13 @@ public class PlayerEvents implements Listener {
 	}
 	
 	@EventHandler
+	public void onPlayerBlockBreak(BlockBreakEvent event){
+		Massband obj = Massband.get(event.getPlayer());
+		if (obj != null) obj.getInteract().blockBreak(event);
+	}
+	
+	
+	@EventHandler
 	public void onPlayerJoin(PlayerJoinEvent event){
 		Massband obj = Massband.get(event.getPlayer());
 		if (obj != null) obj.join(event);
@@ -62,8 +71,14 @@ public class PlayerEvents implements Listener {
 	
 	@EventHandler
 	public void onPlayerMove(PlayerMoveEvent event){
+		//Massband obj = Massband.get(event.getPlayer());
+		//if (obj != null) obj.worldChange(event.getFrom().getWorld());
+	}
+	
+	@EventHandler
+	public void onPlayerChangedWorld(PlayerChangedWorldEvent event){
 		Massband obj = Massband.get(event.getPlayer());
-		if (obj != null) obj.move(event);
+		if (obj != null) obj.worldChange(event.getFrom());
 	}
 	
 }
