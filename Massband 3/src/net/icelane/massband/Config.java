@@ -7,16 +7,20 @@ import org.bukkit.configuration.file.FileConfiguration;
 
 public class Config {
 
-	public static Entry interact_material      = new Entry("interact.material", Material.STICK.toString());
-	public static Entry interact_preventAction = new Entry("interact.prevent-action", false);
-	public static Entry interact_mouseButton   = new Entry("interact.mouse-button", "");
+	public static Entry interact_material              = new Entry("interact.material", Material.STICK.toString());
+	public static Entry interact_preventAction         = new Entry("interact.prevent-action", true);
+	public static Entry interact_switchbuttons         = new Entry("interact.switch-buttons", false);
+	public static Entry interact_doubleClickTimeFrame  = new Entry("interact.doubleclick-timeframe", 300L);
 	
-	public static Entry player_maxVisibleMarkers = new Entry("player.max-visible-markers", 100);
+	
+	public static Entry player_maxVisibleMarkers       = new Entry("player.max-visible-markers", 100);
 	
 	
 	public static void defaults(){
 		addDefault(interact_material);
 		addDefault(interact_preventAction);
+		addDefault(interact_switchbuttons);
+		addDefault(interact_doubleClickTimeFrame);
 	}
 	
 	public static void addDefault(Entry entry){
