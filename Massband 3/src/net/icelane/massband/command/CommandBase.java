@@ -35,6 +35,7 @@ public abstract class CommandBase implements TabExecutor{
 	protected String usage          = "";
 	protected String permissionNode = "";
 	protected boolean op            = false; //fallback permission
+	protected boolean inGameOnly    = false;
 	protected String[] tabList      = {};
 	
 	protected ArrayList<CommandBase> commands = new ArrayList<>();
@@ -74,7 +75,7 @@ public abstract class CommandBase implements TabExecutor{
 	 * Calls will only be committed to <code>command(CommandSender sender, ...)</code> if the object of variable <code>source</code> is not an instance of <code>Player</code>.
 	 * @param player Source of the command.
 	 * @param cmd Command which was executed.
-	 * @param name Alias of the command which was used.
+	 * @param alias Alias of the command which was used.
 	 * @param args Passed command arguments.
 	 * @return true if a valid command, otherwise false.
 	 */
@@ -179,14 +180,16 @@ public abstract class CommandBase implements TabExecutor{
 			// search for "arg" in command names ...
 			if (arg.length() == 0 || cmd.getName().toLowerCase().contains(arg)){
 				resultList.add(cmd.getName());
-				continue;
 			}
-			
-			// search for "arg" in aliases ...
-			for (String alias : cmd.getAliases()) {
-				if (alias.toLowerCase().contains(arg)){
-					resultList.add(cmd.getName());
-					continue;
+		}
+		
+		if (resultList.size() == 0){
+			for(CommandBase cmd : commands){
+				// search for "arg" in aliases ...
+				for (String alias : cmd.getAliases()) {
+					if (alias.toLowerCase().contains(arg)){
+						resultList.add(cmd.getName());
+					}
 				}
 			}
 		}
@@ -195,7 +198,6 @@ public abstract class CommandBase implements TabExecutor{
 			// search for "arg" in command names ...
 			if (arg.length() == 0 || value.toLowerCase().contains(arg)){
 				resultList.add(value);
-				continue;
 			}
 		}
 		
@@ -209,9 +211,10 @@ public abstract class CommandBase implements TabExecutor{
 	@Override
 	public List<String> onTabComplete(CommandSender sender, Command command, String alias, String[] args) {
 		// check for sub commands ...
-		if (args.length > 0){			
-			for (CommandBase cmd : this.commands) {
-				if (cmd.isCommand(args[0])){
+		if (args.length > 1){			
+			for (CommandBase cmd : this.commands) 
+			{
+				if (cmd.isCommand(args[args.length - 2])){
 					// call sub command
 					return cmd.onTabComplete(sender, command, alias, getArgsOnly(args));
 				}
@@ -249,7 +252,12 @@ public abstract class CommandBase implements TabExecutor{
 			if (isPlayer(sender)){
 				result = command(getPlayer(sender), command, alias, args);
 			}else{
-				result = command(sender, command, alias, args);
+				if (isInGameOnly()){
+					sender.sendMessage(CommandText.getIngameOnly(this));
+					result = true;
+				}else{
+					result = command(sender, command, alias, args);
+				}
 			}
 			
 			// send help text on false result
@@ -406,6 +414,14 @@ public abstract class CommandBase implements TabExecutor{
 		return this.op;
 	}
 	
+	public boolean isInGameOnly() {
+		return inGameOnly;
+	}
+
+	public void setInGameOnly(boolean inGameOnly) {
+		this.inGameOnly = inGameOnly;
+	}
+
 	/**
 	 * Removes the first argument of the array, because it is the current command
 	 * @param args

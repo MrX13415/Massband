@@ -32,6 +32,11 @@ Effects:
 	RESET:         §r
 */
 
+	public static String getIngameOnly(CommandBase command){
+		String format = "§cOnly for ingame usage!";
+		return format;
+	}
+	
 	public static String getHelp(CommandBase command){
 		// output formats 
 		String format_header = "\n§aCommand: §7/%1$s§c%2$s §aAliases: §c%3$s";
