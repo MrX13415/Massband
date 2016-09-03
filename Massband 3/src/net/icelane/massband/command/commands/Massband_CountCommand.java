@@ -39,14 +39,14 @@ public class Massband_CountCommand extends CommandBase{
 				if (value < 1 && value > -1 ) value = 1;  // min marker count is 1!
 				if (value < 0) value = -1;  // no "limit"
 
-				obj.getMarker(player.getWorld()).setMaxCount(value);
+				obj.getMarkers(player.getWorld()).setMaxCount(value);
 				
 				player.sendMessage("§7Marker count set to: §c" +  (value == -1 ? "No Limit" : value));
 			}catch (NumberFormatException ex){
 				player.sendMessage("§cError: incorrect argument!");
 			}
 		}else{
-			int count = obj.getMarker(player.getWorld()).getMaxCount();
+			int count = obj.getMarkers(player.getWorld()).getMaxCount();
 			player.sendMessage("§7Marker count: §c" + (count == -1 ? "No Limit" : count));		
 		}
 		

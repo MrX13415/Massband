@@ -71,8 +71,8 @@ public class PlayerEvents implements Listener {
 	
 	@EventHandler
 	public void onPlayerMove(PlayerMoveEvent event){
-		//Massband obj = Massband.get(event.getPlayer());
-		//if (obj != null) obj.worldChange(event.getFrom().getWorld());
+		Massband obj = Massband.get(event.getPlayer());
+		if (obj != null) obj.move(event);
 	}
 	
 	@EventHandler

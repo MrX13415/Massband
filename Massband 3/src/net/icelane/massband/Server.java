@@ -8,6 +8,7 @@ import org.bukkit.plugin.java.JavaPlugin;
 import net.icelane.massband.command.CommandBase;
 import net.icelane.massband.command.commands.MassbandCommand;
 import net.icelane.massband.event.PlayerEvents;
+import net.icelane.massband.event.WorldEvents;
 
 public class Server {
 
@@ -23,6 +24,7 @@ public class Server {
 		JavaPlugin plugin = Plugin.get();
 
 		get().getPluginManager().registerEvents(PlayerEvents.getListener(), plugin);
+		get().getPluginManager().registerEvents(WorldEvents.getListener(), plugin);
 	}
 	
 	public static boolean registerCommands(){

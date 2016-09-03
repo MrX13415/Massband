@@ -31,7 +31,7 @@ public class Massband_ClearCommand extends CommandBase{
 	public boolean command(Player player, Command cmd, String label, String[] args) {
 		Massband obj = Massband.get(player);
 		
-		obj.getMarker(player.getWorld()).removeAll();
+		obj.getMarkers(player.getWorld()).removeAll();
 		
 		player.sendMessage("§7All markers have been removed");
 		

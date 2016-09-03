@@ -21,7 +21,7 @@ public abstract class CommandBase implements TabExecutor{
 
 	// Commands global
 	// ---
-	private static boolean initialized = true;
+	//private static boolean initialized = true;
 	//private static String permissionRootNode = "";
 	
 	// Command specific
@@ -53,6 +53,7 @@ public abstract class CommandBase implements TabExecutor{
 	
 	/***
 	 * Setup the command here.
+	 * For Commands defined in the<code>plugin.yml</code>settings like name, etc. will be retrieved from there.
 	 * Define sub commands here via <code>addCommand(...)</code>.
 	 */
 	public abstract void initialize();
@@ -65,7 +66,7 @@ public abstract class CommandBase implements TabExecutor{
 	 * @param cmd Command which was executed.
 	 * @param alias Alias of the command which was used.
 	 * @param args Passed command arguments.
-	 * @return true if a valid command, otherwise false.
+	 * @return <code>true</code> if a valid command, otherwise false.
 	 */
 	public abstract boolean command(CommandSender sender, Command cmd, String alias, String[] args);
 	
@@ -77,7 +78,7 @@ public abstract class CommandBase implements TabExecutor{
 	 * @param cmd Command which was executed.
 	 * @param alias Alias of the command which was used.
 	 * @param args Passed command arguments.
-	 * @return true if a valid command, otherwise false.
+	 * @return <code>true</code> if a valid command, otherwise false.
 	 */
 	public boolean command(Player player, Command cmd, String alias, String[] args){
 		return command((CommandSender) player, cmd, alias, args);
@@ -87,23 +88,15 @@ public abstract class CommandBase implements TabExecutor{
 	// Command base logic
 	// ---
 	
-//	public static void Initialize(){
-//		if (permissionRootNode == "") throw new IllegalArgumentException("Root permission node not set!");
-//		
-//		CommandBase.initialized = true;
-//	}
-	
-//	public static void SetPermissionRootNode(String permissionRootNode){
-//		CommandBase.permissionRootNode = permissionRootNode.trim();
-//	}
-//	
-//	public static String GetPermissionRootNode(){
-//		return permissionRootNode;
-//	}
-		
+	/**
+	 * Registers a command to the game. Has to be called for every command which should be directly available.
+	 * Any sub command (added to a command via <code>addCommand(...)</code>) must to be registered.
+	 * @param cmdClass A class extending the class <code>CommandBase</code>
+	 * @return An instance of the given command class if the given it has been registered successfully.
+	 * @throws IllegalArgumentException If the given class is not extending the class <code>CommandBase</code>
+	 * @throws RuntimeException If any error occurred while registering the command.
+	 */
 	public static CommandBase register(Class<? extends CommandBase> cmdClass){
-		if (!initialized) throw new IllegalArgumentException("CommandBase not initialized!");
-		
 		// check class is valid
 		if (!CommandBase.class.isAssignableFrom(cmdClass)){
 			throw new IllegalArgumentException("The provided class is not a valid command class.");
@@ -125,15 +118,31 @@ public abstract class CommandBase implements TabExecutor{
 		}
 	}
 	
+	/**
+	 * Whether the given <code>CommandSender</code> object is a player.
+	 * @param sender An instance of class <code>CommandSender</code>
+	 * @return <code>true</code> if the given object is a instance of class <code>Player</code>
+	 */
 	public boolean isPlayer(CommandSender sender){
 		return sender instanceof Player;
 	}
 	
+	/**
+	 * 
+	 * @param sender An instance of class <code>CommandSender</code>.
+	 * @return An object of class <code>Player</code> for the given <code>CommandSender</code> object. <code>null</code> if the given sender object is not a player.
+	 */
 	public Player getPlayer(CommandSender sender){
 		if (sender instanceof Player) return (Player) sender;
 		return null;
 	}
 	
+	/**
+	 * Whether the given <code>CommandSender</code> object has permission to use this command.<br>
+	 * If permissions has been disable for this plug-in, access will be determined if this command has been marked for "op only" and whether the player is OP.
+	 * @param sender An instance of class <code>CommandSender</code>
+	 * @return <code>true</code> if the given <code>CommandSender</code> object has use permissions.
+	 */
 	public boolean hasPermission(CommandSender sender){
 		Plugin plugin = Plugin.get();
 		
@@ -154,6 +163,10 @@ public abstract class CommandBase implements TabExecutor{
 		pluginCommand.setDescription(description);
 	}
 	
+	/**
+	 * Reads any command settings defined in the <code>plugin.yml</code> for this command name and sets them.
+	 * Settings not defined in the <code>plugin.yml</code> won't be changed.
+	 */
 	public void setupCommandDefinition(){
 		Plugin plugin = Plugin.get();
 		if (!plugin.getDescription().getCommands().containsKey(getName())) return;
@@ -172,6 +185,11 @@ public abstract class CommandBase implements TabExecutor{
 			setUsage((String) command.get("usage"));
 	}
 
+	/**
+	 * Returns a list of all matching sub commands and defined tab values for the given argument.
+	 * @param arg A command argument.
+	 * @return A list of all matching strings.
+	 */
 	public List<String> getTabList(String arg){
 		ArrayList<String> resultList = new ArrayList<>();
 		arg = arg.toLowerCase().trim();
@@ -267,6 +285,11 @@ public abstract class CommandBase implements TabExecutor{
 		}
 	}
 
+	/**
+	 * Whether the given name is the name or an alias of this command.
+	 * @param name A name of a command
+	 * @return <code>true</code> if the given name does match this command.
+	 */
 	public boolean isCommand(String name){
 		if (name.equalsIgnoreCase(this.name)) return true;
 		
