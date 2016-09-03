@@ -11,7 +11,7 @@ import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.PlayerInventory;
 
 import net.icelane.massband.Config;
-import net.icelane.massband.core.Markers.BlocksMeasureAxis;
+import net.icelane.massband.core.Markers.BlockAxis;
 import net.icelane.massband.core.Markers.MarkerSettings;
 import net.icelane.massband.core.Markers.MeasureMode;
 
@@ -61,10 +61,8 @@ public class Interact {
 		
 		if (action == right && doubleclick){
 			//remove all markers 
-			if (index > -1){
-				markers.removeAll();
-				index = -1;
-			}
+			markers.removeAll();
+			index = -1;
 		}
 		
 		if (action == right){
@@ -79,9 +77,9 @@ public class Interact {
 			markers.add(block, face);
 		}
 		
-		if (action == left && !doubleclick){
+		if (action == left && doubleclick){
 			//switch measuring mode on start marker
-			if (index == 0){
+			if (index == -1){
 				switch (markers.getMode()) {
 				case BLOCKS: markers.setMode(MeasureMode.VECTORS); break;
 				case VECTORS: markers.setMode(MeasureMode.BLOCKS); break;
@@ -89,8 +87,21 @@ public class Interact {
 				}
 				markers.recalculate();
 			}
+		}
+		
+		if (action == left && !doubleclick){
+			if (index == 0){
+				switch (markers.getIgnoredAxis()) {
+				case None: markers.setIgnoredAxis(BlockAxis.X);  break;
+				case X: markers.setIgnoredAxis(BlockAxis.Y); break;
+				case Y: markers.setIgnoredAxis(BlockAxis.Z); break;
+				case Z: markers.setIgnoredAxis(BlockAxis.None); break;
+				default: break;
+				}
+				markers.recalculate();
+			}
 			
-			//switch state
+			//switch states on markers
 			if (index > 0 && markers.getMode() == MeasureMode.BLOCKS){
 				MarkerSettings settings = markers.getSettings(index);
 				boolean auto = settings.isAutoAxis();
@@ -98,9 +109,9 @@ public class Interact {
 				if (auto) settings.setAutoAxis(false); 
 				
 				switch (settings.getAxis()) {
-				case X: settings.setAxis(BlocksMeasureAxis.Y);  break;
-				case Y: settings.setAxis(BlocksMeasureAxis.Z);  break;
-				case Z: settings.setAxis(BlocksMeasureAxis.X); break;
+				case X: settings.setAxis(BlockAxis.Y);  break;
+				case Y: settings.setAxis(BlockAxis.Z);  break;
+				case Z: settings.setAxis(BlockAxis.X); break;
 				default: break;
 				}
 

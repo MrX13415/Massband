@@ -21,7 +21,7 @@ public class Markers {
 		VECTORS
 	}
 	
-	public enum BlocksMeasureAxis{
+	public enum BlockAxis{
 		None,
 		X,
 		Y,
@@ -30,7 +30,7 @@ public class Markers {
 
 	private World world;
 	
-	private String format_markerFirst  = "§c#";
+	private String format_markerFirst  = "§c#%s";            // (1) additional info
 	private String format_markerLast   = "§7(%1$s) §6%2$s";  // (1) marker count (2) length
 	private String format_marker       = "§7#%1$s: §a%2$s";  // (1) marker index (2) length
 	private String format_markerOne    = "§6%2$s ";          // (2) length
@@ -38,6 +38,7 @@ public class Markers {
 	private String format_blocks_auto  = "§7(%s)";
 	private String format_blocks_axis  = "§9(%s)";
 	private String format_mode_vectors = "%.3f§cm";
+	private String format_mode_axis    = " §9(%s)";
 	
 	private ArrayList<HoloText> markerList = new ArrayList<>();
 	private ArrayList<Block> blockList = new ArrayList<>();
@@ -46,7 +47,8 @@ public class Markers {
 	
 	private MeasureMode mode = MeasureMode.BLOCKS;
 	private int maxCount     = 1;
-
+	private BlockAxis ignoredAxis = BlockAxis.None;
+	
 	private double distance;
 	
 	
@@ -208,6 +210,13 @@ public class Markers {
 			MarkerSettings settings = getSettings(index);
 			
 			if (vecPrev != null){
+				switch (getIgnoredAxis()) {
+				case X: vec.setX(0); vecPrev.setX(0); break;
+				case Y: vec.setY(0); vecPrev.setY(0); break;
+				case Z: vec.setZ(0); vecPrev.setZ(0); break;
+				default: break;
+				}
+				
 				if (mode == MeasureMode.VECTORS){
 					distance += vecPrev.distance(vec);
 				}else{
@@ -217,9 +226,9 @@ public class Markers {
 					
 					if (settings.isAutoAxis()){
 						int newDist = Math.max(distX, Math.max(distY, distZ));
-						if (newDist == distX) settings.setAxis(BlocksMeasureAxis.X);
-						if (newDist == distY) settings.setAxis(BlocksMeasureAxis.Y);
-						if (newDist == distZ) settings.setAxis(BlocksMeasureAxis.Z);
+						if (newDist == distX) settings.setAxis(BlockAxis.X);
+						if (newDist == distY) settings.setAxis(BlockAxis.Y);
+						if (newDist == distZ) settings.setAxis(BlockAxis.Z);
 						distance += newDist;
 					}else{
 						switch (settings.getAxis()) {
@@ -233,20 +242,35 @@ public class Markers {
 			}
 			vecPrev = vec;
 			
-			// determine out format ...
-			String format = format_marker;			
-			if (index == size - 1) format = format_markerLast;  //last
-			if (size == 2) format = format_markerOne;
-			if (index == 0) format = format_markerFirst;   //first
 			
-			// change HoloText entity ...
+			// format value ...
 			String value = String.format(format_mode_vectors, distance);
 			if (mode == MeasureMode.BLOCKS){
 				String strAxis = String.format(settings.isAutoAxis() ? format_blocks_auto : format_blocks_axis, settings.getAxis());	
 				value = String.format(format_mode_blocks, (int) distance, strAxis);
 			}
+			
+			String out  = "";
+			
+			if (index == 0){
+				String modOpts = "";
+				if (getIgnoredAxis() != BlockAxis.None){
+					String _axis = "Y, Z";
+					if (getIgnoredAxis() == BlockAxis.Y) _axis = "X, Z";
+					if (getIgnoredAxis() == BlockAxis.Z) _axis = "X, Y";
+					modOpts = String.format(format_mode_axis, _axis);
+				}
 					
-			String out = String.format(format, index, value);
+				out = String.format(format_markerFirst, modOpts);
+				
+			}else{
+				String format = format_marker;
+				if (index == size - 1) format = format_markerLast;  //last
+				if (size == 2) format = format_markerOne;
+				
+				out = String.format(format, index, value);
+			}
+			
 			holotext.setText(out);
 			holotext.show();
 			
@@ -303,17 +327,25 @@ public class Markers {
 		this.maxCount = maxCount;
 	}
 	
+	public BlockAxis getIgnoredAxis() {
+		return ignoredAxis;
+	}
+
+	public void setIgnoredAxis(BlockAxis ignoredAxis) {
+		this.ignoredAxis = ignoredAxis;
+	}
+
 	public class MarkerSettings{
 		
-		private BlocksMeasureAxis axis = BlocksMeasureAxis.None;
-		private BlocksMeasureAxis lastAutoaxis = BlocksMeasureAxis.None;
+		private BlockAxis axis = BlockAxis.None;
+		private BlockAxis lastAutoaxis = BlockAxis.None;
 		private boolean autoAxis = true;
 		
-		public BlocksMeasureAxis getAxis() {
+		public BlockAxis getAxis() {
 			return axis;
 		}
 		
-		public void setAxis(BlocksMeasureAxis axis) {
+		public void setAxis(BlockAxis axis) {
 			this.axis = axis;
 			if (autoAxis) lastAutoaxis = this.axis;
 		}
@@ -326,7 +358,7 @@ public class Markers {
 			this.autoAxis = autoAxis;
 		}
 
-		public BlocksMeasureAxis getLastAutoaxis() {
+		public BlockAxis getLastAutoaxis() {
 			return lastAutoaxis;
 		}
 		
