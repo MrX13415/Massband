@@ -1,5 +1,6 @@
 package net.icelane.massband.minecraft;
 
+import org.bukkit.Chunk;
 import org.bukkit.Location;
 import org.bukkit.World;
 import org.bukkit.block.Block;
@@ -41,6 +42,7 @@ public class HoloText {
 		entity.setCanPickupItems(false);
 		entity.setCollidable(false);
 		entity.setVisible(false);
+		//entity.setRemoveWhenFarAway(true);
 		
 		entity.setCustomNameVisible(true);
 		entity.setCustomName(text);
@@ -107,15 +109,15 @@ public class HoloText {
 	}
 	
 	public void hide(){
-		if (!entity.isValid()) return;
-
 		entity.remove();
 	}
 	
-	public void show(){
-		if (entity.isValid()) return;
-		
+	public boolean show(){
+		if (isValid()) return false;
+		if (!getChunk().isLoaded()) return false;
+		entity.remove();
 		entity = createEnitiy(entity.getLocation(), entity.getCustomName());
+		return true;
 	}
 	
 	public String getText(){
@@ -125,5 +127,9 @@ public class HoloText {
 	public void setText(String text){
 		entity.setCustomNameVisible(true);
 		entity.setCustomName(text);
+	}
+	
+	public Chunk getChunk(){
+		return getEntity().getWorld().getChunkAt(getEntity().getLocation());	
 	}
 }

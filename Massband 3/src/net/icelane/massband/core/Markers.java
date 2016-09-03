@@ -2,14 +2,17 @@ package net.icelane.massband.core;
 
 import java.util.ArrayList;
 
+import org.bukkit.Chunk;
 import org.bukkit.Location;
 import org.bukkit.World;
 import org.bukkit.block.Block;
 import org.bukkit.block.BlockFace;
+import org.bukkit.entity.Entity;
 import org.bukkit.util.Vector;
 
 import net.icelane.massband.Config;
 import net.icelane.massband.minecraft.HoloText;
+
 
 public class Markers {
 
@@ -61,10 +64,27 @@ public class Markers {
 		}
 	}
 	
-	public void showAll(){
+	public boolean hideInChunck(Chunk chunk){
+		boolean result = false;
 		for (HoloText marker : markerList){
-			marker.show();
+			for(Entity entity : chunk.getEntities()){
+				if (marker.getEntity().getEntityId() == entity.getEntityId()){
+					//DEBUG: Server.logger().info(marker.getText() + " --> " + marker.getEntity().getEntityId());
+					marker.hide();
+					if (!result) result = true;
+				}
+			}
 		}
+		return result;
+	}
+		
+	public boolean showAll(){
+		boolean result = false;
+		for (HoloText marker : markerList){
+			boolean b = marker.show();
+			if (!result) result = b; 
+		}
+		return result;
 	}
 	
 	public void removeAll(){

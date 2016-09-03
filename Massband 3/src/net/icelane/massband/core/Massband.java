@@ -6,10 +6,12 @@ import java.util.UUID;
 
 import org.bukkit.World;
 import org.bukkit.entity.Player;
-import org.bukkit.event.EventHandler;
 import org.bukkit.event.player.PlayerInteractEvent;
 import org.bukkit.event.player.PlayerJoinEvent;
+import org.bukkit.event.player.PlayerMoveEvent;
 import org.bukkit.event.player.PlayerQuitEvent;
+import org.bukkit.event.world.ChunkLoadEvent;
+import org.bukkit.event.world.ChunkUnloadEvent;
 
 public class Massband {
 
@@ -18,7 +20,7 @@ public class Massband {
 	private Player player;
 	private HashMap<String, Markers> worldMarkersList = new HashMap<>(); // String => World.Name
 	private Interact interact;
-
+	
 	private Massband(Player player) {
 		this.player = player;
 		this.interact = new Interact(this);
@@ -48,6 +50,10 @@ public class Massband {
 		
 	}
 	
+	public void reset(){
+		this.interact = new Interact(this);
+	}
+	
 	public static void cleanAll(){
 		for (Entry<UUID, Massband> entry : list.entrySet()){
 			entry.getValue().clean();
@@ -59,6 +65,11 @@ public class Massband {
 			worldMarkersList.get(key).removeAll();
 		}
 	}	
+		
+	public boolean hasItem(){
+		return (player.getInventory().getItemInMainHand().getType() == interact.getMaterial()
+				|| player.getInventory().getItemInOffHand().getType() == interact.getMaterial());
+	}
 	
 	public void interact(PlayerInteractEvent event){
 		this.interact.interact(event);
@@ -68,16 +79,71 @@ public class Massband {
 		load();
 	}
 
-	@EventHandler
 	public void quit(PlayerQuitEvent event){
-		save();
 		clean();
+	}
+	
+	//DEBUG:	int lid = -1;
+	public void move(PlayerMoveEvent event){
+//DEBUG:
+//		try {
+//			HoloText mm = getMarkers(player.getWorld()).get(0);
+//			boolean b = getMarkers(player.getWorld()).get(0).isValid();
+//			Server.get().getConsoleSender().sendMessage("VALID: " + (b?"§a( OK )":"§c( NO )") + " OBJ: §6" + mm.getEntity().getEntityId());
+//			
+//			 
+//			if (lid != -1 && mm.getEntity().getEntityId() != lid){
+//				Server.get().getConsoleSender().sendMessage("§c!!!!!!!!!!!!!!!!!!!!!!!!!!!!!");
+//				Server.get().getConsoleSender().sendMessage("§c!!!                       !!!");
+//				Server.get().getConsoleSender().sendMessage("§c!!! Marker Enitiy CHANGED !!!");
+//				Server.get().getConsoleSender().sendMessage("§c!!!                       !!!");
+//				Server.get().getConsoleSender().sendMessage("§c!!!!!!!!!!!!!!!!!!!!!!!!!!!!!");
+//			}
+//				
+//			lid = mm.getEntity().getEntityId();
+//		} catch (Exception e) {
+//			Server.get().getConsoleSender().sendMessage("§cNo Marker!");
+//		}
 	}
 	
 	public void worldChange(World worldFrom){
 		if (player.getWorld() != worldFrom){
-			getMarker(worldFrom).hideAll();
-			getMarker(player.getWorld()).showAll();
+			getMarkers(worldFrom).hideAll();
+			getMarkers(player.getWorld()).showAll();
+		}
+	}
+	
+	public static void chuckLoad(ChunkLoadEvent event){
+		if (event.isNewChunk()) return;
+
+		//Server.get().getConsoleSender().sendMessage("§e--> Chunk loaded!");
+		
+		for (UUID uuid : list.keySet()){
+			Massband obj = Massband.get(uuid);
+
+			if (!obj.getPlayer().isOnline()) continue;
+			
+			if (obj.getPlayer().getWorld() != event.getWorld()) continue;
+			//if (obj.worldMarkersList.size() == 0) continue;
+			if (!obj.hasItem()) continue;
+			
+			obj.getMarkers(event.getWorld()).showAll();
+				//Server.get().getConsoleSender().sendMessage("§d --> Markers set!");
+			//else
+				//Server.get().getConsoleSender().sendMessage("§c --> Markers not found!");
+		}
+	}
+	
+	public static void chuckUnload(ChunkUnloadEvent event){
+		if (event.isCancelled()) return;
+		
+		for (UUID uuid : list.keySet()){
+			Massband obj = Massband.get(uuid);
+			
+			if (!obj.getPlayer().isOnline()) continue;
+
+			obj.getMarkers(event.getWorld()).hideInChunck(event.getChunk());
+				//Server.get().getConsoleSender().sendMessage("§9 --> Markers removed!");
 		}
 	}
 	
@@ -86,7 +152,7 @@ public class Massband {
 	}
 
 	
-	public Markers getMarker(World world){
+	public Markers getMarkers(World world){
 		Markers m = worldMarkersList.get(world.getName());
 		if (m == null){
 			m = new Markers(world);

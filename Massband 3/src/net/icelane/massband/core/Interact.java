@@ -26,12 +26,13 @@ public class Interact {
 	private long lastInteractTime = System.nanoTime();
 	private long doubleClickDelta = Long.valueOf(Config.interact_doubleClickTimeFrame.valueStr()); //ms 
 	
+	
 	public Interact(Massband obj) {
 		this.massband = obj;
 	}
 	
 	public void interact(PlayerInteractEvent event){
-		Markers markers = massband.getMarker(event.getPlayer().getWorld());
+		Markers markers = massband.getMarkers(event.getPlayer().getWorld());
 		Block block    = event.getClickedBlock();
 		BlockFace face = event.getBlockFace();
 		ItemStack item = event.getItem();
@@ -121,7 +122,7 @@ public class Interact {
 	}
 	
 	public void itemChange(PlayerItemHeldEvent event) {
-		Markers markers = massband.getMarker(event.getPlayer().getWorld());
+		Markers markers = massband.getMarkers(event.getPlayer().getWorld());
 		
 		ItemStack newItem = event.getPlayer().getInventory().getItem(event.getNewSlot());
 		
@@ -130,6 +131,10 @@ public class Interact {
 		}else{
 			markers.showAll();
 		}
+	}
+
+	public Material getMaterial() {
+		return material;
 	}
 
 }
