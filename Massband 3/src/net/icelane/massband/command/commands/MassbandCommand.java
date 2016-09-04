@@ -6,6 +6,7 @@ import org.bukkit.command.CommandSender;
 import net.icelane.massband.Plugin;
 import net.icelane.massband.command.CommandBase;
 
+
 public class MassbandCommand extends CommandBase{
 
 	@Override

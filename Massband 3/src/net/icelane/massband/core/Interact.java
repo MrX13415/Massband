@@ -10,7 +10,7 @@ import org.bukkit.event.player.PlayerItemHeldEvent;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.PlayerInventory;
 
-import net.icelane.massband.Config;
+import net.icelane.massband.config.configs.Config;
 import net.icelane.massband.core.Markers.BlockAxis;
 import net.icelane.massband.core.Markers.MarkerSettings;
 import net.icelane.massband.core.Markers.MeasureMode;
@@ -19,12 +19,12 @@ public class Interact {
 
 	private Massband massband;
 	
-	private Material material     = Material.valueOf(Config.interact_material.valueStr());
-	private boolean preventAction = Boolean.valueOf(Config.interact_preventAction.valueStr());
-	private boolean switchButtons = Boolean.valueOf(Config.interact_switchbuttons.valueStr());
+	private Material material     = (Material) Config.interact_material.get();
+	private boolean preventAction = Config.interact_preventAction.get();
+	private boolean switchButtons = Config.interact_switchbuttons.get();
 	
 	private long lastInteractTime = System.nanoTime();
-	private long doubleClickDelta = Long.valueOf(Config.interact_doubleClickTimeFrame.valueStr()); //ms 
+	private long doubleClickDelta = Config.interact_doubleClickTimeFrame.get(); //ms 
 	
 	
 	public Interact(Massband obj) {

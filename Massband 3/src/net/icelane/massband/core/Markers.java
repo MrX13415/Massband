@@ -10,7 +10,6 @@ import org.bukkit.block.BlockFace;
 import org.bukkit.entity.Entity;
 import org.bukkit.util.Vector;
 
-import net.icelane.massband.Config;
 import net.icelane.massband.minecraft.HoloText;
 
 
@@ -56,9 +55,6 @@ public class Markers {
 		this.world = world;
 	}
 
-	public static int getMaxVisibleCount(){
-		return Integer.getInteger(Config.player_maxVisibleMarkers.valueStr());
-	}
 	
 	public void hideAll(){
 		for (HoloText marker : markerList){
