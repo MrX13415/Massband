@@ -10,10 +10,10 @@ Massband is a plugin for **Minecraft-Servers** based on **Bukkit**. It offers va
 
 
 **Version 3.0 ALPHA**
-#### **[DOWNLOAD](https://dev.bukkit.org/bukkit-plugins/massband/files/)** via Bukkit-Dev
+#### **[DOWNLOAD](https://dev.bukkit.org/bukkit-plugins/massband/files/)** _(via Bukkit-Dev)_
 
-Servers running **Spigot** or **Bukkit** with Minecraft version **1.10**.
-For more informations visit the [Bukkit-Dev](http://dev.bukkit.org/server-mods/massband/) webpage.
+Designed for servers compatible to the **Bukkit API** (_Spigot, CraftBukkit, etc._) using Minecraft version **1.10**.
+For more informations visit the **[Bukkit-Dev](http://dev.bukkit.org/server-mods/massband/)** webpage.
 
 
 
