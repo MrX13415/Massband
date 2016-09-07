@@ -18,6 +18,7 @@ public abstract class Entry<T> {
 		entry.setPath(path);
 		entry.setComment(comment);
 		entry.setDefault(value);
+		entry.set(entry.getDefault());
 		return entry;
 	}
 	
@@ -98,4 +99,8 @@ public abstract class Entry<T> {
 		this.value = value;
 	}
 
+	public void setValueOf(String value) {
+		this.value = valueOf(value);
+	}
+	
 }

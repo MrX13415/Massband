@@ -5,6 +5,7 @@ import org.bukkit.command.CommandSender;
 
 import net.icelane.massband.Plugin;
 import net.icelane.massband.command.CommandBase;
+import net.icelane.massband.config.configs.Config;
 
 
 public class MassbandCommand extends CommandBase{
@@ -67,18 +68,24 @@ public class MassbandCommand extends CommandBase{
 		//*******************
 
 		//**** Hidden features ****
-		if (args.length == 1 && args[0].equalsIgnoreCase("_disable")){
+		if (sender.isOp() && args.length == 1 && args[0].equalsIgnoreCase("_load")){
+			Config.load();
+			sender.sendMessage("§c(i) §6Massband config loaded");
+			return true;
+		}
+		
+		if (sender.isOp() && args.length == 1 && args[0].equalsIgnoreCase("_save")){
+			Config.save();
+			sender.sendMessage("§c(i) §6Massband config saved");
+			return true;
+		}
+		
+		if (sender.isOp() && args.length == 1 && args[0].equalsIgnoreCase("_disable")){
 			sender.sendMessage("§c/!\\ §6Massband will be disabled!");
 			Plugin.get().disable();
 			return true;
 		}
-		
-		if (args.length == 1 && args[0].equalsIgnoreCase("_enable")){
-			//sender.sendMessage("§c/!\\ §6Massband will be disabled!");
-			//Plugin.get().disable();
-			return true;
-		}
-		
+
 		if (args.length == 1 && (args[0].equalsIgnoreCase("_colors") || args[0].equalsIgnoreCase("_color"))){
 			sender.sendMessage("§7Colors: §11 §22 §33 §44 §55 §66 §77 §88 §99 §aa §bb §cc §dd §ee §ff");
 			return true;
