@@ -1,19 +1,26 @@
 package net.icelane.massband.minecraft;
 
+import java.util.ArrayList;
+
 import org.bukkit.Chunk;
 import org.bukkit.Location;
 import org.bukkit.World;
 import org.bukkit.block.Block;
 import org.bukkit.block.BlockFace;
 import org.bukkit.entity.ArmorStand;
+import org.bukkit.entity.Entity;
 import org.bukkit.entity.EntityType;
+
+import net.icelane.massband.Server;
 
 public class HoloText {
 
-	private ArmorStand entity;
-
+	private static double EntityLineOffset = 0.25;
+	
+	private ArrayList<ArmorStand> entities = new ArrayList<>();
+	
 	public HoloText(ArmorStand entity){
-		this.entity   = entity;
+		entities.add(entity);
 	}
 	
 	public static HoloText create(World world, Block block, String text){
@@ -25,10 +32,12 @@ public class HoloText {
 	}
 	
 	public static HoloText create(Location location, String text){
-		return new HoloText(createEnitiy(location, text));
+		HoloText holotext = new HoloText(createEntity(location, ""));
+		if (text.length() > 0) holotext.setText(text);
+		return holotext;
 	}
 	
-	private static ArmorStand createEnitiy(Location location, String text){
+	private static ArmorStand createEntity(Location location, String text){
 		ArmorStand entity = (ArmorStand) location.getWorld().spawnEntity(location, EntityType.ARMOR_STAND);
 		
 		entity.setMarker(true);   // very small hitbox
@@ -70,9 +79,33 @@ public class HoloText {
 		
 		return location;
 	}
+		
+	public void addLine(String text){
+		
+	}
+		
+	public int getLineCount(){
+		return entities.size();
+	}
 	
-	public ArmorStand getEntity(){
-		return entity;
+	
+	public boolean hasEntity(Entity entity){
+		for (ArmorStand _entity : entities) {
+			if (_entity.getEntityId() == entity.getEntityId()) return true;
+		}
+		return false;
+	}
+	
+	private ArmorStand getEntity(int index){
+		return entities.get(index);
+	}
+		
+	private ArmorStand getEntity(){
+		return entities.get(entities.size() - 1);
+	}
+	
+	public ArrayList<ArmorStand> getEntities(){
+		return entities;
 	}
 	
 	public boolean equals(HoloText holo) {
@@ -85,15 +118,20 @@ public class HoloText {
 	}
 	
 	public HoloText clone(){
-		return create(entity.getLocation(), entity.getCustomName());
+		return create(getEntity().getLocation(), getEntity().getCustomName());
 	}
 	
 	public void remove(){
-		entity.remove();
+		for (ArmorStand entity : entities) {
+			entity.remove();
+		}
 	}
 	
 	public boolean isValid(){
-		return entity.isValid();
+		for (ArmorStand entity : entities) {
+			if (!entity.isValid()) return false;
+		}
+		return true;
 	}
 	
 	public boolean move(World world, Block block, BlockFace face){
@@ -101,32 +139,76 @@ public class HoloText {
 	}
 	
 	public boolean move(Block block, BlockFace face){
-		return move(getBlockFaceLocation(entity.getWorld(), block, face));
+		return move(getBlockFaceLocation(getEntity().getWorld(), block, face));
 	}
 
 	public boolean move(Location location){
-		return entity.teleport(location);
+		boolean result = true;
+		for (int index = 0; index < entities.size(); index++) {
+			if (!entities.get(index).teleport(location)) result = false;
+			index++;
+		}
+		return result;
 	}
 	
 	public void hide(){
-		entity.remove();
+		for (ArmorStand entity : entities) {
+			entity.remove();
+		}
 	}
 	
 	public boolean show(){
 		if (isValid()) return false;
 		if (!getChunk().isLoaded()) return false;
-		entity.remove();
-		entity = createEnitiy(entity.getLocation(), entity.getCustomName());
+		
+		for (int index = 0; index < entities.size(); index++) {
+			getEntity(index).remove();
+			entities.set(index, createEntity(getEntity(index).getLocation(), getEntity(index).getCustomName()));
+		}
+		
 		return true;
 	}
 	
 	public String getText(){
-		return entity.getCustomName();
+		String out = "";
+		for (ArmorStand entity : entities) {
+			out += entity.getCustomName() + "\n";
+		}
+		return out;
 	}
-	
+		
 	public void setText(String text){
-		entity.setCustomNameVisible(true);
-		entity.setCustomName(text);
+		text = text.replace("\r\n", "\n");
+		text = text.replace("\r", "\n");
+		String lines[] = text.split("\n"); 
+
+		// save the last (lowest) line of the old text for to still know the location ...
+		ArmorStand baseEntity = getEntity();
+		
+		// remove the hole text ...
+		remove();
+		entities.clear();
+		
+		for (int index = 0; index < lines.length; index++) {
+			
+			// calculate the Y offset according to the number of lines in the text
+			double offset = (lines.length - index - 1) * EntityLineOffset;
+						
+			// calculate the new location of the current line based on the old text
+			Location location = baseEntity.getLocation();
+			location.setY(location.getY() + offset);
+			
+			//BUG: Somehow the teleport does not work in some cases (unknown reason)
+			//   [...]
+			//   entity.teleport(location);
+			//   [...]
+		
+			entities.add(createEntity(location, lines[index]));
+		}
+		
+		// remove the temporary save entity of the old text ...
+		baseEntity.remove();
+		baseEntity = null;
 	}
 	
 	public Chunk getChunk(){

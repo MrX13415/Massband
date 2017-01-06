@@ -29,15 +29,15 @@ public class Markers {
 
 	private World world;
 	
-	private String format_markerFirst  = "§c#%s";            // (1) additional info
+	private String format_markerFirst  = "§c#\nTest\n123\n45\nABC %s";            // (1) additional info
 	private String format_markerLast   = "§7(%1$s) §6%2$s";  // (1) marker count (2) length
 	private String format_marker       = "§7#%1$s: §a%2$s";  // (1) marker index (2) length
 	private String format_markerOne    = "§6%2$s ";          // (2) length
-	private String format_mode_blocks  = "%1d §cblocks %s";
-	private String format_blocks_auto  = "§7(%s)";
-	private String format_blocks_axis  = "§9(%s)";
-	private String format_mode_vectors = "%.3f§cm";
-	private String format_mode_axis    = " §9(%s)";
+	private String format_mode_blocks  = "%1d §cblocks %s";  // 
+	private String format_blocks_auto  = "§7(%s)";           // 
+	private String format_blocks_axis  = "§9(%s)";           // 
+	private String format_mode_vectors = "%.3f§cm";          // 
+	private String format_mode_axis    = "\n§9(%s)";          // 
 	
 	private ArrayList<HoloText> markerList = new ArrayList<>();
 	private ArrayList<Block> blockList = new ArrayList<>();
@@ -66,7 +66,7 @@ public class Markers {
 		boolean result = false;
 		for (HoloText marker : markerList){
 			for(Entity entity : chunk.getEntities()){
-				if (marker.getEntity().getEntityId() == entity.getEntityId()){
+				if (marker.hasEntity(entity)){
 					//DEBUG: Server.logger().info(marker.getText() + " --> " + marker.getEntity().getEntityId());
 					marker.hide();
 					if (!result) result = true;

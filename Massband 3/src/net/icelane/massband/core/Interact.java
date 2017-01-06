@@ -48,7 +48,7 @@ public class Interact {
 		if (item == null) return;
 		if (item.getType() != this.material) return;
 		
-		// is there allready a marker?
+		// is there already a marker?
 		int index = markers.indexOf(block.getLocation());
 		
 		Action right = Action.RIGHT_CLICK_BLOCK;
