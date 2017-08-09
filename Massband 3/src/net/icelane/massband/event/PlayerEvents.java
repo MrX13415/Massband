@@ -42,6 +42,7 @@ public class PlayerEvents implements Listener {
 		Massband obj = Massband.get(event.getPlayer());
 		if (obj != null) obj.interact(event);
 		//TODO: else write error
+
 	}
 	
 	@EventHandler

@@ -1,6 +1,7 @@
 package net.icelane.massband.core;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 
 import org.bukkit.Chunk;
 import org.bukkit.Location;
@@ -10,7 +11,10 @@ import org.bukkit.block.BlockFace;
 import org.bukkit.entity.Entity;
 import org.bukkit.util.Vector;
 
+import net.icelane.massband.Server;
 import net.icelane.massband.minecraft.HoloText;
+import net.icelane.math.Point;
+import net.icelane.math.Polygon;
 
 
 public class Markers {
@@ -29,15 +33,15 @@ public class Markers {
 
 	private World world;
 	
-	private String format_markerFirst  = "§c#\nTest\n123\n45\nABC %s";            // (1) additional info
-	private String format_markerLast   = "§7(%1$s) §6%2$s";  // (1) marker count (2) length
+	private String format_markerFirst  = "§c#\n%1$s";        // (1) additional info
+	private String format_markerLast   = "§7(%1$s) §6%2$s §9%3$s";  // (1) marker count (2) length (3) area
 	private String format_marker       = "§7#%1$s: §a%2$s";  // (1) marker index (2) length
 	private String format_markerOne    = "§6%2$s ";          // (2) length
 	private String format_mode_blocks  = "%1d §cblocks %s";  // 
 	private String format_blocks_auto  = "§7(%s)";           // 
 	private String format_blocks_axis  = "§9(%s)";           // 
 	private String format_mode_vectors = "%.3f§cm";          // 
-	private String format_mode_axis    = "\n§9(%s)";          // 
+	private String format_mode_axis    = "\n§9(%s)";         // 
 	
 	private ArrayList<HoloText> markerList = new ArrayList<>();
 	private ArrayList<Block> blockList = new ArrayList<>();
@@ -193,6 +197,23 @@ public class Markers {
 				);
 	}
 	
+	public Point[] getPoints(){
+		Point[] points = new Point[blockList.size()];
+		
+		for(int index = 0; index < points.length; index++){
+			//block.getLocation().getBlockY();  just at the floor for now
+			//TODO: Add level option X, Y and Z
+			
+			points[index] = new Point(getBlock(index).getLocation().getBlockX(), getBlock(index).getLocation().getBlockZ()); // z is y in minecraft!
+		}
+		
+		return points;
+	}
+	 
+	public double getArea(){
+		return Polygon.getArea(getPoints());
+	}
+	
 	public void recalculate(){
 		int index = 0;
 		int size  = getCount();
@@ -237,8 +258,7 @@ public class Markers {
 				}
 			}
 			vecPrev = vec;
-			
-			
+						
 			// format value ...
 			String value = String.format(format_mode_vectors, distance);
 			if (mode == MeasureMode.BLOCKS){
@@ -264,7 +284,8 @@ public class Markers {
 				if (index == size - 1) format = format_markerLast;  //last
 				if (size == 2) format = format_markerOne;
 				
-				out = String.format(format, index, value);
+				String area = size > 2 ? getArea() + "|" + Polygon.GetBlockArea(getPoints()) : ""; 
+				out = String.format(format, index, value, area);
 			}
 			
 			holotext.setText(out);
@@ -287,7 +308,6 @@ public class Markers {
 	public void setFormat_markerFirst(String format_markerFirst) {
 		this.format_markerFirst = format_markerFirst;
 	}
-
 
 	public String getFormat_markerLast() {
 		return format_markerLast;
