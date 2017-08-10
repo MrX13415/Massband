@@ -11,8 +11,6 @@ import org.bukkit.entity.ArmorStand;
 import org.bukkit.entity.Entity;
 import org.bukkit.entity.EntityType;
 
-import net.icelane.massband.Server;
-
 public class HoloText {
 
 	private static double EntityLineOffset = 0.25;

@@ -9,13 +9,14 @@ public class Polygon {
 	/**
 	 * Returns the calculated area of an polygon defined by the given points.
 	 * </br>
-	 * Note: If the polygon intersect itself, the resulting area will be wrong.
+	 * <b>Note:</b> If the polygon intersect itself, the resulting area will be wrong.
 	 * @param points An array of points defining the polygon to calculate the area of.
 	 * @return The area of the given polygon.
 	 */
 	public static double getArea(Point... points){
-		double area = 0;
+		if (points.length < 3) return 0;
 		
+		double area = 0;	
 		for(int index_p0 = 0; index_p0 < points.length; index_p0++ ){
 			int index_p1 = (index_p0 + 1) % points.length;  // index of the next point (p1 is next of p0)
 			
@@ -23,19 +24,20 @@ public class Polygon {
 			area -= points[index_p1].getX() * points[index_p0].getY();
 		}
 		
-		area = Math.abs(area) / 2.0d;
-		
+		area = Math.abs(area) / 2.0d;		
 		return area;
 	}
 
 	/**
 	 * Weather the orientation of the polygon, defined by the given point array is clockwise or counter-clockwise.
 	 * </br>
-	 * Note: The result is twice the enclosed area, with a +/- convention.
+	 * <b>Note:</b> The result is twice the enclosed area, with a +/- convention.
 	 * @param points The polygon as point array.
 	 * @return Weather the polygon is clockwise orientated.
 	 */
 	public static boolean isClockwise(Point... points){
+		if (points.length < 3) return false;
+		
 		double avg_direction = 0;
 		
 		for(int index = 0; index < points.length; index++){
@@ -51,34 +53,37 @@ public class Polygon {
 	}
 
 	/**
-	 * Resizes the outline of a polygon by the given offset.
+	 * Resizes the outline of a polygon by the given offset.</br>
 	 * The offset value corresponds to the distance between the two edges of the base polygon to the target polygon.
 	 * @param points The polygon as point array.
 	 * @param offset The distance to expand or reduce the polygon.
 	 * @return The resized polygon as point array.
 	 */
 	public static Point[] resize(Point[] points, double offset){
-		ArrayList<Point> forPoints = new ArrayList<Point>();
-		for (Point point : points) {
-			forPoints.add(point);
-		}
+		if (points.length < 3) return points;
 		
 		boolean clockwise = isClockwise(points);
 		ArrayList<Point> offPoints = new ArrayList<Point>();
 
-		Point p1 = points[points.length - 1];
-		Point p2 = null;
+		Point point1 = points[points.length - 1];
+		Point point2 = null;
 		
-		forPoints.add(points[0]);
-		
-		for (Point p3 : forPoints) {
-			if (p2 != null){
-				if (p1 != null){
-					offPoints.add( getOffsetEdge(p1, p2, p3, offset, clockwise) );	
-				}
-				p1 = p2;
+		for (int pointIndex = 0; pointIndex <= points.length; pointIndex++) {
+			Point point3 = null;
+			if (pointIndex < points.length) {
+				point3 = points[pointIndex];
+			}else {
+				// add last point at the end
+				point3 = points[0];
 			}
-			p2 = p3;
+			
+			if (point2 != null){
+				if (point1 != null){
+					offPoints.add( getOffsetVertex(point1, point2, point3, offset, clockwise) );	
+				}
+				point1 = point2;
+			}
+			point2 = point3;
 		}
 
 		Point[] result = new Point[offPoints.size()];
@@ -86,25 +91,32 @@ public class Polygon {
 	}
 	
 	/**
-	 * 
-	 * @param p1
-	 * @param p2
-	 * @param p3
-	 * @param distance
-	 * @param clockwise
-	 * @return
+	 * Returns the new vertex point of two vector defined by three points
+	 * when each vector gets moved about the given distance 90° to itself.
+	 * </br>
+	 * <b>Warning:</b></br>
+	 * Description might not be accurate. To complex to explain properly.</br>
+	 * So here be dragons. You have been warned!
+	 * @param p1 The first point.
+	 * @param p2 The second point.
+	 * @param p3 The tired point. 
+	 * @param distance The distance between the new and the old vector of (p1, p2, p3)
+	 * @param clockwise Weather the points are clockwise orientated.
+	 * @return The new vertex point.
 	 */
-	public static Point getOffsetEdge(Point p1, Point p2, Point p3, double distance, boolean clockwise){
+	public static Point getOffsetVertex(Point p1, Point p2, Point p3, double distance, boolean clockwise){
+		// vector p1->p2
 		Vector vec1 = new Vector();
 		vec1.setX(p2.getX() - p1.getX());
-		vec1.setY(p2.getY() - p2.getY());
+		vec1.setY(p2.getY() - p1.getY());
 		
+		// vector p2->p3
 		Vector vec2 = new Vector();
 		vec2.setX(p3.getX() - p2.getX());
 		vec2.setY(p3.getY() - p2.getY());
 		
 		double delta = 180 - VectorUtil.getAngle(vec1, vec2);
-		boolean isIn = VectorUtil.getCrossSign(vec1, vec2);
+		boolean isIn = VectorUtil.isPositivCrossSign(vec1, vec2);
 
 		double beta = delta / 2.0; 
 		double alpha = 90 - beta;
@@ -112,6 +124,7 @@ public class Polygon {
 	
 		Vector vecp = VectorUtil.getPointVector(p1, p2, c);
 		
+		// inner corners ...
 		if (isIn){
 			vecp.setX(vecp.getX() * -1);
 			vecp.setY(vecp.getY() * -1);
@@ -119,7 +132,7 @@ public class Polygon {
 		
 		if (!clockwise){
 			vecp.setX(vecp.getX() * -1);
-			vecp.setX(vecp.getX() * -1);
+			vecp.setY(vecp.getY() * -1);
 		}
 		
 		// inner corners ...
@@ -130,50 +143,81 @@ public class Polygon {
 		// if not clockwise: beta = beta * -1
 		
 		Vector vecResult = VectorUtil.rotateDeg(vecp, beta);
-				
+		
 		return new Point(p2.getX() + vecResult.getX(), p2.getY() + vecResult.getY());
 	}
 	
-	
-	public static double CalcBlockPolyAreaOffset(Point[] points){
-	// find diagonals between all points and calc area offset
-	double offset = 0;
-	Point pointPrev = null;
-	for (Point point : points) {
-	if (pointPrev != null){
-	// if x and y is different we need to add 0.5 to our area
-	// so each dialgonal will also be counted as full block.
-	if ( point.getX() != pointPrev.getX() && point.getY() != pointPrev.getY())
-		offset += 0.5;
-	}
-	
-	pointPrev = point;
-	}
-	
-	return offset;
+	/**
+	 * Returns the offset required to calculate the real block count of an "almost" block polygon.
+	 * </br>
+	 * Basically the function tries to find "diagonals" between the points and adds <code>0.5</code> for every diagonal found.
+	 * @param points The polygon as point array.
+	 * @return The offset.
+	 */
+	public static double getBlockPolyAreaOffset(Point[] points){
+		if (points.length < 3) return 0; 
+				
+		// find diagonals between all points and calc area offset
+		double offset = 0;
+		Point pointPrev = null;
+		
+		for (Point point : points) {
+			if (pointPrev != null){
+				// if x and y is different we need to add 0.5 to our area
+				// so each diagonal will also be counted as full block.
+				if ( point.getX() != pointPrev.getX() && point.getY() != pointPrev.getY())
+					offset += 0.5;
+				}
+			pointPrev = point;
+		}
+		return offset;
 	}
 
-	
+	/**
+	 * Returns the area or number of block fitting in an polygon area.
+	 * </br>
+	 * Assuming a block is 1x1.
+	 * @param points The polygon as point array.
+	 * @return The number of blocks fitting in the polygon area.
+	 */
 	public static long GetBlockArea(Point[] points){
-		// calulate (almost) block poly-points ...
-		Point[] block_points = toBlockPoly( points ); // extendPoly(
+		if (points.length < 3) return 0;
+				
+		// resize the polygon about a value of 0.5
+		// to account for the blocks on the outline of input the polygon.
+		Point[] block_points = resize(points, 0.5);
 		
-		// find diagonals between all points and calc area offset
-		double offset = CalcBlockPolyAreaOffset(block_points);
+		// get a "almost blocky" polygon ...
+		block_points = toBlockPoly( resize(points, 0.5) ); 
 		
-		// calc block area
+		// find diagonals between all points and calculate the area offset.
+		double offset = getBlockPolyAreaOffset(block_points);
+		
+		// calculate the real block area.
 		return Math.round( getArea(block_points) + offset );
 	}
 	
+	/**
+	 * Converts an ordinary polygon to "almost blocky" version of itself.
+	 * </br>
+	 * "Almost blocky", because there might be "diagonals" between the points in other words "half-blocks".
+	 * The size of the one block is assumed to be 1x1.
+	 * <br>
+	 * @param points The polygon as point array.
+	 * @return The "almost blocky" polygon as point array.
+	 */
 	public static Point[] toBlockPoly(Point[] points)
 	{
+		if (points.length < 3) return points; 
+				
 		ArrayList<Point> outPoints = new ArrayList<Point>();
 		
-		for (int pointIndex = 0; pointIndex < points.length; pointIndex++) {
-			Point point = points[pointIndex];
-			
-			// add last point at the end
-			if (pointIndex == points.length - 1){
+		for (int pointIndex = 0; pointIndex <= points.length; pointIndex++) {
+			Point point = null;
+			if (pointIndex < points.length){
+				point = points[pointIndex];
+			}else{
+				// add last point at the end
 				point = points[0];
 			}
 			
@@ -187,7 +231,7 @@ public class Polygon {
 				// calculate vector p1->p2
 				Vector vec = new Vector();
 				vec.setX(point.getX() - pointPrev.getX());
-				vec.setX(point.getY() - pointPrev.getY());
+				vec.setY(point.getY() - pointPrev.getY());
 				double vec_m = (vec.getX() == 0) ? 1 : vec.getY() / vec.getX();   // 1 if normal vector
 				 
 				// calculate sub points between points ...
@@ -212,7 +256,7 @@ public class Polygon {
 					
 					// Correct direction (+ or -) for the sub vector
 					subvec.setX( (vec.getX() < 0 && subvec.getX() > 0) ? subvec.getX() * -1 : subvec.getX() );
-					subvec.setX( (vec.getY() < 0 && subvec.getY() > 0) ? subvec.getY() * -1 : subvec.getY() );
+					subvec.setY( (vec.getY() < 0 && subvec.getY() > 0) ? subvec.getY() * -1 : subvec.getY() );
 					
 					// calculate point on vector
 					Point subpoint = new Point();

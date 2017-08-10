@@ -1,7 +1,5 @@
 package net.icelane.math;
 
-import org.bukkit.util.Vector;
-
 public class Point {
 
 	private double x;
@@ -22,6 +20,11 @@ public class Point {
 		this.z = z;
 	}
 	
+	/**
+	 * Weather the X, Y and Z coordinates of the given point it equals to this point.
+	 * @param point A point to compare with.
+	 * @return True if both points are equal.
+	 */
 	public boolean equals(Point point) {
 		return (this.getX() == point.getX()
 				&& this.getY() == point.getY()

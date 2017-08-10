@@ -75,12 +75,12 @@ public class VectorUtil {
 	}
 	
 	/**
-	 * Returns the cross sign between to vectors.
+	 * Returns weather the cross sign between to vectors is positive.
 	 * @param v The first vector.
 	 * @param w The second vector.
 	 * @return True if cross is positive. False if negative or zero.
 	 */
-	public static boolean getCrossSign(Vector v, Vector w){
+	public static boolean isPositivCrossSign(Vector v, Vector w){
 		return (v.getX() * w.getY()) > (w.getX() * v.getY());  //x1 * y2 > x2 * y1
 	}
 		

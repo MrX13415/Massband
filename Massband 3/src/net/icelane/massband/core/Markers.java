@@ -1,7 +1,6 @@
 package net.icelane.massband.core;
 
 import java.util.ArrayList;
-import java.util.Arrays;
 
 import org.bukkit.Chunk;
 import org.bukkit.Location;
@@ -11,7 +10,6 @@ import org.bukkit.block.BlockFace;
 import org.bukkit.entity.Entity;
 import org.bukkit.util.Vector;
 
-import net.icelane.massband.Server;
 import net.icelane.massband.minecraft.HoloText;
 import net.icelane.math.Point;
 import net.icelane.math.Polygon;
