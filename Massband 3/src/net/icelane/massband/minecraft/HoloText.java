@@ -11,11 +11,14 @@ import org.bukkit.entity.ArmorStand;
 import org.bukkit.entity.Entity;
 import org.bukkit.entity.EntityType;
 
+import net.icelane.massband.Server;
+
 public class HoloText {
 
 	private static double EntityLineOffset = 0.25;
 	
 	private ArrayList<ArmorStand> entities = new ArrayList<>();
+	private Location location;
 	
 	public HoloText(ArmorStand entity){
 		entities.add(entity);
@@ -31,7 +34,8 @@ public class HoloText {
 	
 	public static HoloText create(Location location, String text){
 		HoloText holotext = new HoloText(createEntity(location, ""));
-		if (text.length() > 0) holotext.setText(text);
+		holotext.location = location;
+		if (text != null) holotext.setText(text);
 		return holotext;
 	}
 	
@@ -42,7 +46,6 @@ public class HoloText {
 		//entity.setInvulnerable(true);
 		entity.setSmall(true);
 		entity.setSilent(true);
-		
 		entity.setGravity(false);
 		entity.setArms(false);
 		entity.setBasePlate(false);
@@ -50,9 +53,9 @@ public class HoloText {
 		entity.setCollidable(false);
 		entity.setVisible(false);
 		//entity.setRemoveWhenFarAway(true);
-		
-		entity.setCustomNameVisible(true);
+
 		entity.setCustomName(text);
+		entity.setCustomNameVisible(true);
 		
 		return entity;
 	}
@@ -143,9 +146,18 @@ public class HoloText {
 	public boolean move(Location location){
 		boolean result = true;
 		for (int index = 0; index < entities.size(); index++) {
-			if (!entities.get(index).teleport(location)) result = false;
+			//BUG: Somehow the teleport does not work in some cases (unknown reason)
+//			boolean ok = entities.get(index).teleport(location);
+//			if (!ok) result = false;
+			
+			String entityText = entities.get(index).getCustomName();
+			entities.get(index).remove();
+			entities.set(index, createEntity(location, entityText));
+			result = true;
+
 			index++;
 		}
+		this.location = location;
 		return result;
 	}
 	
@@ -181,7 +193,8 @@ public class HoloText {
 		String lines[] = text.split("\n"); 
 
 		// save the last (lowest) line of the old text, so we still know the old location ...
-		ArmorStand baseEntity = getEntity();
+		Location baseLocation = this.location; //getEntity().getLocation();
+		//int eid = getEntity().getEntityId();
 		
 		// remove the hole text ...
 		remove();
@@ -193,20 +206,23 @@ public class HoloText {
 			double offset = (lines.length - index - 1) * EntityLineOffset;
 						
 			// calculate the new location of the current line based on the old text
-			Location location = baseEntity.getLocation();
-			location.setY(location.getY() + offset);
+			Location newlocation = new Location(baseLocation.getWorld(), baseLocation.getX(), baseLocation.getY() + offset, baseLocation.getZ());
+			//location.setY(location.getY() + offset);
 			
+			if (lines.length > 1) {
+				Server.get().getConsoleSender().sendMessage("DEBUG: " + offset + " | " + baseLocation + " | " + newlocation.toString());
+			}
 			//BUG: Somehow the teleport does not work in some cases (unknown reason)
 			//   [...]
 			//   entity.teleport(location);
 			//   [...]
 		
-			entities.add(createEntity(location, lines[index]));
+			entities.add(createEntity(newlocation, lines[index]));
 		}
 		
 		// remove the temporary save entity of the old text ...
-		baseEntity.remove();
-		baseEntity = null;
+//		baseEntity.remove();
+//		baseEntity = null;
 	}
 	
 	public Chunk getChunk(){

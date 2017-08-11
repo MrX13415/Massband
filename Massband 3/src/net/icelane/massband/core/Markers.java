@@ -32,7 +32,7 @@ public class Markers {
 	private World world;
 	
 	private String format_markerFirst  = "§c#\n%1$s";        // (1) additional info
-	private String format_markerLast   = "§7(%1$s) §6%2$s §9%3$s";  // (1) marker count (2) length (3) area
+	private String format_markerLast   = "§7(%1$s) §6%2$s\n§9%3$s";  // (1) marker count (2) length (3) area
 	private String format_marker       = "§7#%1$s: §a%2$s";  // (1) marker index (2) length
 	private String format_markerOne    = "§6%2$s ";          // (2) length
 	private String format_mode_blocks  = "%1d §cblocks %s";  // 
@@ -175,7 +175,7 @@ public class Markers {
 		}else{
 			// Create a clone from the last marker and insert it before the last item
 			markerList.add(getCount() - 1, getLast().clone());
-			// move "new" the last marker to the new location
+			// move the "new" last marker to the new location
 			getLast().move(block, face); 
 		}
 		
