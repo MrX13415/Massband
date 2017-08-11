@@ -4,8 +4,12 @@ import java.util.ArrayList;
 
 import org.bukkit.util.Vector;
 
+import net.icelane.massband.Server;
+
 public class Polygon {
 
+	private static long calcStartTime;
+	
 	/**
 	 * Returns the calculated area of an polygon defined by the given points.
 	 * </br>
@@ -120,7 +124,11 @@ public class Polygon {
 
 		double beta = delta / 2.0; 
 		double alpha = 90 - beta;
-		double c = distance / Math.cos(Math.toRadians(alpha));
+		double c = distance;
+		
+		// calculate distance from current to the new point ...
+		// /!\ don't do this if beta=0! The resulting numbers would be huge!
+		if (beta > 0) c = distance / Math.cos(Math.toRadians(alpha));
 	
 		Vector vecp = VectorUtil.getPointVector(p1, p2, c);
 		
@@ -208,6 +216,7 @@ public class Polygon {
 	 */
 	public static Point[] toBlockPoly(Point[] points)
 	{
+		calcStartTime = System.currentTimeMillis();
 		if (points.length < 3) return points; 
 				
 		ArrayList<Point> outPoints = new ArrayList<Point>();
@@ -233,9 +242,17 @@ public class Polygon {
 				vec.setX(point.getX() - pointPrev.getX());
 				vec.setY(point.getY() - pointPrev.getY());
 				double vec_m = (vec.getX() == 0) ? 1 : vec.getY() / vec.getX();   // 1 if normal vector
-				 
+				
+				long maxSubPointCount = (long) vec_length;
+				
 				// calculate sub points between points ...
-				for (int subPointIndex = 0; subPointIndex < vec_length - 1; subPointIndex++) {
+				for (long subPointIndex = 0; subPointIndex < maxSubPointCount - 1; subPointIndex++) {
+					// /!\ Safety time out, just in case the maxSubPointCount is way to big.
+					if ((System.currentTimeMillis() - calcStartTime) > 3000) {
+						Server.get().getConsoleSender().sendMessage("[Massband] §cWARNING: Polygone calculation timeout (3000ms) exeeded. Operation aborted!");
+						return points;
+					}
+					
 					Vector subvec = new Vector();
 					
 					if (vec.getX() != 0 && vec.getY() != 0){
