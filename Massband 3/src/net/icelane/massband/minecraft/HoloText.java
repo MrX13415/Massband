@@ -16,6 +16,7 @@ public class HoloText {
 	private static double EntityLineOffset = 0.25;
 	
 	private Location location;
+	private String text;
 	private ArrayList<ArmorStand> entities = new ArrayList<>();
 
 	
@@ -25,7 +26,7 @@ public class HoloText {
 	
 	public HoloText(Location location, String text){
 		setLocation(location);
-		if (text != null) this.setText(text);
+		setText(text);
 	}
 
 	public static HoloText create(World world, Block block, String text){
@@ -90,7 +91,7 @@ public class HoloText {
 		
 	}
 		
-	public int getLineCount(){
+	public int getEntityCount(){
 		return entities.size();
 	}
 
@@ -131,15 +132,14 @@ public class HoloText {
 	public boolean move(Location location){
 		boolean result = true;
 		for (int index = 0; index < entities.size(); index++) {
-			//BUG: Somehow the teleport does not work in some cases (unknown reason)
-//			boolean ok = entities.get(index).teleport(location);
-//			if (!ok) result = false;
+			ArmorStand entity = entities.get(index);
 			
-			String entityText = entities.get(index).getCustomName();
-			entities.get(index).remove();
-			entities.set(index, createEntity(location, entityText));
-			result = true;
+			Location newLocation = location.clone();
+			newLocation.setY(entity.getLocation().getY());
 
+			boolean ok = entities.get(index).teleport(newLocation);
+			if (!ok) result = false;
+			
 			index++;
 		}
 		setLocation(location);
@@ -165,39 +165,61 @@ public class HoloText {
 	}
 	
 	public String getText(){
-		String out = "";
-		for (ArmorStand entity : entities) {
-			out += entity.getCustomName() + "\n";
-		}
-		return out;
+		return this.text;
 	}
-		
+	
+	public String[] getLines() {
+		return getText().split("\n");
+	}
+	
 	public void setText(String text){
+		// fix new lines
 		text = text.replace("\r\n", "\n");
 		text = text.replace("\r", "\n");
-		String lines[] = text.split("\n"); 
+		
+		this.text = text;
+		redrawText();
+	}
+	
+	/**
+	 * Calculates the Y offset according to the number of lines in the text.
+	 * @param lineIndex The index of the line
+	 * @return The calculated offset value
+	 */
+	public double getLineOffset(int lineIndex) {
+		return (getLines().length - lineIndex - 1) * EntityLineOffset;
+	}
+	
+	public void redrawText(){
+		String lines[] = getLines(); 
 
-		// remove the hole text ...
-		remove();
-		entities.clear();
+		int entityIndex = 0;
 		
 		for (int index = 0; index < lines.length; index++) {
 			// prevent empty entities ...
 			if (lines[index] == "") continue;
 			
 			// calculate the Y offset according to the number of lines in the text
-			double offset = (lines.length - index - 1) * EntityLineOffset;
+			double offset = getLineOffset(index);
 						
 			// calculate the new location of the current line
 			Location newlocation = getLocation().clone();
 			newlocation.setY(newlocation.getY() + offset);
 			
-			//BUG: Somehow the teleport does not work in some cases (unknown reason)
-			//   [...]
-			//   entity.teleport(location);
-			//   [...]
+			// reuse existing entities ...
+			if (entityIndex < getEntityCount()) {
+				getEntity(entityIndex).teleport(newlocation);
+				getEntity(entityIndex).setCustomName(lines[index]);
+			}else {		
+				entities.add(createEntity(newlocation, lines[index]));
+			}
+			entityIndex++;
+		}
 		
-			entities.add(createEntity(newlocation, lines[index]));
+		// clean up ...
+		while(getEntityCount() > entityIndex) {
+			entities.get(getEntityCount() - 1).remove();
+			entities.remove(getEntityCount() - 1);
 		}
 	}
 

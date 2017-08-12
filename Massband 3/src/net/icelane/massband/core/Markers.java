@@ -175,7 +175,7 @@ public class Markers {
 		}else{
 			// Create a clone from the last marker and insert it before the last item
 			markerList.add(getCount() - 1, getLast().clone());
-			// move the "new" last marker to the new location
+			// move the "new" last marker to it's new location
 			getLast().move(block, face); 
 		}
 		
