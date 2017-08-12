@@ -10,6 +10,8 @@ import org.bukkit.block.BlockFace;
 import org.bukkit.entity.ArmorStand;
 import org.bukkit.entity.Entity;
 import org.bukkit.entity.EntityType;
+import org.bukkit.event.player.PlayerTeleportEvent.TeleportCause;
+import org.bukkit.util.Vector;
 
 public class HoloText {
 
@@ -18,7 +20,7 @@ public class HoloText {
 	private Location location;
 	private String text;
 	private ArrayList<ArmorStand> entities = new ArrayList<>();
-
+	private ArrayList<Double> entityOffsets = new ArrayList<>();
 	
 	public HoloText(Location location){
 		this(location, "");
@@ -41,16 +43,19 @@ public class HoloText {
 		return new HoloText(location, text);
 	}
 	
-	private static ArmorStand createEntity(Location location, String text){
-		ArmorStand entity = (ArmorStand) location.getWorld().spawnEntity(location, EntityType.ARMOR_STAND);
-		
-		if (text != null) entity.setCustomName(text);
-		else entity.setCustomName("");
-		
+	public HoloText clone(){
+		return create(getLocation(), getText());
+	}
+	
+	private static void setEntityAttirubtes(ArmorStand entity) {
 		entity.setVisible(false);
 		entity.setGravity(false);
 		entity.setCollidable(false);
-
+		entity.setFallDistance(0);
+		entity.setVelocity(new Vector());
+		entity.setGliding(false);
+		entity.setAI(false);
+		
 		entity.setMarker(true);   // very small hitbox
 		entity.setArms(false);
 		entity.setBasePlate(false);
@@ -61,6 +66,14 @@ public class HoloText {
 		
 		//entity.setRemoveWhenFarAway(true);
 		entity.setCanPickupItems(false);
+	}
+	
+	private static ArmorStand createEntity(Location location, String text){
+		ArmorStand entity = (ArmorStand) location.getWorld().spawnEntity(location, EntityType.ARMOR_STAND);
+		setEntityAttirubtes(entity);
+		
+		if (text != null) entity.setCustomName(text);
+		else entity.setCustomName(" ");
 		entity.setCustomNameVisible(true);
 		
 		return entity;
@@ -104,13 +117,17 @@ public class HoloText {
 		return getEntity().getCustomName();
 	}
 	
-	public HoloText clone(){
-		return create(getEntity().getLocation(), getEntity().getCustomName());
-	}
-	
 	public void remove(){
 		for (ArmorStand entity : entities) {
 			entity.remove();
+		}
+	}
+
+	public void clearButLast(){
+		for (int index = entities.size() - 2; index >= 0; --index) {
+			ArmorStand entity = entities.get(index);
+			entity.remove();
+			entities.remove(index);
 		}
 	}
 	
@@ -133,13 +150,14 @@ public class HoloText {
 		boolean result = true;
 		for (int index = 0; index < entities.size(); index++) {
 			ArmorStand entity = entities.get(index);
+			double offset = entityOffsets.get(index);
 			
-			Location newLocation = location.clone();
-			newLocation.setY(entity.getLocation().getY());
-
-			boolean ok = entities.get(index).teleport(newLocation);
+			Location newLocation = new Location(location.getWorld(),
+					location.getX(), location.getY() + offset, location.getZ(), 
+					location.getYaw(), location.getPitch());
+			
+			boolean ok = entity.teleport(newLocation, TeleportCause.PLUGIN);
 			if (!ok) result = false;
-			
 			index++;
 		}
 		setLocation(location);
@@ -193,34 +211,44 @@ public class HoloText {
 	public void redrawText(){
 		String lines[] = getLines(); 
 
-		int entityIndex = 0;
-		
+		// trim entity list ...
+		while (getEntityCount() > lines.length) {
+			getEntity(0).remove();
+			entities.remove(0);
+		}
+
+		entityOffsets.clear();
+		int entityIndex = getEntityCount() - lines.length;
+ 
 		for (int index = 0; index < lines.length; index++) {
 			// prevent empty entities ...
-			if (lines[index] == "") continue;
+			if (lines[index].equals(""))
+				lines[index] = " "; 
 			
 			// calculate the Y offset according to the number of lines in the text
 			double offset = getLineOffset(index);
-						
+		
 			// calculate the new location of the current line
-			Location newlocation = getLocation().clone();
-			newlocation.setY(newlocation.getY() + offset);
+			Location location = getLocation().clone();
+			location.setY(location.getY() + offset);
 			
 			// reuse existing entities ...
-			if (entityIndex < getEntityCount()) {
-				getEntity(entityIndex).teleport(newlocation);
-				getEntity(entityIndex).setCustomName(lines[index]);
-			}else {		
-				entities.add(createEntity(newlocation, lines[index]));
+			if (entityIndex < 0) {
+				entities.add(index, createEntity(location, lines[index]));
+			}else{	
+				getEntity(index).setCustomName(lines[index]);
+				getEntity(index).teleport(location);
 			}
+			entityOffsets.add(offset);
+			
 			entityIndex++;
 		}
-		
+
 		// clean up ...
-		while(getEntityCount() > entityIndex) {
-			entities.get(getEntityCount() - 1).remove();
-			entities.remove(getEntityCount() - 1);
-		}
+//		while(getEntityCount() > entityIndex) {
+//			entities.get(getEntityCount() - 1).remove();
+//			entities.remove(getEntityCount() - 1);
+//		}
 	}
 
 	public boolean hasEntity(Entity entity){

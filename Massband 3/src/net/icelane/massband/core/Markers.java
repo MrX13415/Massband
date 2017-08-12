@@ -31,15 +31,21 @@ public class Markers {
 
 	private World world;
 	
-	private String format_markerFirst  = "§c#\n%1$s";        // (1) additional info
-	private String format_markerLast   = "§7(%1$s) §6%2$s\n§9%3$s";  // (1) marker count (2) length (3) area
-	private String format_marker       = "§7#%1$s: §a%2$s";  // (1) marker index (2) length
-	private String format_markerOne    = "§6%2$s ";          // (2) length
-	private String format_mode_blocks  = "%1d §cblocks %s";  // 
-	private String format_blocks_auto  = "§7(%s)";           // 
-	private String format_blocks_axis  = "§9(%s)";           // 
-	private String format_mode_vectors = "%.3f§cm";          // 
-	private String format_mode_axis    = "\n§9(%s)";         // 
+	private String format_markerFirst    = "§c#\n%1$s";                  // (1) additional info
+	private String format_markerLast     = "§7(%1$s§7) §6%2$s\n§9%3$s";  // (1) marker count (2) length (3) area
+	private String format_marker         = "§7#%1$s: §a%2$s";            // (1) marker index (2) length
+	private String format_markerOne      = "§6%2$s ";                    // (2) length
+	private String format_mode_axis      = "§9(%1$s§9, %2$s§9)";         // (0) axis 1 (2) axis 2
+	private String format_blocks_length  = "%1d §cblocks %s";            //
+	private String format_blocks_area    = "%1d §cblocks²";               // 
+	private String format_blocks_auto    = "§7(%s§7)";                   // 
+	private String format_blocks_axis    = "§9(%s§9)";                   //
+	private String format_vectors_length = "%.3f§cm";                    // 
+	private String format_vectors_area   = "%.3f§cm²";                   //
+
+	private String text_axis_X           = "§cX";                        // 
+	private String text_axis_Y           = "§aY";                        // 
+	private String text_axis_Z           = "§9Z";                        // 
 	
 	private ArrayList<HoloText> markerList = new ArrayList<>();
 	private ArrayList<Block> blockList = new ArrayList<>();
@@ -173,10 +179,12 @@ public class Markers {
 		if (getCount() == 0){
 			markerList.add(HoloText.create(world, block, face, "#"));
 		}else{
-			// Create a clone from the last marker and insert it before the last item
-			markerList.add(getCount() - 1, getLast().clone());
-			// move the "new" last marker to it's new location
-			getLast().move(block, face); 
+			// Create a clone from the current last marker ...
+			HoloText clone = getLast().clone();
+			// insert the cloned marker ...
+			markerList.add(getCount() - 1, clone);			
+			// move the current last marker to it's new location
+			getLast().move(world, block, face);
 		}
 		
 		blockList.add(block);
@@ -209,7 +217,11 @@ public class Markers {
 	}
 	 
 	public double getArea(){
-		return Polygon.getArea(getPoints());
+		return Polygon.getArea(Polygon.resize(getPoints(), Polygon.block_offset));
+	}
+	
+	public long getBlockArea(){
+		return Polygon.GetBlockArea(getPoints());
 	}
 	
 	public void recalculate(){
@@ -258,10 +270,13 @@ public class Markers {
 			vecPrev = vec;
 						
 			// format value ...
-			String value = String.format(format_mode_vectors, distance);
+			String value = String.format(format_vectors_length, distance);
 			if (mode == MeasureMode.BLOCKS){
-				String strAxis = String.format(settings.isAutoAxis() ? format_blocks_auto : format_blocks_axis, settings.getAxis());	
-				value = String.format(format_mode_blocks, (int) distance, strAxis);
+				String strAxis = String.format(
+						(settings.isAutoAxis() ? format_blocks_auto : format_blocks_axis),
+						getAxisText(settings.getAxis()));
+				
+				value = String.format(format_blocks_length, (int) distance, strAxis);
 			}
 			
 			String out  = "";
@@ -269,12 +284,10 @@ public class Markers {
 			if (index == 0){
 				String modOpts = "";
 				if (getIgnoredAxis() != BlockAxis.None){
-					String _axis = "Y, Z";
-					if (getIgnoredAxis() == BlockAxis.Y) _axis = "X, Z";
-					if (getIgnoredAxis() == BlockAxis.Z) _axis = "X, Y";
-					modOpts = String.format(format_mode_axis, _axis);
+					modOpts = String.format(format_mode_axis,
+							getAxisText(getAllowedAxis()[0]),
+							getAxisText(getAllowedAxis()[1]));
 				}
-					
 				out = String.format(format_markerFirst, modOpts);
 				
 			}else{
@@ -282,8 +295,14 @@ public class Markers {
 				if (index == size - 1) format = format_markerLast;  //last
 				if (size == 2) format = format_markerOne;
 				
-				String area = size > 2 ? getArea() + "|" + Polygon.GetBlockArea(getPoints()) : ""; 
-				out = String.format(format, index, value, area);
+				String strArea = "";
+				if (size > 2) {
+					if (mode == MeasureMode.BLOCKS)
+						strArea = String.format(format_blocks_area, getBlockArea());
+					if (mode == MeasureMode.VECTORS)
+						strArea = String.format(format_vectors_area, getArea()); 
+				}
+				out = String.format(format, index, value, strArea);
 			}
 			
 			holotext.setText(out);
@@ -340,6 +359,15 @@ public class Markers {
 	public void setMaxCount(int maxCount) {
 		this.maxCount = maxCount;
 	}
+		
+	public BlockAxis[] getAllowedAxis() {
+		switch (getIgnoredAxis()) {
+			case X: return new BlockAxis[] {BlockAxis.Y, BlockAxis.Z};
+			case Y: return new BlockAxis[] {BlockAxis.X, BlockAxis.Z};
+			case Z: return new BlockAxis[] {BlockAxis.X, BlockAxis.Y};
+			default: return new BlockAxis[] {};
+		}
+	}
 	
 	public BlockAxis getIgnoredAxis() {
 		return ignoredAxis;
@@ -349,6 +377,15 @@ public class Markers {
 		this.ignoredAxis = ignoredAxis;
 	}
 
+	public String getAxisText(BlockAxis axis) {
+		switch (axis) {
+			case X: return text_axis_X;
+			case Y: return text_axis_Y;
+			case Z: return text_axis_Z;
+			default: return "";
+		}
+	}
+	
 	public class MarkerSettings{
 		
 		private BlockAxis axis = BlockAxis.None;

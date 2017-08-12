@@ -8,6 +8,8 @@ import net.icelane.massband.Server;
 
 public class Polygon {
 
+	public static final double block_offset = 0.5;
+	
 	private static long calcStartTime;
 	
 	/**
@@ -193,10 +195,10 @@ public class Polygon {
 				
 		// resize the polygon about a value of 0.5
 		// to account for the blocks on the outline of input the polygon.
-		Point[] block_points = resize(points, 0.5);
+		Point[] block_points = resize(points, block_offset);
 		
 		// get a "almost blocky" polygon ...
-		block_points = toBlockPoly( resize(points, 0.5) ); 
+		block_points = toBlockPoly(block_points); 
 		
 		// find diagonals between all points and calculate the area offset.
 		double offset = getBlockPolyAreaOffset(block_points);
