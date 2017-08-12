@@ -171,7 +171,7 @@ public class Markers {
 		}
 		
 		if (getCount() == 0){
-			markerList.add(HoloText.create(world, block, face, ""));
+			markerList.add(HoloText.create(world, block, face, "#"));
 		}else{
 			// Create a clone from the last marker and insert it before the last item
 			markerList.add(getCount() - 1, getLast().clone());

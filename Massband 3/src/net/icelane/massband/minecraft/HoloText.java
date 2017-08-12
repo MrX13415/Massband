@@ -11,19 +11,23 @@ import org.bukkit.entity.ArmorStand;
 import org.bukkit.entity.Entity;
 import org.bukkit.entity.EntityType;
 
-import net.icelane.massband.Server;
-
 public class HoloText {
 
 	private static double EntityLineOffset = 0.25;
 	
-	private ArrayList<ArmorStand> entities = new ArrayList<>();
 	private Location location;
+	private ArrayList<ArmorStand> entities = new ArrayList<>();
+
 	
-	public HoloText(ArmorStand entity){
-		entities.add(entity);
+	public HoloText(Location location){
+		this(location, "");
 	}
 	
+	public HoloText(Location location, String text){
+		setLocation(location);
+		if (text != null) this.setText(text);
+	}
+
 	public static HoloText create(World world, Block block, String text){
 		return create(world, block, BlockFace.UP, text);		
 	}
@@ -33,28 +37,29 @@ public class HoloText {
 	}
 	
 	public static HoloText create(Location location, String text){
-		HoloText holotext = new HoloText(createEntity(location, ""));
-		holotext.location = location;
-		if (text != null) holotext.setText(text);
-		return holotext;
+		return new HoloText(location, text);
 	}
 	
 	private static ArmorStand createEntity(Location location, String text){
 		ArmorStand entity = (ArmorStand) location.getWorld().spawnEntity(location, EntityType.ARMOR_STAND);
 		
+		if (text != null) entity.setCustomName(text);
+		else entity.setCustomName("");
+		
+		entity.setVisible(false);
+		entity.setGravity(false);
+		entity.setCollidable(false);
+
 		entity.setMarker(true);   // very small hitbox
+		entity.setArms(false);
+		entity.setBasePlate(false);
+
 		//entity.setInvulnerable(true);
 		entity.setSmall(true);
 		entity.setSilent(true);
-		entity.setGravity(false);
-		entity.setArms(false);
-		entity.setBasePlate(false);
-		entity.setCanPickupItems(false);
-		entity.setCollidable(false);
-		entity.setVisible(false);
+		
 		//entity.setRemoveWhenFarAway(true);
-
-		entity.setCustomName(text);
+		entity.setCanPickupItems(false);
 		entity.setCustomNameVisible(true);
 		
 		return entity;
@@ -88,27 +93,7 @@ public class HoloText {
 	public int getLineCount(){
 		return entities.size();
 	}
-	
-	
-	public boolean hasEntity(Entity entity){
-		for (ArmorStand _entity : entities) {
-			if (_entity.getEntityId() == entity.getEntityId()) return true;
-		}
-		return false;
-	}
-	
-	private ArmorStand getEntity(int index){
-		return entities.get(index);
-	}
-		
-	private ArmorStand getEntity(){
-		return entities.get(entities.size() - 1);
-	}
-	
-	public ArrayList<ArmorStand> getEntities(){
-		return entities;
-	}
-	
+
 	public boolean equals(HoloText holo) {
 		return this.getEntity().getEntityId() == holo.getEntity().getEntityId();
 	}
@@ -157,7 +142,7 @@ public class HoloText {
 
 			index++;
 		}
-		this.location = location;
+		setLocation(location);
 		return result;
 	}
 	
@@ -192,26 +177,21 @@ public class HoloText {
 		text = text.replace("\r", "\n");
 		String lines[] = text.split("\n"); 
 
-		// save the last (lowest) line of the old text, so we still know the old location ...
-		Location baseLocation = this.location; //getEntity().getLocation();
-		//int eid = getEntity().getEntityId();
-		
 		// remove the hole text ...
 		remove();
 		entities.clear();
 		
 		for (int index = 0; index < lines.length; index++) {
+			// prevent empty entities ...
+			if (lines[index] == "") continue;
 			
 			// calculate the Y offset according to the number of lines in the text
 			double offset = (lines.length - index - 1) * EntityLineOffset;
 						
-			// calculate the new location of the current line based on the old text
-			Location newlocation = new Location(baseLocation.getWorld(), baseLocation.getX(), baseLocation.getY() + offset, baseLocation.getZ());
-			//location.setY(location.getY() + offset);
+			// calculate the new location of the current line
+			Location newlocation = getLocation().clone();
+			newlocation.setY(newlocation.getY() + offset);
 			
-			if (lines.length > 1) {
-				Server.get().getConsoleSender().sendMessage("DEBUG: " + offset + " | " + baseLocation + " | " + newlocation.toString());
-			}
 			//BUG: Somehow the teleport does not work in some cases (unknown reason)
 			//   [...]
 			//   entity.teleport(location);
@@ -219,13 +199,45 @@ public class HoloText {
 		
 			entities.add(createEntity(newlocation, lines[index]));
 		}
+	}
+
+	public boolean hasEntity(Entity entity){
+		for (ArmorStand _entity : entities) {
+			if (_entity.getEntityId() == entity.getEntityId()) return true;
+		}
+		return false;
+	}
+	
+	private ArmorStand getEntity(int index){
+		return entities.get(index);
+	}
 		
-		// remove the temporary save entity of the old text ...
-//		baseEntity.remove();
-//		baseEntity = null;
+	private ArmorStand getEntity(){
+		return entities.get(entities.size() - 1);
+	}
+	
+	public ArrayList<ArmorStand> getEntities(){
+		return entities;
 	}
 	
 	public Chunk getChunk(){
 		return getEntity().getWorld().getChunkAt(getEntity().getLocation());	
 	}
+
+	public static double getEntityLineOffset() {
+		return EntityLineOffset;
+	}
+
+	public static void setEntityLineOffset(double entityLineOffset) {
+		EntityLineOffset = entityLineOffset;
+	}
+
+	public Location getLocation() {
+		return location;
+	}
+
+	private void setLocation(Location location) {
+		this.location = location;
+	}
+	
 }
