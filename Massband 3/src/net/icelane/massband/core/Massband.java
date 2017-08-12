@@ -13,6 +13,8 @@ import org.bukkit.event.player.PlayerQuitEvent;
 import org.bukkit.event.world.ChunkLoadEvent;
 import org.bukkit.event.world.ChunkUnloadEvent;
 
+import net.icelane.massband.Server;
+
 public class Massband {
 
 	private static HashMap<UUID, Massband> list = new HashMap<>();
@@ -107,30 +109,27 @@ public class Massband {
 	}
 	
 	public void worldChange(World worldFrom){
-		if (player.getWorld() != worldFrom){
+		if (getPlayer().getWorld() != worldFrom){
 			getMarkers(worldFrom).hideAll();
-			getMarkers(player.getWorld()).showAll();
+			if (this.hasItem()) getMarkers(getPlayer().getWorld()).showAll();
 		}
 	}
 	
 	public static void chuckLoad(ChunkLoadEvent event){
 		if (event.isNewChunk()) return;
 
-		//Server.get().getConsoleSender().sendMessage("§e--> Chunk loaded!");
+		//DEBUG: Server.get().getConsoleSender().sendMessage("§e--> Chunk loaded!");
 		
 		for (UUID uuid : list.keySet()){
 			Massband obj = Massband.get(uuid);
 
 			if (!obj.getPlayer().isOnline()) continue;
-			
-			if (obj.getPlayer().getWorld() != event.getWorld()) continue;
-			//if (obj.worldMarkersList.size() == 0) continue;
 			if (!obj.hasItem()) continue;
+			if (obj.getPlayer().getWorld() != event.getWorld()) continue;
+			if (obj.getMarkerCount(event.getWorld()) == 0) continue;
 			
+			// show markers ...
 			obj.getMarkers(event.getWorld()).showAll();
-				//Server.get().getConsoleSender().sendMessage("§d --> Markers set!");
-			//else
-				//Server.get().getConsoleSender().sendMessage("§c --> Markers not found!");
 		}
 	}
 	
@@ -151,7 +150,6 @@ public class Massband {
 		return player;
 	}
 
-	
 	public Markers getMarkers(World world){
 		Markers m = worldMarkersList.get(world.getName());
 		if (m == null){
@@ -159,6 +157,12 @@ public class Massband {
 			worldMarkersList.put(world.getName(), m);
 		}
 		return m;
+	}
+	
+	public int getMarkerCount(World world){
+		Markers m = worldMarkersList.get(world.getName());
+		if (m == null) return 0;
+		return m.getCount();
 	}
 
 	public Interact getInteract() {
