@@ -13,8 +13,6 @@ import org.bukkit.event.player.PlayerQuitEvent;
 import org.bukkit.event.world.ChunkLoadEvent;
 import org.bukkit.event.world.ChunkUnloadEvent;
 
-import net.icelane.massband.Server;
-
 public class Massband {
 
 	private static HashMap<UUID, Massband> list = new HashMap<>();

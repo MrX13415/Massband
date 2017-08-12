@@ -32,7 +32,7 @@ public class Interact {
 	}
 	
 	public void interact(PlayerInteractEvent event){
-		Markers markers = massband.getMarkers(event.getPlayer().getWorld());
+		Markers markers = getMassband().getMarkers(event.getPlayer().getWorld());
 		Block block    = event.getClickedBlock();
 		BlockFace face = event.getBlockFace();
 		ItemStack item = event.getItem();
@@ -133,11 +133,9 @@ public class Interact {
 	}
 	
 	public void itemChange(PlayerItemHeldEvent event) {
-		Markers markers = massband.getMarkers(event.getPlayer().getWorld());
-		
-		ItemStack newItem = event.getPlayer().getInventory().getItem(event.getNewSlot());
-		
-		if (newItem == null || newItem.getType() != Material.STICK){
+		Markers markers = getMassband().getMarkers(event.getPlayer().getWorld());
+
+		if (getMassband().hasItem()){
 			markers.hideAll();
 		}else{
 			markers.showAll();
@@ -146,6 +144,26 @@ public class Interact {
 
 	public Material getMaterial() {
 		return material;
+	}
+
+	public Massband getMassband() {
+		return massband;
+	}
+
+	public boolean isPreventAction() {
+		return preventAction;
+	}
+
+	public boolean isSwitchButtons() {
+		return switchButtons;
+	}
+
+	public long getLastInteractTime() {
+		return lastInteractTime;
+	}
+
+	public long getDoubleClickDelta() {
+		return doubleClickDelta;
 	}
 
 }
