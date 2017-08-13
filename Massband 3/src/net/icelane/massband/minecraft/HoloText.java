@@ -15,7 +15,7 @@ import org.bukkit.util.Vector;
 
 public class HoloText {
 
-	private static double EntityLineOffset = 0.25;
+	private static double EntityLineOffset = 0.3;
 	
 	private Location location;
 	private String text;
