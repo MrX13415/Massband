@@ -3,12 +3,14 @@ package net.icelane.massband.core;
 import org.bukkit.Material;
 import org.bukkit.block.Block;
 import org.bukkit.block.BlockFace;
+import org.bukkit.entity.Player;
 import org.bukkit.event.block.Action;
 import org.bukkit.event.block.BlockBreakEvent;
+import org.bukkit.event.inventory.InventoryCloseEvent;
 import org.bukkit.event.player.PlayerInteractEvent;
 import org.bukkit.event.player.PlayerItemHeldEvent;
+import org.bukkit.event.player.PlayerSwapHandItemsEvent;
 import org.bukkit.inventory.ItemStack;
-import org.bukkit.inventory.PlayerInventory;
 
 import net.icelane.massband.config.configs.Config;
 import net.icelane.massband.core.Markers.BlockAxis;
@@ -123,25 +125,88 @@ public class Interact {
 		if (preventAction) event.setCancelled(true);
 	}
 	
+	//TODO: OffHand!
 	public void blockBreak(BlockBreakEvent event){
-		PlayerInventory inventory = event.getPlayer().getInventory();
-		
-		if (inventory.getItemInMainHand().getType() == this.material
-				|| inventory.getItemInOffHand().getType() == this.material){
+		if (getMassband().hasItem()){
 			event.setCancelled(true);
 		}
 	}
 	
-	public void itemChange(PlayerItemHeldEvent event) {
-		Markers markers = getMassband().getMarkers(event.getPlayer().getWorld());
+	public void inventoryClose(InventoryCloseEvent event) {
+		if (!(event.getPlayer() instanceof Player)) return;
 
-		if (getMassband().hasItem()){
-			markers.hideAll();
+		if (hasItemInHand((Player)event.getPlayer()))
+			massband.showMarkers(event.getPlayer().getWorld());
+		else
+			massband.hideMarkers(event.getPlayer().getWorld());
+	}
+	
+	public void swapHandItem(PlayerSwapHandItemsEvent event) {
+		if (event.getMainHandItem().getType() == material
+			|| event.getOffHandItem().getType() == material) {
+			
+			massband.showMarkers(event.getPlayer().getWorld());
 		}else{
-			markers.showAll();
+			massband.hideMarkers(event.getPlayer().getWorld());
+		}
+	}
+	
+	public void itemHeld(PlayerItemHeldEvent event) {
+		ItemStack newHand = event.getPlayer().getInventory().getItem(event.getNewSlot());
+		ItemStack offHand = event.getPlayer().getInventory().getItemInOffHand();
+
+		if (isItemHeld(newHand) || isItemHeld(offHand)){
+			massband.showMarkers(event.getPlayer().getWorld());
+		}else{
+			massband.hideMarkers(event.getPlayer().getWorld());
 		}
 	}
 
+	public void itemPickup(Player player, ItemStack pickupItem) {
+		if (player == null) return;
+		
+		// cancel if item to be picked up is not our "material" ...
+		if (pickupItem == null || pickupItem.getType() != material) return;
+		
+		// cancel if main hand slot is not empty ...
+		if (!isItemHeld(player.getInventory().getItemInMainHand(), Material.AIR)) return;
+					
+		// cancel if there is an empty slot before the current selected slot
+		for (int index = 0; index < player.getInventory().getHeldItemSlot(); index++) {
+			if (player.getInventory().getItem(index).getType() == Material.AIR) return;
+		}
+		
+		massband.showMarkers(player.getWorld());
+	}
+	
+	public void itemDrop(Player player) {
+		if (!hasItemInHand(player))
+			massband.hideMarkers(player.getWorld());
+	}
+	
+	public void itemBreak(Player player) {
+		if (!hasItemInHand(player))
+			massband.hideMarkers(player.getWorld());
+	}
+		
+	public void itemConsume(Player player) {
+		if (!hasItemInHand(player))
+			massband.hideMarkers(player.getWorld());
+	}
+	
+	public boolean hasItemInHand(Player player) {
+		return isItemHeld(player.getInventory().getItemInMainHand())
+				|| isItemHeld(player.getInventory().getItemInOffHand());
+	}
+		
+	public boolean isItemHeld(ItemStack hand) {
+		return isItemHeld(hand, material);
+	}
+	
+	public boolean isItemHeld(ItemStack hand, Material material) {
+		return hand != null && hand.getType() == material;
+	}
+	
 	public Material getMaterial() {
 		return material;
 	}

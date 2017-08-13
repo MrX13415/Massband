@@ -3,12 +3,17 @@ package net.icelane.massband.event;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
 import org.bukkit.event.block.BlockBreakEvent;
+import org.bukkit.event.player.PlayerChangedMainHandEvent;
 import org.bukkit.event.player.PlayerChangedWorldEvent;
+import org.bukkit.event.player.PlayerDropItemEvent;
 import org.bukkit.event.player.PlayerInteractEvent;
+import org.bukkit.event.player.PlayerItemBreakEvent;
+import org.bukkit.event.player.PlayerItemConsumeEvent;
 import org.bukkit.event.player.PlayerItemHeldEvent;
 import org.bukkit.event.player.PlayerJoinEvent;
 import org.bukkit.event.player.PlayerMoveEvent;
 import org.bukkit.event.player.PlayerQuitEvent;
+import org.bukkit.event.player.PlayerSwapHandItemsEvent;
 import org.bukkit.inventory.ItemStack;
 
 import net.icelane.massband.core.Massband;
@@ -25,7 +30,6 @@ public class PlayerEvents implements Listener {
 	
 	@EventHandler
 	public void onPlayerInteract(PlayerInteractEvent event){
-		
 		// fire the interact event only once ...
 		if (playerInteract_Handled){
 			playerInteract_Handled = false;
@@ -35,20 +39,49 @@ public class PlayerEvents implements Listener {
 		ItemStack mainHand = event.getPlayer().getInventory().getItemInMainHand();
 		ItemStack offHand  = event.getPlayer().getInventory().getItemInOffHand();
 		
+		// only fire once
 		if (mainHand == null || mainHand.getType() == offHand.getType()){
 			playerInteract_Handled = true;
 		}
 		
 		Massband obj = Massband.get(event.getPlayer());
 		if (obj != null) obj.interact(event);
-		//TODO: else write error
-
+		//TODO: else error
 	}
 	
 	@EventHandler
+	public void onPlayerChangedMainHand(PlayerChangedMainHandEvent event) {
+		
+	}
+	
+	@EventHandler
+	public void onPlayerDropItem(PlayerDropItemEvent event) {
+		Massband obj = Massband.get(event.getPlayer());
+		if (obj != null) obj.getInteract().itemDrop(event.getPlayer());
+	}
+	
+	@EventHandler
+	public void onPlayerItemBreak(PlayerItemBreakEvent event) {
+		Massband obj = Massband.get(event.getPlayer());
+		if (obj != null) obj.getInteract().itemBreak(event.getPlayer());
+	}
+		
+	@EventHandler
+	public void onPlayerItemConsume(PlayerItemConsumeEvent event) {
+		Massband obj = Massband.get(event.getPlayer());
+		if (obj != null) obj.getInteract().itemConsume(event.getPlayer());
+	}
+	
+	@EventHandler
+	public void onPlayerSwapHandItems(PlayerSwapHandItemsEvent event) {
+		Massband obj = Massband.get(event.getPlayer());
+		if (obj != null) obj.getInteract().swapHandItem(event);
+	}
+
+	@EventHandler
 	public void onPlayerItemHeld(PlayerItemHeldEvent event){
 		Massband obj = Massband.get(event.getPlayer());
-		if (obj != null) obj.getInteract().itemChange(event);
+		if (obj != null) obj.getInteract().itemHeld(event);
 	}
 	
 	@EventHandler
@@ -56,7 +89,6 @@ public class PlayerEvents implements Listener {
 		Massband obj = Massband.get(event.getPlayer());
 		if (obj != null) obj.getInteract().blockBreak(event);
 	}
-	
 	
 	@EventHandler
 	public void onPlayerJoin(PlayerJoinEvent event){

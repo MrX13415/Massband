@@ -67,8 +67,7 @@ public class Massband {
 	}	
 		
 	public boolean hasItem(){
-		return (player.getInventory().getItemInMainHand().getType() == interact.getMaterial()
-				|| player.getInventory().getItemInOffHand().getType() == interact.getMaterial());
+		return interact.hasItemInHand(player);
 	}
 	
 	public void interact(PlayerInteractEvent event){
@@ -107,9 +106,9 @@ public class Massband {
 	}
 	
 	public void worldChange(World worldFrom){
-		if (getPlayer().getWorld() != worldFrom){
+		if (player.getWorld() != worldFrom){
 			getMarkers(worldFrom).hideAll();
-			if (this.hasItem()) getMarkers(getPlayer().getWorld()).showAll();
+			if (this.hasItem()) getMarkers(player.getWorld()).showAll();
 		}
 	}
 	
@@ -161,6 +160,18 @@ public class Massband {
 		Markers m = worldMarkersList.get(world.getName());
 		if (m == null) return 0;
 		return m.getCount();
+	}
+	
+	public void hideMarkers(World world){
+		Markers m = worldMarkersList.get(world.getName());
+		if (m == null) return;
+		m.hideAll();
+	}
+	
+	public void showMarkers(World world){
+		Markers m = worldMarkersList.get(world.getName());
+		if (m == null) return;
+		m.showAll();
 	}
 
 	public Interact getInteract() {
