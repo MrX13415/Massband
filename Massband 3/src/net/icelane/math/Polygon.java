@@ -250,11 +250,17 @@ public class Polygon {
 				
 				// calculate sub points between points ...
 				for (long subPointIndex = 0; subPointIndex < maxSubPointCount - 1; subPointIndex++) {
-					// /!\ Safety time out, just in case the maxSubPointCount is way to big.
-					if ((System.currentTimeMillis() - calcStartTime) > 3000) {
-						Server.get().getConsoleSender().sendMessage("[Massband] §cWARNING: Polygone calculation timeout (3000ms) exeeded. Operation aborted!");
+					
+					if (subPointIndex >= Short.MAX_VALUE) {
 						return points;
 					}
+					
+					// /!\ Safety time out, just in case the maxSubPointCount is way to big.
+					if ((System.currentTimeMillis() - calcStartTime) > 1000) {
+						Server.get().getConsoleSender().sendMessage("[Massband] §cWARNING: Polygone calculation timeout (1000ms) exeeded. Operation aborted!");
+						return points;
+					}
+					
 					
 					Vector subvec = new Vector();
 					
