@@ -23,6 +23,8 @@ public class MassbandCommand extends CommandBase{
 		//setUsage("Uhm ... idk?");
 		
 		addCommand(Massband_ClearCommand.class);
+		addCommand(Massband_LimitCommand.class);
+		addCommand(Massband_NoLimitCommand.class);
 		addCommand(Massband_CountCommand.class);
 		addCommand(Massband_InfoCommand.class);
 		addCommand(Massband_ModeCommand.class);
