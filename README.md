@@ -6,7 +6,7 @@
 Massband is a plugin for **Minecraft-Servers** based on **Bukkit**. It offers variouse measuring tools for making the players bulding life a bit easier.
 
 
--
+---
 
 
 **Version 3.0.4 ALPHA**
@@ -43,5 +43,5 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 SOFTWARE.
 
 
--
+---
 
