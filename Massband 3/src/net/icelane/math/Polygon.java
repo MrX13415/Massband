@@ -8,7 +8,8 @@ import net.icelane.massband.Server;
 
 public class Polygon {
 
-	public static final double block_offset = 0.5;
+	public static final double block_offset = 0.25;
+	public static final double vectors_offset = 0.5;
 	
 	private static long calcStartTime;
 	

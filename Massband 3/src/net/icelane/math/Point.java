@@ -20,6 +20,12 @@ public class Point {
 		this.z = z;
 	}
 	
+	@Override
+	public boolean equals(Object obj) {
+		if (obj instanceof Point) return equals((Point) obj);
+		return false;
+	}
+	
 	/**
 	 * Weather the X, Y and Z coordinates of the given point it equals to this point.
 	 * @param point A point to compare with.
@@ -29,6 +35,11 @@ public class Point {
 		return (this.getX() == point.getX()
 				&& this.getY() == point.getY()
 				&& this.getZ() == point.getZ());
+	}
+	
+	@Override
+	public String toString() {
+		return String.format("(x: %s, y: %s, z: %s)", x, y, z);
 	}
 
 	public double getX() {

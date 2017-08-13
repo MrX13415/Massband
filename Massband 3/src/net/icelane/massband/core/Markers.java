@@ -207,9 +207,11 @@ public class Markers {
 		Point[] points = new Point[blockList.size()];
 		
 		for(int index = 0; index < points.length; index++){
-			double x = getBlock(index).getLocation().getBlockX();
-			double y = getBlock(index).getLocation().getBlockY();
-			double z = getBlock(index).getLocation().getBlockZ();			
+			// add 0.5 so we have the center of each block ...
+			double x = getBlock(index).getLocation().getBlockX() + 0.5;
+			double y = getBlock(index).getLocation().getBlockY() + 0.5;
+			double z = getBlock(index).getLocation().getBlockZ() + 0.5;
+			
 			points[index] = new Point(x, y, z);
 		}
 		
@@ -217,24 +219,39 @@ public class Markers {
 	}
 	 
 	public Point[] get2DPoints() {
-		if (getIgnoredAxis() == BlockAxis.None) return getPoints();
+		//DEBUG: Server.logger().info("-------------------------");
+		//DEBUG: Server.logger().info(" Ignored: " + getIgnoredAxis());
+		Point[] inPoints = getPoints();
+		ArrayList<Point> outPoints = new ArrayList<Point>(inPoints.length);
 		
-		Point[] points = getPoints();
-		Point[] out = new Point[points.length];
-		for (int index = 0; index < points.length; index++) {
+		for (int index = 0; index < inPoints.length; index++) {
+			Point out = inPoints[index].get2D_XZ();   // top down
+			
 			switch (getIgnoredAxis()) {
-				case X: out[index] = points[index].get2D_YZ(); break;
-				case Z: out[index] = points[index].get2D_XY(); break;
-				case Y:    // We don't support 3D polygon calculation yet!
-				case None: // So we calculate use top down by default
-					out[index] = points[index].get2D_XZ(); break;
+				case X: out = inPoints[index].get2D_YZ(); break;
+				case Z: out = inPoints[index].get2D_XY(); break;
+				case Y:         // We don't support 3D polygon calculation yet!
+				case None:      // So we calculate using top down by default
+				default: break;
+			}
+			
+			// only add unique points!
+			if(!outPoints.contains(out)) {
+				outPoints.add(out);
+			
+			//DEBUG:
+			//	Server.logger().info(" -> P[" + index + "] " + out + " <= " + inPoints[index]);
+			//}else {
+			//	Server.logger().info("    P[" + index + "] " + out + " <= " + inPoints[index]);
 			}
 		}
-		return out;
+		
+		Point[] result = new Point[outPoints.size()];
+		return outPoints.toArray(result);
 	}
 	
 	public double getArea(){
-		return Polygon.getArea(Polygon.resize(get2DPoints(), Polygon.block_offset));
+		return Polygon.getArea(Polygon.resize(get2DPoints(), Polygon.vectors_offset));
 	}
 	
 	public long getBlockArea(){
@@ -300,25 +317,29 @@ public class Markers {
 			
 			if (index == 0){
 				String modOpts = "";
+				
 				if (getIgnoredAxis() != BlockAxis.None){
 					modOpts = String.format(format_mode_axis,
 							getAxisText(getAllowedAxis()[0]),
 							getAxisText(getAllowedAxis()[1]));
 				}
+				
 				out = String.format(format_markerFirst, modOpts);
 				
 			}else{
 				String format = format_marker;
 				if (index == size - 1) format = format_markerLast;  //last
 				if (size == 2) format = format_markerOne;
-				
+
+				// calculate polygon area on last marker ... 
 				String strArea = "";
-				if (size > 2) {
+				if (size > 2 && index == (getCount() - 1)) {
 					if (mode == MeasureMode.BLOCKS)
 						strArea = String.format(format_blocks_area, getBlockArea());
 					if (mode == MeasureMode.VECTORS)
 						strArea = String.format(format_vectors_area, getArea()); 
 				}
+				
 				out = String.format(format, index, value, strArea);
 			}
 			
