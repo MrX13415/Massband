@@ -125,10 +125,10 @@ public class Interact {
 		if (preventAction) event.setCancelled(true);
 	}
 	
-	//TODO: OffHand!
 	public void blockBreak(BlockBreakEvent event){
-		if (getMassband().hasItem()){
+		if (hasItemInMainHand(event.getPlayer())) {
 			event.setCancelled(true);
+			return;
 		}
 	}
 	
@@ -194,9 +194,16 @@ public class Interact {
 			massband.hideMarkers(player.getWorld());
 	}
 	
+	public boolean hasItemInMainHand(Player player) {
+		return isItemHeld(player.getInventory().getItemInMainHand());
+	}
+	
+	public boolean hasItemInOffHand(Player player) {
+		return isItemHeld(player.getInventory().getItemInOffHand());
+	}
+	
 	public boolean hasItemInHand(Player player) {
-		return isItemHeld(player.getInventory().getItemInMainHand())
-				|| isItemHeld(player.getInventory().getItemInOffHand());
+		return hasItemInMainHand(player) || hasItemInOffHand(player);
 	}
 		
 	public boolean isItemHeld(ItemStack hand) {
