@@ -40,16 +40,16 @@ public class PlayerEvents implements Listener {
 		ItemStack offHand  = event.getPlayer().getInventory().getItemInOffHand();
 		
 		// only fire once
-		if (mainHand == null || mainHand.getType() == offHand.getType()){
+		if (mainHand.getType() == offHand.getType()){
 			playerInteract_Handled = true;
 		}
 		
 		Massband obj = Massband.get(event.getPlayer());
 		if (obj != null) obj.interact(event);
-		//TODO: else error
+		//TODO: else error 
 	}
 	
-	@EventHandler
+	@EventHandler 
 	public void onPlayerChangedMainHand(PlayerChangedMainHandEvent event) {
 		
 	}

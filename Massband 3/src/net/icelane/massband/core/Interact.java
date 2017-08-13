@@ -10,6 +10,7 @@ import org.bukkit.event.inventory.InventoryCloseEvent;
 import org.bukkit.event.player.PlayerInteractEvent;
 import org.bukkit.event.player.PlayerItemHeldEvent;
 import org.bukkit.event.player.PlayerSwapHandItemsEvent;
+import org.bukkit.inventory.EquipmentSlot;
 import org.bukkit.inventory.ItemStack;
 
 import net.icelane.massband.config.configs.Config;
@@ -24,10 +25,11 @@ public class Interact {
 	private Material material     = (Material) Config.interact_material.get();
 	private boolean preventAction = Config.interact_preventAction.get();
 	private boolean switchButtons = Config.interact_switchbuttons.get();
-	
-	private long lastInteractTime = System.nanoTime();
 	private long doubleClickDelta = Config.interact_doubleClickTimeFrame.get(); //ms 
-	
+
+	private long lastInteractTime = System.nanoTime();
+	private Action lastInteractAction;
+	private EquipmentSlot lastInteractSlot;
 	
 	public Interact(Massband obj) {
 		this.massband = obj;
@@ -39,17 +41,29 @@ public class Interact {
 		BlockFace face = event.getBlockFace();
 		ItemStack item = event.getItem();
 		Action action  = event.getAction();
-		
-		long time  = System.nanoTime();
-		long delta = (time - lastInteractTime) / 1000000; //ms
-		lastInteractTime = time;
-		boolean doubleclick = (delta > 0 && delta <= doubleClickDelta);
+		EquipmentSlot slot = event.getHand();
 		
 		if (block == null) return;
 		if (face == null) return;
 		if (item == null) return;
 		if (item.getType() != this.material) return;
 		
+		long time  = System.nanoTime();
+		long delta = (time - lastInteractTime) / 1000000; //ms
+		boolean doubleclick = (delta > 0 && delta <= doubleClickDelta);
+		if (lastInteractAction != action) doubleclick = false;
+		if (lastInteractSlot != slot) doubleclick = false;
+				
+		lastInteractTime = time;
+		lastInteractAction = action;
+		lastInteractSlot = slot;
+		
+		//DEBUG:
+		//Server.logger().info("doubleclick: " + doubleclick + " delta: " + delta);
+		//Server.logger().info("item: " + item);
+		//Server.logger().info("item: " + event.getHand());
+		//Server.logger().info("--------------" );
+
 		// is there already a marker?
 		int index = markers.indexOf(block.getLocation());
 		
@@ -173,7 +187,8 @@ public class Interact {
 					
 		// cancel if there is an empty slot before the current selected slot
 		for (int index = 0; index < player.getInventory().getHeldItemSlot(); index++) {
-			if (player.getInventory().getItem(index).getType() == Material.AIR) return;
+			ItemStack slot = player.getInventory().getItem(index);
+			if (slot == null || slot.getType() == Material.AIR) return;
 		}
 		
 		massband.showMarkers(player.getWorld());
