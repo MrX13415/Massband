@@ -37,11 +37,11 @@ public class Markers {
 	private String format_markerOne      = "§6%2$s ";                    // (2) length
 	private String format_mode_axis      = "§9(%1$s§9, %2$s§9)";         // (0) axis 1 (2) axis 2
 	private String format_blocks_length  = "%1d §cblocks %s";            //
-	private String format_blocks_area    = "%1d §cblocks²";               // 
+	private String format_blocks_area    = "%1d §7blocks§c²";               // 
 	private String format_blocks_auto    = "§7(%s§7)";                   // 
 	private String format_blocks_axis    = "§9(%s§9)";                   //
 	private String format_vectors_length = "%.3f§cm";                    // 
-	private String format_vectors_area   = "%.3f§cm²";                   //
+	private String format_vectors_area   = "%.3f§7m§c²";                   //
 
 	private String text_axis_X           = "§cX";                        // 
 	private String text_axis_Y           = "§aY";                        // 
@@ -207,21 +207,38 @@ public class Markers {
 		Point[] points = new Point[blockList.size()];
 		
 		for(int index = 0; index < points.length; index++){
-			//block.getLocation().getBlockY();  just at the floor for now
-			//TODO: Add level option X, Y and Z
-			
-			points[index] = new Point(getBlock(index).getLocation().getBlockX(), getBlock(index).getLocation().getBlockZ()); // z is y in minecraft!
+			double x = getBlock(index).getLocation().getBlockX();
+			double y = getBlock(index).getLocation().getBlockY();
+			double z = getBlock(index).getLocation().getBlockZ();			
+			points[index] = new Point(x, y, z);
 		}
 		
 		return points;
 	}
 	 
+	public Point[] get2DPoints() {
+		if (getIgnoredAxis() == BlockAxis.None) return getPoints();
+		
+		Point[] points = getPoints();
+		Point[] out = new Point[points.length];
+		for (int index = 0; index < points.length; index++) {
+			switch (getIgnoredAxis()) {
+				case X: out[index] = points[index].get2D_YZ(); break;
+				case Z: out[index] = points[index].get2D_XY(); break;
+				case Y:    // We don't support 3D polygon calculation yet!
+				case None: // So we calculate use top down by default
+					out[index] = points[index].get2D_XZ(); break;
+			}
+		}
+		return out;
+	}
+	
 	public double getArea(){
-		return Polygon.getArea(Polygon.resize(getPoints(), Polygon.block_offset));
+		return Polygon.getArea(Polygon.resize(get2DPoints(), Polygon.block_offset));
 	}
 	
 	public long getBlockArea(){
-		return Polygon.GetBlockArea(getPoints());
+		return Polygon.GetBlockArea(get2DPoints());
 	}
 	
 	public void recalculate(){

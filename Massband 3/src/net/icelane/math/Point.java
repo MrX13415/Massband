@@ -54,7 +54,31 @@ public class Point {
 	public void setZ(double z) {
 		this.z = z;
 	}
+	
+	/**
+	 * Returns a two dimensional (2D) copy of this point object where the X and Z coordinates are swapped.
+	 * @return A new point object.
+	 */
+	public Point get2D_YZ() {
+		return new Point(z, y, 0);
+	}
 
+	/**
+	 * Returns a two dimensional (2D) copy of this point object where the Y and Z coordinates are swapped.
+	 * @return A new point object.
+	 */
+	public Point get2D_XZ() {
+		return new Point(x, z, 0);
+	}
+
+	/**
+	 * Returns a two dimensional (2D) copy of this point object.
+	 * @return A new point object.
+	 */
+	public Point get2D_XY() {
+		return new Point(x, y, 0);
+	}
+	
 	/**
 	 * Returns the distance between this and another point.
 	 * @param point Another point to measure the distance to.
