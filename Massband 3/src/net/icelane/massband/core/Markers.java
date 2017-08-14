@@ -8,8 +8,10 @@ import org.bukkit.World;
 import org.bukkit.block.Block;
 import org.bukkit.block.BlockFace;
 import org.bukkit.entity.Entity;
+import org.bukkit.entity.Player;
 import org.bukkit.util.Vector;
 
+import net.icelane.massband.Plugin;
 import net.icelane.massband.minecraft.HoloText;
 import net.icelane.math.Point;
 import net.icelane.math.Polygon;
@@ -29,6 +31,7 @@ public class Markers {
 		Z
 	}
 
+	private Player player;
 	private World world;
 	
 	private String format_markerFirst    = "§c#\n%1$s";                  // (1) additional info
@@ -59,7 +62,8 @@ public class Markers {
 	private double distance;
 	
 	
-	public Markers(World world) {
+	public Markers(Player player, World world) {
+		this.player = player;
 		this.world = world;
 	}
 
@@ -177,7 +181,9 @@ public class Markers {
 		}
 		
 		if (getCount() == 0){
-			markerList.add(HoloText.create(world, block, face, "#"));
+			HoloText marker = HoloText.create(world, block, face, "#");
+			marker.setMetadata(Plugin.get(), "net.icelane.massband:Marker", player.getUniqueId());
+			markerList.add(marker);
 		}else{
 			// Create a clone from the current last marker ...
 			HoloText clone = getLast().clone();

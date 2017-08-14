@@ -150,7 +150,7 @@ public class Massband {
 	public Markers getMarkers(World world){
 		Markers m = worldMarkersList.get(world.getName());
 		if (m == null){
-			m = new Markers(world);
+			m = new Markers(player, world);
 			worldMarkersList.put(world.getName(), m);
 		}
 		return m;

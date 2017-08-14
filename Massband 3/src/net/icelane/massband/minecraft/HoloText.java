@@ -1,6 +1,7 @@
 package net.icelane.massband.minecraft;
 
 import java.util.ArrayList;
+import java.util.UUID;
 
 import org.bukkit.Chunk;
 import org.bukkit.Location;
@@ -11,23 +12,34 @@ import org.bukkit.entity.ArmorStand;
 import org.bukkit.entity.Entity;
 import org.bukkit.entity.EntityType;
 import org.bukkit.event.player.PlayerTeleportEvent.TeleportCause;
+import org.bukkit.metadata.FixedMetadataValue;
+import org.bukkit.metadata.MetadataValue;
+import org.bukkit.plugin.Plugin;
 import org.bukkit.util.Vector;
 
 public class HoloText {
 
-	private static double EntityLineOffset = 0.3;
+	public static final String metadata_OwnerID = "OwnerID";
+	public static final String metadata_ObjectType = "ObjectType";
+	
+	private static double defaultEntityLineOffset = 0.3;	
 	
 	private Location location;
 	private String text;
 	private ArrayList<ArmorStand> entities = new ArrayList<>();
 	private ArrayList<Double> entityOffsets = new ArrayList<>();
+	private double lineOffset = defaultEntityLineOffset;
 	
-	public HoloText(Location location){
-		this(location, "");
+	private MetadataValue owernID;
+	private MetadataValue objectType;
+	
+	
+	private HoloText(Location location){
+		setLocation(location);
 	}
 	
 	public HoloText(Location location, String text){
-		setLocation(location);
+		this(location);
 		setText(text);
 	}
 
@@ -44,9 +56,25 @@ public class HoloText {
 	}
 	
 	public HoloText clone(){
-		return create(getLocation(), getText());
+		HoloText holotext = new HoloText(getLocation());
+		holotext.objectType = this.objectType;
+		holotext.owernID = this.owernID;
+		holotext.setText(getText());
+		return holotext;
 	}
 	
+	public void setMetadata(Plugin plugin, String objectType, UUID ownerID) {
+		this.objectType = new FixedMetadataValue(plugin, objectType);
+		this.owernID = new FixedMetadataValue(plugin, ownerID.toString());
+	}
+
+	private static void setMetadata(ArmorStand entity, HoloText holotext) {
+		if (holotext.objectType != null) 
+			entity.setMetadata(metadata_ObjectType, holotext.objectType);
+		if (holotext.owernID != null)
+			entity.setMetadata(metadata_OwnerID, holotext.owernID);
+	}
+
 	private static void setEntityAttirubtes(ArmorStand entity) {
 		entity.setVisible(false);
 		entity.setGravity(false);
@@ -68,10 +96,11 @@ public class HoloText {
 		entity.setCanPickupItems(false);
 	}
 	
-	private static ArmorStand createEntity(Location location, String text){
+	private static ArmorStand createEntity(HoloText holotext, Location location, String text){
 		ArmorStand entity = (ArmorStand) location.getWorld().spawnEntity(location, EntityType.ARMOR_STAND);
 		setEntityAttirubtes(entity);
-		
+		setMetadata(entity, holotext);
+
 		if (text != null) entity.setCustomName(text);
 		else entity.setCustomName(" ");
 		entity.setCustomNameVisible(true);
@@ -176,7 +205,7 @@ public class HoloText {
 		
 		for (int index = 0; index < entities.size(); index++) {
 			getEntity(index).remove();
-			entities.set(index, createEntity(getEntity(index).getLocation(), getEntity(index).getCustomName()));
+			entities.set(index, createEntity(this, getEntity(index).getLocation(), getEntity(index).getCustomName()));
 		}
 		
 		return true;
@@ -205,7 +234,7 @@ public class HoloText {
 	 * @return The calculated offset value
 	 */
 	public double getLineOffset(int lineIndex) {
-		return (getLines().length - lineIndex - 1) * EntityLineOffset;
+		return (getLines().length - lineIndex - 1) * lineOffset;
 	}
 	
 	public void redrawText(){
@@ -234,7 +263,7 @@ public class HoloText {
 			
 			// reuse existing entities ...
 			if (entityIndex < 0) {
-				entities.add(index, createEntity(location, lines[index]));
+				entities.add(index, createEntity(this, location, lines[index]));
 			}else{	
 				getEntity(index).setCustomName(lines[index]);
 				getEntity(index).teleport(location);
@@ -274,14 +303,6 @@ public class HoloText {
 		return getEntity().getWorld().getChunkAt(getEntity().getLocation());	
 	}
 
-	public static double getEntityLineOffset() {
-		return EntityLineOffset;
-	}
-
-	public static void setEntityLineOffset(double entityLineOffset) {
-		EntityLineOffset = entityLineOffset;
-	}
-
 	public Location getLocation() {
 		return location;
 	}
@@ -289,5 +310,20 @@ public class HoloText {
 	private void setLocation(Location location) {
 		this.location = location;
 	}
-	
+
+	public static double getDefaultEntityLineOffset() {
+		return defaultEntityLineOffset;
+	}
+
+	public static void setDefaultEntityLineOffset(double defaultEntityLineOffset) {
+		HoloText.defaultEntityLineOffset = defaultEntityLineOffset;
+	}
+
+	public double getLineOffset() {
+		return lineOffset;
+	}
+
+	public void setLineOffset(double lineOffset) {
+		this.lineOffset = lineOffset;
+	}
 }
