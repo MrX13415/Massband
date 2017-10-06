@@ -14,9 +14,9 @@ import org.bukkit.inventory.EquipmentSlot;
 import org.bukkit.inventory.ItemStack;
 
 import net.icelane.massband.config.configs.Config;
-import net.icelane.massband.core.Markers.BlockAxis;
-import net.icelane.massband.core.Markers.MarkerSettings;
-import net.icelane.massband.core.Markers.MeasureMode;
+import net.icelane.massband.core.Marker.BlockAxis;
+import net.icelane.massband.core.Marker.MarkerSettings;
+import net.icelane.massband.core.Marker.MeasureMode;
 
 public class Interact {
 
@@ -36,7 +36,7 @@ public class Interact {
 	}
 	
 	public void interact(PlayerInteractEvent event){
-		Markers markers = getMassband().getMarkers(event.getPlayer().getWorld());
+		Marker markers = getMassband().getMarkers(event.getPlayer().getWorld());
 		Block block    = event.getClickedBlock();
 		BlockFace face = event.getBlockFace();
 		ItemStack item = event.getItem();

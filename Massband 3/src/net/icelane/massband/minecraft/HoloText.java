@@ -1,7 +1,7 @@
 package net.icelane.massband.minecraft;
 
+import java.awt.geom.Ellipse2D;
 import java.util.ArrayList;
-import java.util.UUID;
 
 import org.bukkit.Chunk;
 import org.bukkit.Location;
@@ -11,70 +11,120 @@ import org.bukkit.block.BlockFace;
 import org.bukkit.entity.ArmorStand;
 import org.bukkit.entity.Entity;
 import org.bukkit.entity.EntityType;
+import org.bukkit.entity.Player;
 import org.bukkit.event.player.PlayerTeleportEvent.TeleportCause;
 import org.bukkit.metadata.FixedMetadataValue;
 import org.bukkit.metadata.MetadataValue;
 import org.bukkit.plugin.Plugin;
+import org.bukkit.scheduler.BukkitTask;
 import org.bukkit.util.Vector;
 
-public class HoloText {
+import net.icelane.massband.Server;
+import net.icelane.massband.core.Marker;
 
-	public static final String metadata_OwnerID = "OwnerID";
-	public static final String metadata_ObjectType = "ObjectType";
+public class HoloText {
+	
+	public static final String metadata_Identifier = "Identifier";
+	public static final String metadata_Object = "HoloText_Object";
+	public static final String metadata_OwnerName = "OwnerName";
 	
 	private static double defaultEntityLineOffset = 0.3;	
+	private static long defaultOwnerHideTicks = 20L * 3; //ticks (20 tick => 1 sec)
 	
+	private static Plugin plugin;
+
+	private Player player;
 	private Location location;
 	private String text;
 	private ArrayList<ArmorStand> entities = new ArrayList<>();
 	private ArrayList<Double> entityOffsets = new ArrayList<>();
 	private double lineOffset = defaultEntityLineOffset;
+	private boolean visible;
 	
-	private MetadataValue owernID;
-	private MetadataValue objectType;
+	private boolean ownerShown;
+	private double ownerShowTime;
+	private int ownerNameEntityId;
+	private BukkitTask ownerHideTask;
+	
+	private MetadataValue ownerName;
+	private MetadataValue identifier;
 	
 	
-	private HoloText(Location location){
+	private HoloText(Player player, Location location){
+		//if (plugin == null) throw new InitializationError("Not initialized. Use initialize(...) once befor using any HoloText object.");
+		this.player = player;
 		setLocation(location);
 	}
 	
-	public HoloText(Location location, String text){
-		this(location);
+	public HoloText(Player player, Location location, String text){
+		this(player, location);
 		setText(text);
 	}
+	
+	public static void initialize(Plugin plugin) {
+		HoloText.plugin = plugin;
+	}
 
-	public static HoloText create(World world, Block block, String text){
-		return create(world, block, BlockFace.UP, text);		
+	public static HoloText create(Player player, World world, Block block, String text){
+		return create(player, world, block, BlockFace.UP, text);		
 	}
 	
-	public static HoloText create(World world, Block block, BlockFace face, String text){
-		return create(getBlockFaceLocation(world, block, face), text);
+	public static HoloText create(Player player, World world, Block block, BlockFace face, String text){
+		return create(player, getBlockFaceLocation(world, block, face), text);
 	}
 	
-	public static HoloText create(Location location, String text){
-		return new HoloText(location, text);
+	public static HoloText create(Player player, Location location, String text){
+		return new HoloText(player, location, text);
 	}
 	
 	public HoloText clone(){
-		HoloText holotext = new HoloText(getLocation());
-		holotext.objectType = this.objectType;
-		holotext.owernID = this.owernID;
+		HoloText holotext = new HoloText(this.player, this.location.clone());		
+		holotext.identifier = this.identifier;
+		holotext.ownerName = this.ownerName;
 		holotext.setText(getText());
+		//if (ownerShown) holotext.showOwner();
 		return holotext;
 	}
 	
-	public void setMetadata(Plugin plugin, String objectType, UUID ownerID) {
-		this.objectType = new FixedMetadataValue(plugin, objectType);
-		this.owernID = new FixedMetadataValue(plugin, ownerID.toString());
+	public static MetadataValue getMetadata(Entity entity, String metadataKey) {
+		return getMetadata(plugin, entity, metadataKey);
+	}
+	
+	public static MetadataValue getMetadata(Plugin plugin, Entity entity, String metadataKey) {
+		if (entity == null) return null;
+		for (MetadataValue metavalue : entity.getMetadata(metadataKey)) {
+			if (!metavalue.getOwningPlugin().getName().equals(plugin.getName())) continue;
+			return metavalue;
+		}
+		return null;
+	}
+	
+	public void prepareMetadata(String objectIdentifier) {
+		this.identifier = new FixedMetadataValue(plugin, objectIdentifier);
+		this.ownerName = new FixedMetadataValue(plugin, player.getName().toString());
 	}
 
-	private static void setMetadata(ArmorStand entity, HoloText holotext) {
-		if (holotext.objectType != null) 
-			entity.setMetadata(metadata_ObjectType, holotext.objectType);
-		if (holotext.owernID != null)
-			entity.setMetadata(metadata_OwnerID, holotext.owernID);
+	public void writeOwnerTagMetadata(ArmorStand entity) {
+		entity.setMetadata("OwnerTag", new FixedMetadataValue(plugin, true));
 	}
-
+	
+	public void writeMetadata() {
+		if (this.identifier == null && this.ownerName == null) return;
+		
+		for (ArmorStand entity : entities) {
+			writeMetadata(entity, this);
+		}	
+	}
+	
+	private static void writeMetadata(ArmorStand entity, HoloText holotext) {
+		entity.setMetadata(metadata_Object, new FixedMetadataValue(plugin, holotext));
+		
+		if (holotext.identifier != null) 
+			entity.setMetadata(metadata_Identifier, holotext.identifier);
+		if (holotext.ownerName != null)
+			entity.setMetadata(metadata_OwnerName, holotext.ownerName);
+	}
+	
 	private static void setEntityAttirubtes(ArmorStand entity) {
 		entity.setVisible(false);
 		entity.setGravity(false);
@@ -96,10 +146,20 @@ public class HoloText {
 		entity.setCanPickupItems(false);
 	}
 	
+	private ArmorStand recreateEntity(ArmorStand entity){
+		ArmorStand newEntity = createEntity(this, entity.getLocation(), entity.getCustomName());		
+		if (isOwnerEntity(entity)) {
+			ownerNameEntityId = newEntity.getEntityId();
+			Server.logger().info(" ====> Name: " + newEntity.getCustomName() + " | " + entity.getCustomName());
+			writeOwnerTagMetadata(newEntity);
+		}
+		return newEntity;
+	}
+	
 	private static ArmorStand createEntity(HoloText holotext, Location location, String text){
 		ArmorStand entity = (ArmorStand) location.getWorld().spawnEntity(location, EntityType.ARMOR_STAND);
 		setEntityAttirubtes(entity);
-		setMetadata(entity, holotext);
+		writeMetadata(entity, holotext);
 
 		if (text != null) entity.setCustomName(text);
 		else entity.setCustomName(" ");
@@ -128,38 +188,24 @@ public class HoloText {
 		
 		return location;
 	}
-		
-	public void addLine(String text){
-		
-	}
-		
+
 	public int getEntityCount(){
 		return entities.size();
 	}
 
 	public boolean equals(HoloText holo) {
-		return this.getEntity().getEntityId() == holo.getEntity().getEntityId();
+		return this.getLastEntity().getEntityId() == holo.getLastEntity().getEntityId();
 	}
 	
 	@Override
 	public String toString() {
-		return getEntity().getCustomName();
+		return getLastEntity().getCustomName();
 	}
 	
 	public void remove(){
-		for (ArmorStand entity : entities) {
-			entity.remove();
-		}
+		hide();
 	}
 
-	public void clearButLast(){
-		for (int index = entities.size() - 2; index >= 0; --index) {
-			ArmorStand entity = entities.get(index);
-			entity.remove();
-			entities.remove(index);
-		}
-	}
-	
 	public boolean isValid(){
 		for (ArmorStand entity : entities) {
 			if (!entity.isValid()) return false;
@@ -172,7 +218,7 @@ public class HoloText {
 	}
 	
 	public boolean move(Block block, BlockFace face){
-		return move(getBlockFaceLocation(getEntity().getWorld(), block, face));
+		return move(getBlockFaceLocation(getLastEntity().getWorld(), block, face));
 	}
 
 	public boolean move(Location location){
@@ -197,6 +243,7 @@ public class HoloText {
 		for (ArmorStand entity : entities) {
 			entity.remove();
 		}
+		visible = false;
 	}
 	
 	public boolean show(){
@@ -205,9 +252,9 @@ public class HoloText {
 		
 		for (int index = 0; index < entities.size(); index++) {
 			getEntity(index).remove();
-			entities.set(index, createEntity(this, getEntity(index).getLocation(), getEntity(index).getCustomName()));
-		}
-		
+			entities.set(index, recreateEntity(getEntity(index)));
+		}		
+		visible = true;
 		return true;
 	}
 	
@@ -225,7 +272,7 @@ public class HoloText {
 		text = text.replace("\r", "\n");
 		
 		this.text = text;
-		redrawText();
+		refresh();
 	}
 	
 	/**
@@ -237,9 +284,12 @@ public class HoloText {
 		return (getLines().length - lineIndex - 1) * lineOffset;
 	}
 	
-	public void redrawText(){
+	public void refresh(){
 		String lines[] = getLines(); 
-
+		
+		// /!\ Important: Reset, because the entity gets reused for "normal" text.
+		ownerNameEntityId = 0;
+		
 		// trim entity list ...
 		while (getEntityCount() > lines.length) {
 			getEntity(0).remove();
@@ -248,7 +298,7 @@ public class HoloText {
 
 		entityOffsets.clear();
 		int entityIndex = getEntityCount() - lines.length;
- 
+
 		for (int index = 0; index < lines.length; index++) {
 			// prevent empty entities ...
 			if (lines[index].equals(""))
@@ -258,7 +308,7 @@ public class HoloText {
 			double offset = getLineOffset(index);
 		
 			// calculate the new location of the current line
-			Location location = getLocation().clone();
+			Location location = this.location.clone();
 			location.setY(location.getY() + offset);
 			
 			// reuse existing entities ...
@@ -267,17 +317,132 @@ public class HoloText {
 			}else{	
 				getEntity(index).setCustomName(lines[index]);
 				getEntity(index).teleport(location);
+				writeMetadata(getEntity(index), this);
 			}
 			entityOffsets.add(offset);
 			
 			entityIndex++;
 		}
+		
+		visible = true;
+		if (ownerShown){
+		//	hideOwner();
+			showOwner();
+		}
+	}
 
-		// clean up ...
-//		while(getEntityCount() > entityIndex) {
-//			entities.get(getEntityCount() - 1).remove();
-//			entities.remove(getEntityCount() - 1);
-//		}
+	public boolean showOwner() {
+		return showOwner(defaultOwnerHideTicks);
+	}
+	
+	public boolean showOwner(long autohideticks) {		
+		Server.logger().info("    -> visible: " + visible);
+		Server.logger().info("    -> ownerShown: " + ownerShown);
+		Server.logger().info("    -> ownerEntityId: " + ownerNameEntityId);
+		Server.logger().info("    -> 0 EntityId: " + entities.get(0).getEntityId());
+		Server.logger().info("    -> 0 Entity Valid: " + entities.get(0).isValid());
+		Server.logger().info("    -> 0 Entity Visible: " + entities.get(0).isVisible());
+		Server.logger().info("    -> 0 Entity Name: " + entities.get(0).getCustomName());
+		String cnnn = entities.get(0).getCustomName();
+		
+		if (cnnn.contains("(")) {
+			@SuppressWarnings("unused")
+			boolean ohoh___ = true;
+			ownerShown = false;
+		}
+				
+		if (ownerShown) {
+			ownerShown = entities.get(0).getEntityId() == ownerNameEntityId;
+		}
+
+		if (!visible) return false;
+		if (ownerShown) return false;
+		hideOwner();
+		
+		// calculate the Y offset, so it above the first line.
+		double offset = getLineOffset(1) * -1;
+		
+		// calculate the new location ...
+		Location location = this.location.clone();
+		location.setY(location.getY() + offset);
+						
+		// create name tag ...
+		ArmorStand entity = createEntity(this, location, player.getName());
+		Server.logger().warning("Owner: " + location);
+		
+		writeOwnerTagMetadata(entity);
+		ownerNameEntityId = entity.getEntityId();
+		Server.logger().info(" ====> Name: " + entity.getCustomName());
+		ownerShown = true;
+
+		// add to entity list ...
+		entities.add(0, entity);
+		entityOffsets.add(0, offset);
+
+		// run scheduler for auto hiding ...
+		if (autohideticks > 0 && ownerHideTask == null) {
+			ownerHideTask = Server.get().getScheduler().runTaskLater(plugin, new Runnable() {
+				@Override
+				public void run() {
+					hideOwner();
+					ownerHideTask = null;
+				}
+			}, defaultOwnerHideTicks);				
+		}else if(ownerHideTask != null) {
+			ownerHideTask.cancel();
+			ownerHideTask = null;
+		}
+		
+		return true;
+	}
+	
+	private boolean isOwnerEntity(Entity entity) {
+		if (entity == null) return false;		
+		Server.logger().info("isOwnerEntity: " + ownerNameEntityId);
+		if (entity.getEntityId() == ownerNameEntityId) return true;
+		
+//		MetadataValue ownerTag = HoloText.getMetadata(plugin, entity, "OwnerTag");
+//		if (ownerTag != null && ownerTag.asBoolean()) return true;
+	
+		return false;
+	}
+	
+	public boolean hasOwnerEntity() {
+		ArmorStand entity = getFirstEntity();
+		if (entity == null) return false;
+		
+		Server.logger().info("        -> Id: " + entity.getEntityId());
+		Server.logger().info("        -> Valid: " + entity.isValid());
+		Server.logger().info("        -> Visible: " + entity.isVisible());
+		Server.logger().info("        -> Name: " + entity.getCustomName());
+		
+		
+		if (!isOwnerEntity(entity)) return false;
+		
+		Server.logger().warning("        => Is Owner Entity!");
+		
+		if (!entity.isValid()) {
+			entity.remove();
+			entities.remove(0);
+			entityOffsets.remove(0);
+			return false;
+		}
+		
+		return true;
+	}
+	
+	public boolean hideOwner() {
+		if (!hasOwnerEntity()) return false;
+
+		getFirstEntity().remove();
+		entities.remove(0);
+		entityOffsets.remove(0);
+		ownerShown = false;
+		return true;
+	}
+	
+	public boolean isOwnerShown() {
+		return ownerShown;
 	}
 
 	public boolean hasEntity(Entity entity){
@@ -287,12 +452,16 @@ public class HoloText {
 		return false;
 	}
 	
-	private ArmorStand getEntity(int index){
+	public ArmorStand getEntity(int index){
 		return entities.get(index);
 	}
 		
-	private ArmorStand getEntity(){
+	public ArmorStand getLastEntity(){
 		return entities.get(entities.size() - 1);
+	}
+	
+	public ArmorStand getFirstEntity(){
+		return entities.get(0);
 	}
 	
 	public ArrayList<ArmorStand> getEntities(){
@@ -300,11 +469,11 @@ public class HoloText {
 	}
 	
 	public Chunk getChunk(){
-		return getEntity().getWorld().getChunkAt(getEntity().getLocation());	
+		return getLastEntity().getWorld().getChunkAt(getLastEntity().getLocation());	
 	}
 
 	public Location getLocation() {
-		return location;
+		return location.clone();
 	}
 
 	private void setLocation(Location location) {
