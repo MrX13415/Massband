@@ -1,12 +1,14 @@
 package net.icelane.massband.core;
 
 import java.util.ArrayList;
+import java.util.List;
 
 import org.bukkit.Chunk;
 import org.bukkit.Location;
 import org.bukkit.World;
 import org.bukkit.block.Block;
 import org.bukkit.block.BlockFace;
+import org.bukkit.entity.ArmorStand;
 import org.bukkit.entity.Entity;
 import org.bukkit.entity.Player;
 import org.bukkit.util.Vector;
@@ -17,8 +19,10 @@ import net.icelane.math.Point;
 import net.icelane.math.Polygon;
 
 
-public class Markers {
-
+public class Marker {
+	
+	public static final String Metadata_Identifier = "net.icelane.massband:Marker"; 
+	
 	public enum MeasureMode{
 		BLOCKS,
 		VECTORS
@@ -33,18 +37,18 @@ public class Markers {
 
 	private Player player;
 	private World world;
-	
+
 	private String format_markerFirst    = "§c#\n%1$s";                  // (1) additional info
 	private String format_markerLast     = "§7(%1$s§7) §6%2$s\n§9%3$s";  // (1) marker count (2) length (3) area
 	private String format_marker         = "§7#%1$s: §a%2$s";            // (1) marker index (2) length
 	private String format_markerOne      = "§6%2$s ";                    // (2) length
 	private String format_mode_axis      = "§9(%1$s§9, %2$s§9)";         // (0) axis 1 (2) axis 2
 	private String format_blocks_length  = "%1d §cblocks %s";            //
-	private String format_blocks_area    = "%1d §7blocks§c²";               // 
+	private String format_blocks_area    = "%1d §7blocks§c²";            // 
 	private String format_blocks_auto    = "§7(%s§7)";                   // 
 	private String format_blocks_axis    = "§9(%s§9)";                   //
 	private String format_vectors_length = "%.3f§cm";                    // 
-	private String format_vectors_area   = "%.3f§7m§c²";                   //
+	private String format_vectors_area   = "%.3f§7m§c²";                 //
 
 	private String text_axis_X           = "§cX";                        // 
 	private String text_axis_Y           = "§aY";                        // 
@@ -62,7 +66,8 @@ public class Markers {
 	private double distance;
 	
 	
-	public Markers(Player player, World world) {
+	public Marker(Player player, World world) {
+		HoloText.initialize(Plugin.get());
 		this.player = player;
 		this.world = world;
 	}
@@ -116,8 +121,8 @@ public class Markers {
 		return (holotext != null);
 	}
 
-	private boolean inBounds(int index){
-		return index > -1 && index < getCount();
+	private boolean inBounds(int index, List<?> list){
+		return index > -1 && index < list.size();
 	}
 	
 	public int getCount(){
@@ -125,22 +130,22 @@ public class Markers {
 	}
 	
 	public HoloText get(int index){
-		if (!inBounds(index)) return null;
+		if (!inBounds(index, markerList)) return null;
 		return markerList.get(index);
 	}
 	
 	public Block getBlock(int index){
-		if (!inBounds(index)) return null;
+		if (!inBounds(index, blockList)) return null;
 		return blockList.get(index);
 	}
 	
 	public BlockFace getBlockFace(int index){
-		if (!inBounds(index)) return null;
+		if (!inBounds(index, faceList)) return null;
 		return faceList.get(index);
 	}
 	
 	public MarkerSettings getSettings(int index){
-		if (!inBounds(index)) return null;
+		if (!inBounds(index, settingsList)) return null;
 		return settingsList.get(index);
 	}
 
@@ -181,8 +186,9 @@ public class Markers {
 		}
 		
 		if (getCount() == 0){
-			HoloText marker = HoloText.create(world, block, face, "#");
-			marker.setMetadata(Plugin.get(), "net.icelane.massband:Marker", player.getUniqueId());
+			HoloText marker = HoloText.create(player, world, block, face, "#");
+			marker.prepareMetadata(Metadata_Identifier);
+			marker.writeMetadata();
 			markerList.add(marker);
 		}else{
 			// Create a clone from the current last marker ...
@@ -348,6 +354,14 @@ public class Markers {
 				
 				out = String.format(format, index, value, strArea);
 			}
+			
+//			for (Entity entity : holotext.getFirstEntity().getNearbyEntities(10, 10, 10)) {
+//				if (!(entity instanceof Player)) continue;
+//				if (entity.getEntityId() == player.getEntityId()) continue;
+//				
+//				out = String.format("§7%1$s§0\n%2$s", player.getName(), out);
+//				break;
+//			}
 			
 			holotext.setText(out);
 			holotext.show();

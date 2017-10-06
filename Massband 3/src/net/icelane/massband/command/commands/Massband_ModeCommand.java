@@ -5,8 +5,8 @@ import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
 
 import net.icelane.massband.command.CommandBase;
-import net.icelane.massband.core.Markers;
-import net.icelane.massband.core.Markers.MeasureMode;
+import net.icelane.massband.core.Marker;
+import net.icelane.massband.core.Marker.MeasureMode;
 import net.icelane.massband.core.Massband;
 
 public class Massband_ModeCommand extends CommandBase{
@@ -45,7 +45,7 @@ public class Massband_ModeCommand extends CommandBase{
 				try{valueInt = Integer.valueOf(args[0]);}catch (NumberFormatException ex){}
 				
 				int index = 0; 
-				for (MeasureMode mode : Markers.MeasureMode.values()){
+				for (MeasureMode mode : Marker.MeasureMode.values()){
 					if (index == valueInt) valueInt = index;
 					if (mode.toString().toLowerCase().contains(args[0].toLowerCase().trim())){
 						value = mode;
@@ -53,7 +53,7 @@ public class Massband_ModeCommand extends CommandBase{
 					index++;
 				}
 				
-				if (value == null) value = Markers.MeasureMode.values()[valueInt];  
+				if (value == null) value = Marker.MeasureMode.values()[valueInt];  
 				
 				obj.getMarkers(player.getWorld()).setMode(value);
 				obj.getMarkers(player.getWorld()).recalculate();
