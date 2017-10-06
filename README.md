@@ -9,7 +9,7 @@ Massband is a plugin for **Minecraft-Servers** based on **Bukkit**. It offers va
 ---
 
 
-**Version 3.0.4 ALPHA**
+**Version 3.0.5 ALPHA (unreleased)**
 #### **[DOWNLOAD](https://dev.bukkit.org/bukkit-plugins/massband/files/)** _(via Bukkit-Dev)_
 
 Designed for servers compatible to the **Bukkit API** (_Spigot, CraftBukkit, etc._) using Minecraft version **1.10.x** to **1.12.x**, .
