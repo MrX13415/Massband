@@ -1,24 +1,35 @@
 package net.icelane.massband.core;
 
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map.Entry;
+import java.util.concurrent.ConcurrentHashMap;
 import java.util.UUID;
 
 import org.bukkit.World;
+import org.bukkit.entity.ArmorStand;
+import org.bukkit.entity.Entity;
 import org.bukkit.entity.Player;
 import org.bukkit.event.player.PlayerInteractEvent;
 import org.bukkit.event.player.PlayerJoinEvent;
 import org.bukkit.event.player.PlayerMoveEvent;
 import org.bukkit.event.player.PlayerQuitEvent;
+import org.bukkit.event.player.PlayerTeleportEvent;
 import org.bukkit.event.world.ChunkLoadEvent;
 import org.bukkit.event.world.ChunkUnloadEvent;
+import org.bukkit.metadata.FixedMetadataValue;
+import org.bukkit.metadata.MetadataValue;
+
+import net.icelane.massband.Plugin;
+import net.icelane.massband.Server;
+import net.icelane.massband.minecraft.HoloText;
 
 public class Massband {
 
 	private static HashMap<UUID, Massband> list = new HashMap<>();
 	
 	private Player player;
-	private HashMap<String, Markers> worldMarkersList = new HashMap<>(); // String => World.Name
+	private HashMap<String, Marker> worldMarkersList = new HashMap<>(); // String => World.Name
 	private Interact interact;
 	
 	private Massband(Player player) {
@@ -82,29 +93,38 @@ public class Massband {
 		clean();
 	}
 	
-	//DEBUG:	int lid = -1;
-	public void move(PlayerMoveEvent event){
-//DEBUG:
-//		try {
-//			HoloText mm = getMarkers(player.getWorld()).get(0);
-//			boolean b = getMarkers(player.getWorld()).get(0).isValid();
-//			Server.get().getConsoleSender().sendMessage("VALID: " + (b?"§a( OK )":"§c( NO )") + " OBJ: §6" + mm.getEntity().getEntityId());
-//			
-//			 
-//			if (lid != -1 && mm.getEntity().getEntityId() != lid){
-//				Server.get().getConsoleSender().sendMessage("§c!!!!!!!!!!!!!!!!!!!!!!!!!!!!!");
-//				Server.get().getConsoleSender().sendMessage("§c!!!                       !!!");
-//				Server.get().getConsoleSender().sendMessage("§c!!! Marker Enitiy CHANGED !!!");
-//				Server.get().getConsoleSender().sendMessage("§c!!!                       !!!");
-//				Server.get().getConsoleSender().sendMessage("§c!!!!!!!!!!!!!!!!!!!!!!!!!!!!!");
-//			}
-//				
-//			lid = mm.getEntity().getEntityId();
-//		} catch (Exception e) {
-//			Server.get().getConsoleSender().sendMessage("§cNo Marker!");
-//		}
+	public void teleport(PlayerTeleportEvent event) {
+		
 	}
 	
+	long lastrun;
+	
+	public void move(PlayerMoveEvent event){
+		
+		if (System.currentTimeMillis() - lastrun < 100) return;
+		lastrun = System.currentTimeMillis();
+		
+		List<Entity> nearby = event.getPlayer().getNearbyEntities(10, 10, 10);
+
+		for (Entity entity : nearby) {		
+			// check for ArmorStand ...
+			if (!(entity instanceof ArmorStand)) continue;
+			
+			// check of Massband marker ...
+			MetadataValue objectType = HoloText.getMetadata(Plugin.get(), entity, HoloText.metadata_Identifier);
+			if (objectType == null || !objectType.asString().equals(Marker.Metadata_Identifier)) continue;
+			
+			// get the HoloText object it belongs to ...
+			MetadataValue hlobject = HoloText.getMetadata(Plugin.get(), entity, HoloText.metadata_Object);
+			if (hlobject == null || !(hlobject.value() instanceof HoloText)) continue;
+
+			HoloText marker = (HoloText) hlobject.value();
+
+			boolean ok1 = marker.showOwner();
+		}
+		
+	}
+
 	public void worldChange(World worldFrom){
 		if (player.getWorld() != worldFrom){
 			getMarkers(worldFrom).hideAll();
@@ -147,29 +167,29 @@ public class Massband {
 		return player;
 	}
 
-	public Markers getMarkers(World world){
-		Markers m = worldMarkersList.get(world.getName());
+	public Marker getMarkers(World world){
+		Marker m = worldMarkersList.get(world.getName());
 		if (m == null){
-			m = new Markers(player, world);
+			m = new Marker(player, world);
 			worldMarkersList.put(world.getName(), m);
 		}
 		return m;
 	}
 	
 	public int getMarkerCount(World world){
-		Markers m = worldMarkersList.get(world.getName());
+		Marker m = worldMarkersList.get(world.getName());
 		if (m == null) return 0;
 		return m.getCount();
 	}
 	
 	public void hideMarkers(World world){
-		Markers m = worldMarkersList.get(world.getName());
+		Marker m = worldMarkersList.get(world.getName());
 		if (m == null) return;
 		m.hideAll();
 	}
 	
 	public void showMarkers(World world){
-		Markers m = worldMarkersList.get(world.getName());
+		Marker m = worldMarkersList.get(world.getName());
 		if (m == null) return;
 		m.showAll();
 	}

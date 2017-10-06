@@ -1,6 +1,5 @@
 package net.icelane.massband.minecraft;
 
-import java.awt.geom.Ellipse2D;
 import java.util.ArrayList;
 
 import org.bukkit.Chunk;
@@ -20,7 +19,6 @@ import org.bukkit.scheduler.BukkitTask;
 import org.bukkit.util.Vector;
 
 import net.icelane.massband.Server;
-import net.icelane.massband.core.Marker;
 
 public class HoloText {
 	
@@ -150,7 +148,6 @@ public class HoloText {
 		ArmorStand newEntity = createEntity(this, entity.getLocation(), entity.getCustomName());		
 		if (isOwnerEntity(entity)) {
 			ownerNameEntityId = newEntity.getEntityId();
-			Server.logger().info(" ====> Name: " + newEntity.getCustomName() + " | " + entity.getCustomName());
 			writeOwnerTagMetadata(newEntity);
 		}
 		return newEntity;
@@ -281,7 +278,6 @@ public class HoloText {
 	 * @return The calculated offset value
 	 */
 	public double getLineOffset(int lineIndex) {
-		int klll = getLines().length;
 		return Math.abs((getLines().length - lineIndex - 1) * lineOffset);
 	}
 	
@@ -327,8 +323,7 @@ public class HoloText {
 		
 		visible = true;
 		if (ownerShown){
-		//	hideOwner();
-			//showOwner();
+			showOwner();
 		}
 	}
 
@@ -337,24 +332,9 @@ public class HoloText {
 	}
 	
 	public boolean showOwner(long autohideticks) {		
-		Server.logger().info("    -> visible: " + visible);
-		Server.logger().info("    -> ownerShown: " + ownerShown);
-		Server.logger().info("    -> ownerEntityId: " + ownerNameEntityId);
-		Server.logger().info("    -> 0 EntityId: " + entities.get(0).getEntityId());
-		Server.logger().info("    -> 0 Entity Valid: " + entities.get(0).isValid());
-		Server.logger().info("    -> 0 Entity Visible: " + entities.get(0).isVisible());
-		Server.logger().info("    -> 0 Entity Name: " + entities.get(0).getCustomName());
-		String cnnn = entities.get(0).getCustomName();
-		
-		if (cnnn.contains("(")) {
-			@SuppressWarnings("unused")
-			boolean ohoh___ = true;
-			ownerShown = false;
-		}
-		
-		
+		// check if the owner tag is really shown.
 		if (ownerShown) {
-			ownerShown = entities.get(0).getEntityId() == ownerNameEntityId;
+			ownerShown = isOwnerEntity(getFirstEntity());
 		}
 
 		if (!visible) return false;
@@ -362,6 +342,7 @@ public class HoloText {
 		hideOwner();
 		
 		// calculate the Y offset, so it above the first line.
+		// "-1", because "getLineOffset" dosn't know the "new" line yet.2
 		double offset = Math.abs(getLineOffset(-1) * -1);
 		
 		// calculate the new location ...
@@ -370,17 +351,20 @@ public class HoloText {
 						
 		// create name tag ...
 		ArmorStand entity = createEntity(this, location, player.getName());
-		Server.logger().warning("Owner: " + location);
-		
 		writeOwnerTagMetadata(entity);
 		ownerNameEntityId = entity.getEntityId();
-		Server.logger().info(" ====> Name: " + entity.getCustomName());
 		ownerShown = true;
 
 		// add to entity list ...
 		entities.add(0, entity);
 		entityOffsets.add(0, offset);
-
+	
+		// reset and cancel the current task if present.
+		if(ownerHideTask != null) {
+			ownerHideTask.cancel();
+			ownerHideTask = null;
+		}
+		
 		// run scheduler for auto hiding ...
 		if (autohideticks > 0 && ownerHideTask == null) {
 			ownerHideTask = Server.get().getScheduler().runTaskLater(plugin, new Runnable() {
@@ -390,9 +374,6 @@ public class HoloText {
 					ownerHideTask = null;
 				}
 			}, defaultOwnerHideTicks);				
-		}else if(ownerHideTask != null) {
-			ownerHideTask.cancel();
-			ownerHideTask = null;
 		}
 		
 		return true;
@@ -400,7 +381,6 @@ public class HoloText {
 	
 	private boolean isOwnerEntity(Entity entity) {
 		if (entity == null) return false;		
-		Server.logger().info("isOwnerEntity: " + ownerNameEntityId);
 		if (entity.getEntityId() == ownerNameEntityId) return true;
 		
 //		MetadataValue ownerTag = HoloText.getMetadata(plugin, entity, "OwnerTag");
@@ -412,21 +392,17 @@ public class HoloText {
 	public boolean hasOwnerEntity() {
 		ArmorStand entity = getFirstEntity();
 		if (entity == null) return false;
-		
-		Server.logger().info("        -> Id: " + entity.getEntityId());
-		Server.logger().info("        -> Valid: " + entity.isValid());
-		Server.logger().info("        -> Visible: " + entity.isVisible());
-		Server.logger().info("        -> Name: " + entity.getCustomName());
-		
-		
 		if (!isOwnerEntity(entity)) return false;
-		
-		Server.logger().warning("        => Is Owner Entity!");
 		
 		if (!entity.isValid()) {
 			entity.remove();
 			entities.remove(0);
 			entityOffsets.remove(0);
+			
+			if(ownerHideTask != null) {
+				ownerHideTask.cancel();
+				ownerHideTask = null;
+			}
 			return false;
 		}
 		
@@ -440,6 +416,11 @@ public class HoloText {
 		entities.remove(0);
 		entityOffsets.remove(0);
 		ownerShown = false;
+		
+		if(ownerHideTask != null) {
+			ownerHideTask.cancel();
+			ownerHideTask = null;
+		}
 		return true;
 	}
 	

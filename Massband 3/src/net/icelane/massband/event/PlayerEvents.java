@@ -14,6 +14,7 @@ import org.bukkit.event.player.PlayerJoinEvent;
 import org.bukkit.event.player.PlayerMoveEvent;
 import org.bukkit.event.player.PlayerQuitEvent;
 import org.bukkit.event.player.PlayerSwapHandItemsEvent;
+import org.bukkit.event.player.PlayerTeleportEvent;
 import org.bukkit.inventory.ItemStack;
 
 import net.icelane.massband.core.Massband;
@@ -48,7 +49,7 @@ public class PlayerEvents implements Listener {
 		if (obj != null) obj.interact(event);
 		//TODO: else error 
 	}
-	
+
 	@EventHandler 
 	public void onPlayerChangedMainHand(PlayerChangedMainHandEvent event) {
 		
@@ -107,6 +108,11 @@ public class PlayerEvents implements Listener {
 		Massband obj = Massband.get(event.getPlayer());
 		if (obj != null) obj.move(event);
 	}
+	
+	public void onPlayerTeleporEvent(PlayerTeleportEvent event) {
+		Massband obj = Massband.get(event.getPlayer());
+		if (obj != null) obj.teleport(event);
+	}	
 	
 	@EventHandler
 	public void onPlayerChangedWorld(PlayerChangedWorldEvent event){
