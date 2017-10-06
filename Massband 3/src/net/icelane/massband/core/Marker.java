@@ -8,7 +8,6 @@ import org.bukkit.Location;
 import org.bukkit.World;
 import org.bukkit.block.Block;
 import org.bukkit.block.BlockFace;
-import org.bukkit.entity.ArmorStand;
 import org.bukkit.entity.Entity;
 import org.bukkit.entity.Player;
 import org.bukkit.util.Vector;
@@ -194,7 +193,9 @@ public class Marker {
 			// Create a clone from the current last marker ...
 			HoloText clone = getLast().clone();
 			// insert the cloned marker ...
-			markerList.add(getCount() - 1, clone);			
+			markerList.add(getCount() - 1, clone);
+			// hide the owner tag so it gets created only if it's necessary
+			getLast().hideOwner();
 			// move the current last marker to it's new location
 			getLast().move(world, block, face);
 		}

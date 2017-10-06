@@ -28,6 +28,7 @@ public class HoloText {
 	
 	private static double defaultEntityLineOffset = 0.3;	
 	private static long defaultOwnerHideTicks = 20L * 3; //ticks (20 tick => 1 sec)
+	private static long defaultOwnerShowDelayTicks = 10L; //ticks (1 tick => 50 ms)
 	
 	private static Plugin plugin;
 
@@ -40,10 +41,11 @@ public class HoloText {
 	private boolean visible;
 	
 	private boolean ownerShown;
-	private double ownerShowTime;
 	private int ownerNameEntityId;
+	private long ownerHideTaskTicks;
 	private BukkitTask ownerHideTask;
-	
+	private BukkitTask ownerShowTask;
+
 	private MetadataValue ownerName;
 	private MetadataValue identifier;
 	
@@ -80,7 +82,7 @@ public class HoloText {
 		holotext.identifier = this.identifier;
 		holotext.ownerName = this.ownerName;
 		holotext.setText(getText());
-		//if (ownerShown) holotext.showOwner();
+		if (ownerShown) holotext.showOwner(0, defaultOwnerHideTicks);
 		return holotext;
 	}
 	
@@ -285,7 +287,13 @@ public class HoloText {
 		String lines[] = getLines(); 
 		
 		// /!\ Important: Reset, because the entity gets reused for "normal" text.
-		ownerNameEntityId = 0;
+		//ownerNameEntityId = 0;
+		ArmorStand ownerEntity = null;
+		
+		if (getEntityCount() > 0 && isOwnerEntity(getFirstEntity())) {
+			ownerEntity = getFirstEntity();
+			entities.remove(0);
+		}
 		
 		// trim entity list ...
 		while (getEntityCount() > lines.length) {
@@ -321,17 +329,48 @@ public class HoloText {
 			entityIndex++;
 		}
 		
-		visible = true;
-		if (ownerShown){
-			showOwner();
+		if (ownerEntity != null) {
+			entities.add(0, ownerEntity);
+			ownerShown = true;
+			ownerNameEntityId = ownerEntity.getEntityId();
 		}
+		visible = true;
 	}
 
-	public boolean showOwner() {
-		return showOwner(defaultOwnerHideTicks);
+	public void showOwner() {
+		showOwner(defaultOwnerShowDelayTicks, defaultOwnerHideTicks);
 	}
 	
-	public boolean showOwner(long autohideticks) {		
+	public void showOwner(long showdelayticks, long autohideticks) {
+		if (ownerShowTask != null) return;
+		// reset the current "hide" task if present.
+		if(ownerHideTask != null) {
+			ownerHideTask.cancel();
+			ownerHideTask = null;
+			scheduleHideTask(ownerHideTaskTicks);
+		}
+		
+		if (showdelayticks <= 0) {
+			if(ownerShowTask != null) {
+				ownerShowTask.cancel();
+				ownerShowTask = null;
+			}
+			showOwnerInstantly(autohideticks);
+			return;
+		}
+		
+		ownerShowTask = Server.get().getScheduler().runTaskLater(plugin, new Runnable() {
+			@Override
+			public void run() {
+				ownerShowTask = null;
+				showOwnerInstantly(autohideticks);
+			}
+		}, showdelayticks);	
+	}
+	
+	private boolean showOwnerInstantly(long autohideticks) {	
+		ownerShowTask = null;
+		
 		// check if the owner tag is really shown.
 		if (ownerShown) {
 			ownerShown = isOwnerEntity(getFirstEntity());
@@ -366,15 +405,8 @@ public class HoloText {
 		}
 		
 		// run scheduler for auto hiding ...
-		if (autohideticks > 0 && ownerHideTask == null) {
-			ownerHideTask = Server.get().getScheduler().runTaskLater(plugin, new Runnable() {
-				@Override
-				public void run() {
-					hideOwner();
-					ownerHideTask = null;
-				}
-			}, defaultOwnerHideTicks);				
-		}
+		ownerHideTaskTicks = autohideticks;
+		scheduleHideTask(autohideticks);
 		
 		return true;
 	}
@@ -395,33 +427,48 @@ public class HoloText {
 		if (!isOwnerEntity(entity)) return false;
 		
 		if (!entity.isValid()) {
-			entity.remove();
-			entities.remove(0);
-			entityOffsets.remove(0);
-			
-			if(ownerHideTask != null) {
-				ownerHideTask.cancel();
-				ownerHideTask = null;
-			}
+			removeOwnerTag();
 			return false;
 		}
 		
 		return true;
 	}
 	
+	public void scheduleHideTask(long autohideticks) {
+		// run scheduler for auto hiding ...
+		if (autohideticks > 0 && ownerHideTask == null) {
+			ownerHideTask = Server.get().getScheduler().runTaskLater(plugin, new Runnable() {
+				@Override
+				public void run() {
+					hideOwner();
+					ownerHideTask = null;
+				}
+			}, autohideticks - 1);				
+		}
+	}
+	
 	public boolean hideOwner() {
 		if (!hasOwnerEntity()) return false;
-
-		getFirstEntity().remove();
-		entities.remove(0);
-		entityOffsets.remove(0);
-		ownerShown = false;
-		
+		removeOwnerTag();
+		return true;
+	}
+	
+	private void removeOwnerTag() {
 		if(ownerHideTask != null) {
 			ownerHideTask.cancel();
 			ownerHideTask = null;
 		}
-		return true;
+		
+		if(ownerShowTask != null) {
+			ownerShowTask.cancel();
+			ownerShowTask = null;
+		}
+		
+		getFirstEntity().remove();
+		entities.remove(0);
+		entityOffsets.remove(0);
+		ownerShown = false;
+		ownerNameEntityId = 0;
 	}
 	
 	public boolean isOwnerShown() {

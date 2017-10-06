@@ -3,7 +3,6 @@ package net.icelane.massband.core;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map.Entry;
-import java.util.concurrent.ConcurrentHashMap;
 import java.util.UUID;
 
 import org.bukkit.World;
@@ -17,11 +16,9 @@ import org.bukkit.event.player.PlayerQuitEvent;
 import org.bukkit.event.player.PlayerTeleportEvent;
 import org.bukkit.event.world.ChunkLoadEvent;
 import org.bukkit.event.world.ChunkUnloadEvent;
-import org.bukkit.metadata.FixedMetadataValue;
 import org.bukkit.metadata.MetadataValue;
 
 import net.icelane.massband.Plugin;
-import net.icelane.massband.Server;
 import net.icelane.massband.minecraft.HoloText;
 
 public class Massband {
@@ -119,8 +116,7 @@ public class Massband {
 			if (hlobject == null || !(hlobject.value() instanceof HoloText)) continue;
 
 			HoloText marker = (HoloText) hlobject.value();
-
-			boolean ok1 = marker.showOwner();
+			marker.showOwner();
 		}
 		
 	}
