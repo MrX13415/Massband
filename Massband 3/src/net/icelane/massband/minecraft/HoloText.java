@@ -281,7 +281,8 @@ public class HoloText {
 	 * @return The calculated offset value
 	 */
 	public double getLineOffset(int lineIndex) {
-		return (getLines().length - lineIndex - 1) * lineOffset;
+		int klll = getLines().length;
+		return Math.abs((getLines().length - lineIndex - 1) * lineOffset);
 	}
 	
 	public void refresh(){
@@ -327,7 +328,7 @@ public class HoloText {
 		visible = true;
 		if (ownerShown){
 		//	hideOwner();
-			showOwner();
+			//showOwner();
 		}
 	}
 
@@ -350,7 +351,8 @@ public class HoloText {
 			boolean ohoh___ = true;
 			ownerShown = false;
 		}
-				
+		
+		
 		if (ownerShown) {
 			ownerShown = entities.get(0).getEntityId() == ownerNameEntityId;
 		}
@@ -360,7 +362,7 @@ public class HoloText {
 		hideOwner();
 		
 		// calculate the Y offset, so it above the first line.
-		double offset = getLineOffset(1) * -1;
+		double offset = Math.abs(getLineOffset(-1) * -1);
 		
 		// calculate the new location ...
 		Location location = this.location.clone();
