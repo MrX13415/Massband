@@ -24,11 +24,14 @@ public class HoloText {
 	
 	public static final String metadata_Identifier = "Identifier";
 	public static final String metadata_Object = "HoloText_Object";
-	public static final String metadata_OwnerName = "OwnerName";
+	public static final String metadata_OwnerUUID = "OwnerUUID";
+	public static final String metadata_IsOwnerTag = "IsOwnerTag";
 	
 	private static double defaultEntityLineOffset = 0.3;	
 	private static long defaultOwnerHideTicks = 20L * 3; //ticks (20 tick => 1 sec)
 	private static long defaultOwnerShowDelayTicks = 10L; //ticks (1 tick => 50 ms)
+
+	private String format_ownerName = "§o§8%s";
 	
 	private static Plugin plugin;
 
@@ -46,7 +49,7 @@ public class HoloText {
 	private BukkitTask ownerHideTask;
 	private BukkitTask ownerShowTask;
 
-	private MetadataValue ownerName;
+	private MetadataValue ownerUUID;
 	private MetadataValue identifier;
 	
 	
@@ -80,9 +83,9 @@ public class HoloText {
 	public HoloText clone(){
 		HoloText holotext = new HoloText(this.player, this.location.clone());		
 		holotext.identifier = this.identifier;
-		holotext.ownerName = this.ownerName;
+		holotext.ownerUUID = this.ownerUUID;
 		holotext.setText(getText());
-		if (ownerShown) holotext.showOwner(0, defaultOwnerHideTicks);
+		if (ownerShown) holotext.showOwner(0, ownerHideTaskTicks);
 		return holotext;
 	}
 	
@@ -99,17 +102,23 @@ public class HoloText {
 		return null;
 	}
 	
-	public void prepareMetadata(String objectIdentifier) {
+	/**
+	 * Prepares a default set of meta data to this object.
+	 * Containing a given identifier and the UUID of the player created this object.
+	 *   
+	 * @param objectIdentifier
+	 */
+	public void prepareDefaultMetadata(String objectIdentifier) {
 		this.identifier = new FixedMetadataValue(plugin, objectIdentifier);
-		this.ownerName = new FixedMetadataValue(plugin, player.getName().toString());
+		this.ownerUUID = new FixedMetadataValue(plugin, player.getUniqueId().toString());
 	}
 
 	public void writeOwnerTagMetadata(ArmorStand entity) {
-		entity.setMetadata("OwnerTag", new FixedMetadataValue(plugin, true));
+		entity.setMetadata(metadata_IsOwnerTag, new FixedMetadataValue(plugin, true));
 	}
 	
 	public void writeMetadata() {
-		if (this.identifier == null && this.ownerName == null) return;
+		if (this.identifier == null && this.ownerUUID == null) return;
 		
 		for (ArmorStand entity : entities) {
 			writeMetadata(entity, this);
@@ -121,11 +130,11 @@ public class HoloText {
 		
 		if (holotext.identifier != null) 
 			entity.setMetadata(metadata_Identifier, holotext.identifier);
-		if (holotext.ownerName != null)
-			entity.setMetadata(metadata_OwnerName, holotext.ownerName);
+		if (holotext.ownerUUID != null)
+			entity.setMetadata(metadata_OwnerUUID, holotext.ownerUUID);
 	}
 	
-	private static void setEntityAttirubtes(ArmorStand entity) {
+	private static void setEntityAttriubtes(ArmorStand entity) {
 		entity.setVisible(false);
 		entity.setGravity(false);
 		entity.setCollidable(false);
@@ -157,7 +166,7 @@ public class HoloText {
 	
 	private static ArmorStand createEntity(HoloText holotext, Location location, String text){
 		ArmorStand entity = (ArmorStand) location.getWorld().spawnEntity(location, EntityType.ARMOR_STAND);
-		setEntityAttirubtes(entity);
+		setEntityAttriubtes(entity);
 		writeMetadata(entity, holotext);
 
 		if (text != null) entity.setCustomName(text);
@@ -221,6 +230,16 @@ public class HoloText {
 	}
 
 	public boolean move(Location location){
+		try {
+			return _move(location);
+		} catch (Exception e) {
+			return false;
+		}
+	}
+	
+	private boolean _move(Location location){
+		if (entities.size() == 0) return false;
+		
 		boolean result = true;
 		for (int index = 0; index < entities.size(); index++) {
 			ArmorStand entity = entities.get(index);
@@ -387,9 +406,9 @@ public class HoloText {
 		// calculate the new location ...
 		Location location = this.location.clone();
 		location.setY(location.getY() + offset);
-						
+		
 		// create name tag ...
-		ArmorStand entity = createEntity(this, location, player.getName());
+		ArmorStand entity = createEntity(this, location, String.format(format_ownerName, player.getName()));
 		writeOwnerTagMetadata(entity);
 		ownerNameEntityId = entity.getEntityId();
 		ownerShown = true;
@@ -415,8 +434,8 @@ public class HoloText {
 		if (entity == null) return false;		
 		if (entity.getEntityId() == ownerNameEntityId) return true;
 		
-//		MetadataValue ownerTag = HoloText.getMetadata(plugin, entity, "OwnerTag");
-//		if (ownerTag != null && ownerTag.asBoolean()) return true;
+		MetadataValue ownerTag = HoloText.getMetadata(entity, metadata_IsOwnerTag);
+		if (ownerTag != null && ownerTag.asBoolean()) return true;
 	
 		return false;
 	}
@@ -475,6 +494,10 @@ public class HoloText {
 		return ownerShown;
 	}
 
+	public boolean isOwner(Player player) {
+		return this.player.getUniqueId().equals(player.getUniqueId());
+	}
+	
 	public boolean hasEntity(Entity entity){
 		for (ArmorStand _entity : entities) {
 			if (_entity.getEntityId() == entity.getEntityId()) return true;
@@ -524,5 +547,21 @@ public class HoloText {
 
 	public void setLineOffset(double lineOffset) {
 		this.lineOffset = lineOffset;
+	}
+
+	public String getOwnerNameFormat() {
+		return format_ownerName;
+	}
+
+	public void setOwnerNameFormat(String format_ownerName) {
+		this.format_ownerName = format_ownerName;
+	}
+
+	public BukkitTask getOwnerHideTask() {
+		return ownerHideTask;
+	}
+
+	public BukkitTask getOwnerShowTask() {
+		return ownerShowTask;
 	}
 }
