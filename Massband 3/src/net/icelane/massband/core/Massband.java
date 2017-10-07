@@ -19,11 +19,14 @@ import org.bukkit.event.world.ChunkUnloadEvent;
 import org.bukkit.metadata.MetadataValue;
 
 import net.icelane.massband.Plugin;
+import net.icelane.massband.Server;
 import net.icelane.massband.minecraft.HoloText;
 
 public class Massband {
 
 	private static HashMap<UUID, Massband> list = new HashMap<>();
+	
+	private static boolean debug;
 	
 	private Player player;
 	private HashMap<String, Marker> worldMarkersList = new HashMap<>(); // String => World.Name
@@ -195,4 +198,14 @@ public class Massband {
 		return interact;
 	}
 
+	public static boolean isDebug() {
+		return debug;
+	}
+
+	public static void setDebug(boolean debug) {
+		Massband.debug = debug;
+		// TODO header
+		Server.logger().info("[" + Plugin.get().getDescription().getName() + "] Debug mode " + (debug?"enabled":"disabled"));
+	}
+	
 }
