@@ -30,6 +30,8 @@ public class Interact {
 	private long lastInteractTime = System.nanoTime();
 	private Action lastInteractAction;
 	private EquipmentSlot lastInteractSlot;
+	private Block lastInteractBlock;
+	private BlockFace lastInteractBlockFace;
 	
 	public Interact(Massband obj) {
 		this.massband = obj;
@@ -48,15 +50,27 @@ public class Interact {
 		if (item == null) return;
 		if (item.getType() != this.material) return;
 		
+		// handle double click ...
 		long time  = System.nanoTime();
 		long delta = (time - lastInteractTime) / 1000000; //ms
 		boolean doubleclick = (delta > 0 && delta <= doubleClickDelta);
 		if (lastInteractAction != action) doubleclick = false;
 		if (lastInteractSlot != slot) doubleclick = false;
-				
+		// must be the same block ...
+		if (lastInteractBlock != null &&
+				(lastInteractBlock.getX() != block.getX()
+				|| lastInteractBlock.getY() != block.getY()
+				|| lastInteractBlock.getZ() != block.getZ()))
+			doubleclick = false;
+		// must be the same face on the block ...
+		if (lastInteractBlockFace != null &&
+				lastInteractBlockFace.compareTo(face) != 0)
+			doubleclick = false;
+
 		lastInteractTime = time;
 		lastInteractAction = action;
 		lastInteractSlot = slot;
+		lastInteractBlock = block;
 		
 		//DEBUG:
 		//Server.logger().info("doubleclick: " + doubleclick + " delta: " + delta);
