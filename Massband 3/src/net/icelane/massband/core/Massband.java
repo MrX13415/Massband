@@ -97,9 +97,9 @@ public class Massband {
 	long lastrun;
 	
 	public void move(PlayerMoveEvent event){
-		
-		if (System.currentTimeMillis() - lastrun < 100) return;
-		lastrun = System.currentTimeMillis();
+		// run only 4 times per second ...
+		if (System.currentTimeMillis() - lastrun < 250) return;
+		lastrun = System.currentTimeMillis(); 
 		
 		List<Entity> nearby = event.getPlayer().getNearbyEntities(10, 10, 10);
 
@@ -110,13 +110,14 @@ public class Massband {
 			// check of Massband marker ...
 			MetadataValue objectType = HoloText.getMetadata(Plugin.get(), entity, HoloText.metadata_Identifier);
 			if (objectType == null || !objectType.asString().equals(Marker.Metadata_Identifier)) continue;
-			
+
 			// get the HoloText object it belongs to ...
 			MetadataValue hlobject = HoloText.getMetadata(Plugin.get(), entity, HoloText.metadata_Object);
 			if (hlobject == null || !(hlobject.value() instanceof HoloText)) continue;
 
 			HoloText marker = (HoloText) hlobject.value();
-			marker.showOwner();
+			// show the owner tag if the player is not the owner itself.
+			if (!marker.isOwner(event.getPlayer())) marker.showOwner();
 		}
 		
 	}
