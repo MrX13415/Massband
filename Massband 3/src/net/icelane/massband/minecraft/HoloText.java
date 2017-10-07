@@ -19,6 +19,7 @@ import org.bukkit.scheduler.BukkitTask;
 import org.bukkit.util.Vector;
 
 import net.icelane.massband.Server;
+import net.icelane.massband.config.configs.Config;
 
 public class HoloText {
 	
@@ -43,6 +44,7 @@ public class HoloText {
 	private double lineOffset = defaultEntityLineOffset;
 	private boolean visible;
 	
+	private boolean ownerTagsEnabled = Config.marker_showOwnerTags.get();
 	private boolean ownerShown;
 	private int ownerNameEntityId;
 	private long ownerHideTaskTicks;
@@ -357,10 +359,14 @@ public class HoloText {
 	}
 
 	public void showOwner() {
+		if (!ownerTagsEnabled) return;
+		
 		showOwner(defaultOwnerShowDelayTicks, defaultOwnerHideTicks);
 	}
 	
 	public void showOwner(long showdelayticks, long autohideticks) {
+		if (!ownerTagsEnabled) return;
+		
 		if (ownerShowTask != null) return;
 		// reset the current "hide" task if present.
 		if(ownerHideTask != null) {
@@ -387,7 +393,9 @@ public class HoloText {
 		}, showdelayticks);	
 	}
 	
-	private boolean showOwnerInstantly(long autohideticks) {	
+	private boolean showOwnerInstantly(long autohideticks) {
+		if (!ownerTagsEnabled) return false;
+		
 		ownerShowTask = null;
 		
 		// check if the owner tag is really shown.

@@ -32,7 +32,7 @@ public class MassbandCommand extends CommandBase{
 		addCommand(Massband_ResetCommand.class);
 	}
 	
-	//TODO
+	//TODO move into it's own command class
 	int bxs;
 	int bx;
 	int bzs;

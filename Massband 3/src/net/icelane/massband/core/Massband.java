@@ -20,6 +20,7 @@ import org.bukkit.metadata.MetadataValue;
 
 import net.icelane.massband.Plugin;
 import net.icelane.massband.Server;
+import net.icelane.massband.config.configs.Config;
 import net.icelane.massband.minecraft.HoloText;
 
 public class Massband {
@@ -99,7 +100,12 @@ public class Massband {
 	
 	long lastrun;
 	
+	
+	//TODO move to Marker class
 	public void move(PlayerMoveEvent event){
+		// owner tags are disabled!
+		if (!Config.marker_showOwnerTags.get()) return;
+		
 		// run only 4 times per second ...
 		if (System.currentTimeMillis() - lastrun < 250) return;
 		lastrun = System.currentTimeMillis(); 
@@ -121,8 +127,7 @@ public class Massband {
 			HoloText marker = (HoloText) hlobject.value();
 			// show the owner tag if the player is not the owner itself.
 			if (!marker.isOwner(event.getPlayer())) marker.showOwner();
-		}
-		
+		}		
 	}
 
 	public void worldChange(World worldFrom){
