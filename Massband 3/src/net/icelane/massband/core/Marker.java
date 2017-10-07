@@ -167,7 +167,8 @@ public class Marker {
 	public int indexOf(Location location){
 		for (int index = 0; index < getCount(); index++){
 			Block block = getBlock(index);
-
+			if (block == null) continue;
+			
 			if(location.getBlockX() == block.getX() && 
 			   location.getBlockY() == block.getY() &&
 			   location.getBlockZ() == block.getZ()) return index;
@@ -186,7 +187,7 @@ public class Marker {
 		
 		if (getCount() == 0){
 			HoloText marker = HoloText.create(player, world, block, face, "#");
-			marker.prepareMetadata(Metadata_Identifier);
+			marker.prepareDefaultMetadata(Metadata_Identifier);
 			marker.writeMetadata();
 			markerList.add(marker);
 		}else{
