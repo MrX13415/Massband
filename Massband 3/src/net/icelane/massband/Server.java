@@ -12,14 +12,14 @@ import net.icelane.massband.event.InventoryEvents;
 import net.icelane.massband.event.PlayerEvents;
 import net.icelane.massband.event.WorldEvents;
 
-public class Server {
+public abstract class Server {
 
 	public static org.bukkit.Server get(){
 		return Plugin.get().getServer();
 	}
 	
 	public static Logger logger(){
-		return get().getLogger();
+		return Plugin.logger;
 	}
 	
 	public static void registerEvents(){
@@ -32,19 +32,14 @@ public class Server {
 	}
 	
 	public static boolean registerCommands(){
-		JavaPlugin plugin = Plugin.get();
-		
 		// register commands
 		try {
-//			CommandBase.SetPermissionRootNode("massband");
-//			CommandBase.Initialize();
-
-			//register the main commands 
+			//register the main command (/massband)
 			CommandBase.register(MassbandCommand.class);
 			
 			return true;
 		} catch (Exception ex) {
-			logger().severe("[" + plugin.getDescription().getName() + "] Error: Commands not definated in 'plugin.yml'");
+			logger().severe("Error: Commands not definated in 'plugin.yml'");
 			logger().log(Level.SEVERE, "BOOM!", ex);
 		}
 		return false;

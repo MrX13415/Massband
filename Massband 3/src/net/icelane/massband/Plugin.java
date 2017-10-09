@@ -1,5 +1,7 @@
 package net.icelane.massband;
 
+import java.util.logging.Logger;
+
 import org.bukkit.Bukkit;
 import org.bukkit.configuration.file.FileConfiguration;
 import org.bukkit.plugin.java.JavaPlugin;
@@ -10,6 +12,7 @@ import net.icelane.massband.core.Massband;
 public class Plugin extends JavaPlugin{
 
 	private static Plugin plugin;
+	protected static Logger logger;
 	
 	private boolean permissionsEnabled = true;
 		
@@ -24,8 +27,8 @@ public class Plugin extends JavaPlugin{
 	@Override
 	public void onLoad() {
 		super.onLoad();
-		
 		plugin = this;
+		logger = this.getLogger();
 	}
 	
 	@Override

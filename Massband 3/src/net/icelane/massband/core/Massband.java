@@ -209,8 +209,7 @@ public class Massband {
 
 	public static void setDebug(boolean debug) {
 		Massband.debug = debug;
-		// TODO header
-		Server.logger().info("[" + Plugin.get().getDescription().getName() + "] Debug mode " + (debug?"enabled":"disabled"));
+		Server.logger().warning("Debug mode " + (debug ? "enabled" : "disabled"));
 	}
 	
 }
