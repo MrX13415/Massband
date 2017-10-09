@@ -9,6 +9,7 @@ import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.logging.Level;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -30,9 +31,8 @@ public abstract class ConfigBase {
 	public static void initialize(Class<? extends ConfigBase> cfgclass) {
 		try {
 			config = cfgclass.newInstance();
-		} catch (InstantiationException | IllegalAccessException e) {
-			Server.logger().warning("ERROR @ CONFIG!");
-			//TODO: errors
+		} catch (InstantiationException | IllegalAccessException ex) {
+			Server.logger().log(Level.WARNING, "An error occured while initializing the configuration.", ex);
 		}
 	}
 	
@@ -156,9 +156,8 @@ public abstract class ConfigBase {
 			}
 	
 			lines.clear();
-		} catch (IOException e) {
-			//TODO: error
-			e.printStackTrace();
+		} catch (IOException ex) {
+			Server.logger().log(Level.WARNING, "Error: Unable process config data while " + (save ? "saving" : "loading") + " the config file.", ex);
 		}
 	}
 
@@ -173,9 +172,8 @@ public abstract class ConfigBase {
 			for (String line : lines) {
 				writer.write(line + '\n');
 			}
-		} catch (IOException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
+		} catch (IOException ex) {
+			Server.logger().log(Level.WARNING, "Error: Unable save the config file to disk.", ex);
 		}finally {
 			try {
 				if (writer != null) writer.close();
@@ -250,17 +248,14 @@ public abstract class ConfigBase {
 		Field[] fields = Config.class.getDeclaredFields();
 
 		for (Field field : fields) {
-		    if (Modifier.isStatic(field.getModifiers()) && Entry.class.isAssignableFrom(field.getType())) {
-		    	
+		    if (Modifier.isStatic(field.getModifiers()) && Entry.class.isAssignableFrom(field.getType())) {		    	
 		    	try {
 		    		list.add( (Entry<?>) field.get(null) );
 					
-				} catch (IllegalArgumentException e) {
-					// TODO Auto-generated catch block
-					e.printStackTrace();
-				} catch (IllegalAccessException e) {
-					// TODO Auto-generated catch block
-					e.printStackTrace();
+				} catch (IllegalArgumentException ex) {
+					Server.logger().log(Level.WARNING, "Error: Unable process config data.", ex);
+				} catch (IllegalAccessException ex) {
+					Server.logger().log(Level.WARNING, "Error: Unable process config data.", ex);
 				}
 		    }
 		}

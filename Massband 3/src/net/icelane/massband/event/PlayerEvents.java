@@ -17,6 +17,7 @@ import org.bukkit.event.player.PlayerSwapHandItemsEvent;
 import org.bukkit.event.player.PlayerTeleportEvent;
 import org.bukkit.inventory.ItemStack;
 
+import net.icelane.massband.Server;
 import net.icelane.massband.core.Massband;
 
 public class PlayerEvents implements Listener {
@@ -47,7 +48,7 @@ public class PlayerEvents implements Listener {
 		
 		Massband obj = Massband.get(event.getPlayer());
 		if (obj != null) obj.interact(event);
-		//TODO: else error 
+		else Server.logger().warning(String.format("Error: Unable to instanciate Massband for Player: %s (%s)", event.getPlayer().getName(), event.getPlayer().getUniqueId()));
 	}
 
 	@EventHandler 
