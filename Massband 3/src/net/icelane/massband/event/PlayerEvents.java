@@ -1,5 +1,6 @@
 package net.icelane.massband.event;
 
+import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
 import org.bukkit.event.block.BlockBreakEvent;
@@ -121,4 +122,14 @@ public class PlayerEvents implements Listener {
 		if (obj != null) obj.worldChange(event.getFrom());
 	}
 	
+	/**
+	 * Called when a player picks-up an item.
+	 * @param event
+	 */
+	@SuppressWarnings("deprecation")
+	@EventHandler
+	public void onPlayerPickupItem(org.bukkit.event.player.PlayerPickupItemEvent event){
+		Massband obj = Massband.get(event.getPlayer());
+		if (obj != null) obj.getInteract().itemPickup((Player) event.getPlayer(), event.getItem().getItemStack());
+	}
 }
