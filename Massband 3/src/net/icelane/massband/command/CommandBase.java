@@ -6,36 +6,65 @@ import java.util.Comparator;
 import java.util.List;
 import java.util.Map;
 
+import org.bukkit.Bukkit;
 import org.bukkit.command.Command;
 import org.bukkit.command.CommandSender;
 import org.bukkit.command.PluginCommand;
 import org.bukkit.command.TabExecutor;
 import org.bukkit.entity.Player;
+import org.bukkit.permissions.PermissionDefault;
 
 import com.google.common.collect.ImmutableList;
 
 import net.icelane.massband.Plugin;
 
-
+/**
+ * Abstract API for easy command implementation in Bukkit.
+ * @author MrX13415
+ * @version 2.1
+ */
 public abstract class CommandBase implements TabExecutor{
 
 	// Commands global
 	// ---
-	//private static boolean initialized = true;
-	//private static String permissionRootNode = "";
+	/**
+	 * The visibility stages a command can have.
+	 * This will control how and if a command is listed in the help output.
+	 * <li>{@link #Hidden}</li>
+	 * <li>{@link #Visible}</li>
+	 * <li>{@link #Permission}</li>
+	 */
+	public enum Visibility{
+		/**
+		 * The command will never be listed in the help output.
+		 */
+		Hidden,
+		/**
+		 * The command is visible to everyone at all time in the help output.
+		 */
+		Visible, 
+		/**
+		 * The command will only be visible if the command sender has the required permission to use it.
+		 */
+		Permission
+	}
 	
 	// Command specific
 	// ---
 	protected PluginCommand pluginCommand;
 	
-	protected String name          = "";
+	protected String name           = "";
 	protected String[] aliases      = {};
 	protected String description    = "";
 	protected String help           = "";
 	protected String usage          = "";
-	protected String permissionNode = "";
-	protected boolean op            = false; //fallback permission
+	protected Permission permission = null;
+	protected boolean isNode        = false;
+	protected boolean op            = false;
+	protected boolean opOnly        = false;
+	//protected boolean explicit      = false; // Permission has to be set explicit. Excluded from wildcard.
 	protected boolean inGameOnly    = false;
+	protected Visibility visibility = Visibility.Permission;
 	protected String[] tabList      = {};
 	
 	protected ArrayList<CommandBase> commands = new ArrayList<>();
@@ -90,7 +119,7 @@ public abstract class CommandBase implements TabExecutor{
 	
 	/**
 	 * Registers a command to the game. Has to be called for every command which should be directly available.
-	 * Any sub command (added to a command via <code>addCommand(...)</code>) must to be registered.
+	 * Any sub command (added to a command via <code>addCommand(...)</code>) must not be registered.
 	 * @param cmdClass A class extending the class <code>CommandBase</code>
 	 * @return An instance of the given command class if the given it has been registered successfully.
 	 * @throws IllegalArgumentException If the given class is not extending the class <code>CommandBase</code>
@@ -101,13 +130,14 @@ public abstract class CommandBase implements TabExecutor{
 		if (!CommandBase.class.isAssignableFrom(cmdClass)){
 			throw new IllegalArgumentException("The provided class is not a valid command class.");
 		}
-		
+
 		try {
 			// register and init the given class as command
 			CommandBase cmd = (CommandBase) cmdClass.newInstance();
 			cmd.setname(cmd.name());
 			cmd.setupCommandDefinition();
 			cmd.initialize(); 
+			cmd.buildPermission();
 			cmd.initPluginCommand();
 			return cmd;
 			
@@ -116,6 +146,50 @@ public abstract class CommandBase implements TabExecutor{
 		} catch (IllegalAccessException e) {
 			throw new RuntimeException("Unable to register the provied class as command.");
 		}
+	}
+	
+	private void initPluginCommand(){
+		pluginCommand = Plugin.get().getCommand(name);
+		pluginCommand.setAliases(Arrays.asList(aliases));
+		pluginCommand.setExecutor(this);
+		pluginCommand.setUsage(usage);
+		pluginCommand.setDescription(description);
+		//pluginCommand.setPermission("");
+		
+		initCommandPermission();
+	}
+	
+	private void initCommandPermission() {
+		if (getPermission() == null) return;
+		
+		org.bukkit.permissions.Permission p = Bukkit.getPluginManager().getPermission(getPermission().getFullPermission());
+		if (p != null) {
+			p.setDefault(getPermission().getDefaultValue());
+		}else {
+			Bukkit.getPluginManager().addPermission(getPermission().getPermission());	
+		}
+	}
+	
+	/**
+	 * Reads any command settings defined in the <code>plugin.yml</code> for this command name and sets them.
+	 * Settings not defined in the <code>plugin.yml</code> won't be changed.
+	 */
+	public void setupCommandDefinition(){
+		Plugin plugin = Plugin.get();
+		if (!plugin.getDescription().getCommands().containsKey(getName())) return;
+		Map<String, Object> command = Plugin.get().getDescription().getCommands().get(getName());
+		
+		if (command.containsKey("description"))
+			setDescription((String) command.get("description"));
+		
+		if (command.containsKey("aliases"))
+			setAliases(((ImmutableList<?>) command.get("aliases")).toArray(new String[0]));
+
+//		if (command.containsKey("permission"))
+//			setPermissionNode((String) command.get("permission"));
+		
+		if (command.containsKey("usage"))
+			setUsage((String) command.get("usage"));
 	}
 	
 	/**
@@ -138,53 +212,87 @@ public abstract class CommandBase implements TabExecutor{
 	}
 	
 	/**
-	 * Whether the given <code>CommandSender</code> object has permission to use this command.<br>
-	 * If permissions has been disable for this plug-in, access will be determined if this command has been marked for "op only" and whether the player is OP.
+	 * Whether the given <code>CommandSender</code> object has permission to use this command.
+	 * Permission will also be granted if a wildcard permission of any parent command is present.
+	 * <p>
+	 * Wildcard permission can be disabled by setting <code>setExplicit(...)</code> of command object in question to <code>false</code>.
+	 * Permission will then only granted if the permission has been set explicit to the <code>CommandSender</code> object.</p>
+	 * <p>
+	 * If permissions has been disable for this plug-in, access will be determined if this command has been marked for "OP only" and whether the player is OP.
+	 * </p>
 	 * @param sender An instance of class <code>CommandSender</code>
 	 * @return <code>true</code> if the given <code>CommandSender</code> object has use permissions.
 	 */
 	public boolean hasPermission(CommandSender sender){
+		//TODO Wildcard permission and disallowed permission not working together.
 		Plugin plugin = Plugin.get();
 		
-		if (plugin.isPermissionsEnabled()){
-			return sender.hasPermission(getPermission());
-		}else if (this.op){
-			return sender.isOp(); 
-		}else{
-			return true;
+		// advanced permissions arn't available ...
+		if (!plugin.isPermissionsEnabled() || this.opOnly ) {
+			return ( this.op ? sender.isOp() : true );
 		}
-	}
-	
-	private void initPluginCommand(){
-		pluginCommand = Plugin.get().getCommand(name);
-		pluginCommand.setAliases(Arrays.asList(aliases));
-		pluginCommand.setExecutor(this);
-		pluginCommand.setUsage(usage);
-		pluginCommand.setDescription(description);
+		
+		if (sender.hasPermission(getPermission().getFullPermission())) return true;
+		
+		// This permission is also granted if the sender has a wildcard permission of a parent command.
+		//if (!this.explicit) {
+		return hasAsteriskPermission(sender);
+		//}
+		
+		//return false;
 	}
 	
 	/**
-	 * Reads any command settings defined in the <code>plugin.yml</code> for this command name and sets them.
-	 * Settings not defined in the <code>plugin.yml</code> won't be changed.
+	 * Recursively checks if the <code>CommandSender</code> object provided, has a wild card permission.
+	 * First we check if there is a wildcard permission of our own permission.
+	 * If not, we check if the permission of the next parent command is present and so on. 
+	 * @param sender An instance of class <code>CommandSender</code>
+	 * @return <code>true</code> if the given <code>CommandSender</code> object has a wildcard permission.
 	 */
-	public void setupCommandDefinition(){
-		Plugin plugin = Plugin.get();
-		if (!plugin.getDescription().getCommands().containsKey(getName())) return;
-		Map<String, Object> command = Plugin.get().getDescription().getCommands().get(getName());
-		
-		if (command.containsKey("description"))
-			setDescription((String) command.get("description"));
-		
-		if (command.containsKey("aliases"))
-			setAliases(((ImmutableList<?>) command.get("aliases")).toArray(new String[0]));
+	protected boolean hasAsteriskPermission(CommandSender sender){
+		Permission permission = new Permission(Permission.Asterisk, PermissionDefault.FALSE);
+		permission.setParent(getPermission());
+		permission = buildPermission(permission);
 
-		if (command.containsKey("permission"))
-			setPermissionNode((String) command.get("permission"));
+		if (sender.hasPermission(permission.getFullPermission())) return true;
+		if (parent == null) return false;
 		
-		if (command.containsKey("usage"))
-			setUsage((String) command.get("usage"));
+		return parent.hasAsteriskPermission(sender);
+	}
+	
+	/**
+	 * Rebuild the permission object of this command object based the <code>permissionNode</code> field of this and all parent commands.
+	 * @return The builded Permission object which as been set to this command.
+	 */
+	public Permission buildPermission(){
+		if (!isNode) return permission;
+		permission = buildPermission(new Permission(getPermission()));
+		return permission;
 	}
 
+	/**
+	 * Build a permission object using the given node as base and the <code>permissionNode</code> field all parent commands.
+	 * @return The builded Permission object.
+	 */
+	protected Permission buildPermission(Permission node){
+		CommandBase parent = getParent();
+		Permission permission = node;
+				
+		while (parent != null) {
+			Permission parentNode = new Permission(parent.getPermission());
+			
+			if (permission.getNode().isEmpty()) {
+				permission = parentNode;
+			}else {
+				permission.setParent(parentNode);	
+			}
+			
+			parent = parent.getParent();  // next
+		}
+		
+		return permission;
+	}
+	
 	/**
 	 * Returns a list of all matching sub commands and defined tab values for the given argument.
 	 * @param arg A command argument.
@@ -263,7 +371,7 @@ public abstract class CommandBase implements TabExecutor{
 
 		// process command
 		if (args.length == 1 && args[0].equals("?")){
-			sender.sendMessage(CommandText.getHelp(this));
+			sender.sendMessage(CommandText.getHelp(this, sender));
 			return true;
 		}else{
 			boolean result = false;
@@ -279,7 +387,7 @@ public abstract class CommandBase implements TabExecutor{
 			}
 			
 			// send help text on false result
-			if (!result) sender.sendMessage(CommandText.getHelp(this));
+			if (!result) sender.sendMessage(CommandText.getHelp(this, sender));
 			
 			return true;
 		}
@@ -318,6 +426,9 @@ public abstract class CommandBase implements TabExecutor{
 			cmd.initialize(); 
 			cmd.setParent(this);
 			this.commands.add(cmd);
+			//TODO improve permission
+			cmd.buildPermission();
+			cmd.initCommandPermission();
 			
 		} catch (InstantiationException e) {
 			throw new RuntimeException("Unable to register the provied class as sub command.");
@@ -374,27 +485,12 @@ public abstract class CommandBase implements TabExecutor{
 		return usage;
 	}
 
-	public String getPermission(){
-		CommandBase parent = getParent();
-		
-		String permission = getPermissionNode();
-		while (parent != null) {
-			String node = parent.getPermissionNode();
-			
-			if (node.trim() == "op") return "op";
-			
-			if (node.trim() != ""){
-				permission = node + "." + permission;
-			}
-
-			parent = parent.getParent();
-		}
-		
+	public Permission getPermission(){
 		return permission;
 	}
 	
 	public String getPermissionNode(){
-		return permissionNode;
+		return permission.getNode();
 	}
 	
 	public String[] getTabList() {
@@ -424,25 +520,76 @@ public abstract class CommandBase implements TabExecutor{
 	public void setUsage(String usage) {
 		this.usage = usage;
 	}
+		
+	public void setPermission(String permission){
+		setPermission(permission, PermissionDefault.FALSE);
+	}
+	
+	public void setPermission(String permission, PermissionDefault defaultValue){
+		setPermissionNode(permission, defaultValue);
+		isNode = false;
+	}
 	
 	public void setPermissionNode(String permissionNode){
-		this.permissionNode = permissionNode;
+		setPermissionNode(permissionNode, PermissionDefault.FALSE);
+	}
+	
+	public void setPermissionNode(String permissionNode, PermissionDefault defaultValue){
+		this.permission = new Permission(permissionNode, defaultValue);
+		isNode = true;
 	}
 	
 	public void setTabList(String...tabValue){
 		tabList = tabValue;
 	}
 	
+	public void setOp(boolean op) {
+		this.op = op;
+	}
+
 	public boolean isOP(){
 		return this.op;
 	}
 	
+	public boolean isOpOnly() {
+		return opOnly;
+	}
+
+	public void setOpOnly(boolean opOnly) {
+		this.opOnly = opOnly;
+		setOp(opOnly);
+	}
+
+	public boolean isOp() {
+		return op;
+	}
+
 	public boolean isInGameOnly() {
 		return inGameOnly;
 	}
 
 	public void setInGameOnly(boolean inGameOnly) {
 		this.inGameOnly = inGameOnly;
+	}
+
+//	public boolean isexplicit() {
+//		return explicit;
+//	}
+//
+//	/**
+//	 * Weather the command allows permission via wildcard permission of a parent command.
+//	 * @param explicit
+//	 */
+//	public void setExplicit(boolean explicit) {
+//		this.explicit = explicit;
+//	}
+
+	public Visibility getVisibility() {
+		return visibility;
+	}
+
+	public void setVisibility(Visibility visibility) {
+		this.visibility = visibility;
 	}
 
 	/**

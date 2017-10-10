@@ -1,5 +1,7 @@
 package net.icelane.massband.command;
 
+import org.bukkit.command.CommandSender;
+
 import net.icelane.massband.Plugin;
 
 public class CommandText {
@@ -37,7 +39,7 @@ Effects:
 		return format;
 	}
 	
-	public static String getHelp(CommandBase command){
+	public static String getHelp(CommandBase command, CommandSender sender){
 		// output formats 
 		String format_header = "\n§aCommand: §7/%1$s§c%2$s §aAliases: §c%3$s";
 		String format_desc   = "\n  §7%1$s";
@@ -73,7 +75,7 @@ Effects:
 		}
 		
 		// define permission
-		if ( Plugin.get().isPermissionsEnabled() && command.getPermission().length() > 0 ){
+		if ( Plugin.get().isPermissionsEnabled() && command.getPermission() != null && !command.isOpOnly()){
 			out_perm = String.format(format_perm, command.getPermission());
 		}
 				
@@ -85,6 +87,17 @@ Effects:
 
 		// define commands (args)
 		for (CommandBase cmd : command.getCommands()) {
+			// handle the visibility of the command
+			switch (cmd.getVisibility()) {
+			case Hidden: continue; // The command is hidden so we skip it!
+			case Permission:
+				if (sender == null) break;
+				// if we don't have the permission, skip it ...
+				if (!cmd.hasPermission(sender)) continue;
+				break;
+			default: break;
+			}
+			
 			out_args += String.format(format_cmd, cmd.getName(), cmd.getUsage(), cmd.getDescription());
 			
 			if (command.getCommands().size() - command.getCommands().indexOf(cmd) > 1) out_args += "\n";
@@ -109,7 +122,7 @@ Effects:
 		}
 		
 		// define header and basic output
-		String out_header = String.format(format_header, parents, label, command.getPermission());
+		String out_header = String.format(format_header, parents, label, command.isOpOnly() ? "OP" : command.getPermission());
 
 		return out_header;
 	}
