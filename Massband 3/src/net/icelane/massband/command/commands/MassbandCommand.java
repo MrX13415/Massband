@@ -23,6 +23,8 @@ public class MassbandCommand extends CommandBase{
 	
 	@Override
 	public void initialize() {
+		setPermissionNode("massband.command");
+		
 		addCommand(Massband_ClearCommand.class);
 		addCommand(Massband_LimitCommand.class);
 		addCommand(Massband_NoLimitCommand.class);
@@ -30,6 +32,8 @@ public class MassbandCommand extends CommandBase{
 		addCommand(Massband_InfoCommand.class);
 		addCommand(Massband_ModeCommand.class);
 		addCommand(Massband_ResetCommand.class);
+		addCommand(Massband_SettingsCommand.class);
+		addCommand(Massband_DebugCommand.class);
 	}
 	
 	//TODO move into it's own command class
