@@ -1,13 +1,10 @@
 package net.icelane.massband.core;
 
 import java.util.HashMap;
-import java.util.List;
 import java.util.Map.Entry;
 import java.util.UUID;
 
 import org.bukkit.World;
-import org.bukkit.entity.ArmorStand;
-import org.bukkit.entity.Entity;
 import org.bukkit.entity.Player;
 import org.bukkit.event.player.PlayerInteractEvent;
 import org.bukkit.event.player.PlayerJoinEvent;
@@ -16,11 +13,8 @@ import org.bukkit.event.player.PlayerQuitEvent;
 import org.bukkit.event.player.PlayerTeleportEvent;
 import org.bukkit.event.world.ChunkLoadEvent;
 import org.bukkit.event.world.ChunkUnloadEvent;
-import org.bukkit.metadata.MetadataValue;
 
-import net.icelane.massband.Plugin;
 import net.icelane.massband.Server;
-import net.icelane.massband.config.configs.Config;
 import net.icelane.massband.minecraft.HoloText;
 
 public class Massband {
@@ -98,36 +92,8 @@ public class Massband {
 		
 	}
 	
-	long lastrun;
-	
-	
-	//TODO move to Marker class
 	public void move(PlayerMoveEvent event){
-		// owner tags are disabled!
-		if (!Config.marker_showOwnerTags.get()) return;
-		
-		// run only 4 times per second ...
-		if (System.currentTimeMillis() - lastrun < 250) return;
-		lastrun = System.currentTimeMillis(); 
-		
-		List<Entity> nearby = event.getPlayer().getNearbyEntities(10, 10, 10);
-
-		for (Entity entity : nearby) {		
-			// check for ArmorStand ...
-			if (!(entity instanceof ArmorStand)) continue;
-			
-			// check of Massband marker ...
-			MetadataValue objectType = HoloText.getMetadata(Plugin.get(), entity, HoloText.metadata_Identifier);
-			if (objectType == null || !objectType.asString().equals(Marker.Metadata_Identifier)) continue;
-
-			// get the HoloText object it belongs to ...
-			MetadataValue hlobject = HoloText.getMetadata(Plugin.get(), entity, HoloText.metadata_Object);
-			if (hlobject == null || !(hlobject.value() instanceof HoloText)) continue;
-
-			HoloText marker = (HoloText) hlobject.value();
-			// show the owner tag if the player is not the owner itself.
-			if (!marker.isOwner(event.getPlayer())) marker.showOwner();
-		}		
+		HoloText.showOwnerTagsOnPlayerMove(event);
 	}
 
 	public void worldChange(World worldFrom){
