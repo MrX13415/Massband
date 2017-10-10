@@ -52,7 +52,7 @@ public class Marker {
 	private String text_axis_X           = "§cX";                        // 
 	private String text_axis_Y           = "§aY";                        // 
 	private String text_axis_Z           = "§9Z";                        // 
-	
+
 	private ArrayList<HoloText> markerList = new ArrayList<>();
 	private ArrayList<Block> blockList = new ArrayList<>();
 	private ArrayList<BlockFace> faceList = new ArrayList<>();
@@ -356,15 +356,7 @@ public class Marker {
 				
 				out = String.format(format, index, value, strArea);
 			}
-			
-//			for (Entity entity : holotext.getFirstEntity().getNearbyEntities(10, 10, 10)) {
-//				if (!(entity instanceof Player)) continue;
-//				if (entity.getEntityId() == player.getEntityId()) continue;
-//				
-//				out = String.format("§7%1$s§0\n%2$s", player.getName(), out);
-//				break;
-//			}
-			
+						
 			holotext.setText(out);
 			holotext.show();
 			

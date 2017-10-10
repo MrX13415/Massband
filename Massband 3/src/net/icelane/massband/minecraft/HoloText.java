@@ -1,6 +1,7 @@
 package net.icelane.massband.minecraft;
 
 import java.util.ArrayList;
+import java.util.List;
 
 import org.bukkit.Chunk;
 import org.bukkit.Location;
@@ -11,6 +12,7 @@ import org.bukkit.entity.ArmorStand;
 import org.bukkit.entity.Entity;
 import org.bukkit.entity.EntityType;
 import org.bukkit.entity.Player;
+import org.bukkit.event.player.PlayerMoveEvent;
 import org.bukkit.event.player.PlayerTeleportEvent.TeleportCause;
 import org.bukkit.metadata.FixedMetadataValue;
 import org.bukkit.metadata.MetadataValue;
@@ -20,6 +22,7 @@ import org.bukkit.util.Vector;
 
 import net.icelane.massband.Server;
 import net.icelane.massband.config.configs.Config;
+import net.icelane.massband.core.Marker;
 
 public class HoloText {
 	
@@ -32,10 +35,12 @@ public class HoloText {
 	private static long defaultOwnerHideTicks = 20L * 3; //ticks (20 tick => 1 sec)
 	private static long defaultOwnerShowDelayTicks = 10L; //ticks (1 tick => 50 ms)
 
+	private static Plugin plugin;
+	
+	private	static long ownerTags_LastRun;
+	
 	private String format_ownerName = "§o§8%s";
 	
-	private static Plugin plugin;
-
 	private Player player;
 	private Location location;
 	private String text;
@@ -436,6 +441,34 @@ public class HoloText {
 		scheduleHideTask(autohideticks);
 		
 		return true;
+	}
+	
+	public static void showOwnerTagsOnPlayerMove(PlayerMoveEvent event){
+		// owner tags are disabled!
+		if (!Config.marker_showOwnerTags.get()) return;
+		
+		// run only 4 times per second ...
+		if (System.currentTimeMillis() - ownerTags_LastRun < 250) return;
+		ownerTags_LastRun = System.currentTimeMillis(); 
+		
+		List<Entity> nearby = event.getPlayer().getNearbyEntities(10, 10, 10);
+
+		for (Entity entity : nearby) {		
+			// check for ArmorStand ...
+			if (!(entity instanceof ArmorStand)) continue;
+			
+			// check of Massband marker ...
+			MetadataValue objectType = HoloText.getMetadata(plugin, entity, HoloText.metadata_Identifier);
+			if (objectType == null || !objectType.asString().equals(Marker.Metadata_Identifier)) continue;
+
+			// get the HoloText object it belongs to ...
+			MetadataValue hlobject = HoloText.getMetadata(plugin, entity, HoloText.metadata_Object);
+			if (hlobject == null || !(hlobject.value() instanceof HoloText)) continue;
+
+			HoloText marker = (HoloText) hlobject.value();
+			// show the owner tag if the player is not the owner itself.
+			if (!marker.isOwner(event.getPlayer())) marker.showOwner();
+		}		
 	}
 	
 	private boolean isOwnerEntity(Entity entity) {

@@ -22,4 +22,5 @@ public class EntityEvents implements Listener {
 		Massband obj = Massband.get((Player) event.getEntity());
 		if (obj != null) obj.getInteract().itemPickup((Player) event.getEntity(), event.getItem().getItemStack());
 	}
+	
 }
