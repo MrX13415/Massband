@@ -18,7 +18,7 @@ public class Massband_ResetCommand extends CommandBase{
 	public void initialize() {
 		setAliases("rst");
 		setDescription("Resets your settings to default.");
-		setPermissionNode("reset");
+		setPermission("massband.command.reset", true);
 		setInGameOnly(true);
 	}
 

@@ -23,7 +23,7 @@ public class Massband_ModeCommand extends CommandBase{
 		setHelp("§7Set measuring mode to be used. Available modes:"
 				+ "\n   §71: §cblocks    §7Measurs block distance in X or Y direction or 45 degrees diagonal."
 				+ "\n   §72: §cvectors   §7Measures the vector distance between the center points of blocks.");
-		setPermissionNode("mode");
+		setPermission("massband.command.mode", true);
 		setUsage("[blocks|vectors]");
 		setInGameOnly(true);
 		setTabList("blocks", "vectors");

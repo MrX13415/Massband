@@ -17,7 +17,7 @@ public class Massband_InfoCommand extends CommandBase{
 	public void initialize() {
 		setAliases("i");
 		setDescription("Provides info");
-		setPermissionNode("info");
+		setPermission("massband.command.info", true);
 	}
 
 	@Override

@@ -18,7 +18,7 @@ public class Massband_NoLimitCommand extends CommandBase{
 	public void initialize() {
 		setAliases("unlimited", "nolimit", "nol", "nl");
 		setDescription("Set the number of markers to be placed to unlimited.");
-		setPermissionNode("count");
+		setPermission("massband.command.count", true);
 		setInGameOnly(true);
 	}
 

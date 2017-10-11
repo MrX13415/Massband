@@ -18,7 +18,7 @@ public class Massband_CountCommand extends CommandBase{
 	public void initialize() {
 		setAliases("markers", "cnt", "c");
 		setDescription("Set the number of markers to be placed. Set to -1 for no Limit.");
-		setPermissionNode("count");
+		setPermission("massband.command.count", true);
 		setUsage("<marker count>");
 		setInGameOnly(true);
 		setTabList("10", "1", "-1");

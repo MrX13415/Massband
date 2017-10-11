@@ -18,7 +18,7 @@ public class Massband_SettingsCommand extends CommandBase{
 	public void initialize() {
 		setAliases("setting", "set");
 		setDescription("Change various settings for you personal.");
-		setPermissionNode("settings");
+		setPermission("massband.command.settings", true);
 		setInGameOnly(true);
 	}
 

@@ -18,7 +18,7 @@ public class Massband_LimitCommand extends CommandBase{
 	public void initialize() {
 		setAliases("limited", "limit", "lm");
 		setDescription("Set the number of markers to be placed to 1.");
-		setPermissionNode("count");
+		setPermission("massband.command.count", true);
 		setInGameOnly(true);
 	}
 

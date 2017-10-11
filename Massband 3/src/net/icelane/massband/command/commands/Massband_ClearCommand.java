@@ -18,7 +18,7 @@ public class Massband_ClearCommand extends CommandBase{
 	public void initialize() {
 		setAliases("clr", "remove");
 		setDescription("Removes all markers");
-		setPermissionNode("clear");
+		setPermission("massband.command.clear", true);
 		setInGameOnly(true);
 	}
 

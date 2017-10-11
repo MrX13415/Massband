@@ -18,16 +18,29 @@ public class Massband_DebugCommand extends CommandBase{
 	public void initialize() {
 		setAliases("debug");
 		setDescription("Debug command. peep bop.");
-		setOpOnly(true);
+		setPermission("massband.debug", false);
 	}
 
 	@Override
 	public boolean command(CommandSender sender, Command cmd, String label, String[] args) {
-		return true;
+		if (args.length == 1){
+			if (args[0].equalsIgnoreCase("true") || args[0].equalsIgnoreCase("1")){
+				Massband.setDebug(true);
+				if (sender instanceof Player) sender.sendMessage("§c(i) §6Debug enabled");
+			}else{
+				Massband.setDebug(false);
+				if (sender instanceof Player) sender.sendMessage("§c(i) §6Debug disabled");
+			}
+			return true;
+		}
+				
+		return false;
 	}
 
 	@Override
 	public boolean command(Player player, Command cmd, String label, String[] args) {
+		//command(player, cmd, label, args);
+		
 		//Massband obj = Massband.get(player);
 
 		//obj.getMarkers(player.getWorld()).setMaxCount(1);
