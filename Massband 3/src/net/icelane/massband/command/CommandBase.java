@@ -153,19 +153,21 @@ public abstract class CommandBase implements TabExecutor{
 		pluginCommand.setExecutor(this);
 		pluginCommand.setUsage(usage);
 		pluginCommand.setDescription(description);
-		//pluginCommand.setPermission("");
-		
+
 		initCommandPermission();
 	}
 	
 	private void initCommandPermission() {
 		if (getPermission() == null) return;
 		
-//		org.bukkit.permissions.Permission p = Bukkit.getPluginManager().getPermission(getPermission().getFullPermission());
-//		if (p != null) {
-//			p.setDefault(getPermission().getDefaultValue());
-//		}else {
-//			Bukkit.getPluginManager().addPermission(getPermission().getPermission());	
+		// add the permission if its not already known to the server.
+		if (Bukkit.getPluginManager().getPermission(getPermission().getName()) == null)
+			Bukkit.getPluginManager().addPermission(getPermission());	
+		
+		//TODO: add wildcard permission if command has subcommands
+//		if (parent != null && parent.getPermission() != null) {
+//			getPermission().addParent(parent.getPermission(),
+//					getPermission().getDefault() == PermissionDefault.TRUE || getPermission().getDefault() == PermissionDefault.NOT_OP);
 //		}
 	}
 	
@@ -178,18 +180,18 @@ public abstract class CommandBase implements TabExecutor{
 		if (!plugin.getDescription().getCommands().containsKey(getName())) return;
 		Map<String, Object> command = Plugin.get().getDescription().getCommands().get(getName());
 
-//TODO required?
-//		if (command.containsKey("description"))
-//			setDescription((String) command.get("description"));
-//		
-//		if (command.containsKey("aliases"))
-//			setAliases(((ImmutableList<?>) command.get("aliases")).toArray(new String[0]));
-//
-//		if (command.containsKey("permission"))
-//			setPermission((String) command.get("permission"));
-//		
-//		if (command.containsKey("usage"))
-//			setUsage((String) command.get("usage"));
+//TODO improve!
+		if (command.containsKey("description"))
+			setDescription((String) command.get("description"));
+		
+		if (command.containsKey("aliases"))
+			setAliases(((ImmutableList<?>) command.get("aliases")).toArray(new String[0]));
+
+		if (command.containsKey("permission"))
+			setPermission((String) command.get("permission"), true);
+		
+		if (command.containsKey("usage"))
+			setUsage((String) command.get("usage"));
 	}
 	
 	/**
