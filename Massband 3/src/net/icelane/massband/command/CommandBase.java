@@ -12,6 +12,7 @@ import org.bukkit.command.CommandSender;
 import org.bukkit.command.PluginCommand;
 import org.bukkit.command.TabExecutor;
 import org.bukkit.entity.Player;
+import org.bukkit.permissions.Permission;
 import org.bukkit.permissions.PermissionDefault;
 
 import com.google.common.collect.ImmutableList;
@@ -59,10 +60,8 @@ public abstract class CommandBase implements TabExecutor{
 	protected String help           = "";
 	protected String usage          = "";
 	protected Permission permission = null;
-	protected boolean isNode        = false;
 	protected boolean op            = false;
 	protected boolean opOnly        = false;
-	//protected boolean explicit      = false; // Permission has to be set explicit. Excluded from wildcard.
 	protected boolean inGameOnly    = false;
 	protected Visibility visibility = Visibility.Permission;
 	protected String[] tabList      = {};
@@ -137,7 +136,7 @@ public abstract class CommandBase implements TabExecutor{
 			cmd.setname(cmd.name());
 			cmd.setupCommandDefinition();
 			cmd.initialize(); 
-			cmd.buildPermission();
+			//cmd.buildPermission();
 			cmd.initPluginCommand();
 			return cmd;
 			
@@ -162,12 +161,12 @@ public abstract class CommandBase implements TabExecutor{
 	private void initCommandPermission() {
 		if (getPermission() == null) return;
 		
-		org.bukkit.permissions.Permission p = Bukkit.getPluginManager().getPermission(getPermission().getFullPermission());
-		if (p != null) {
-			p.setDefault(getPermission().getDefaultValue());
-		}else {
-			Bukkit.getPluginManager().addPermission(getPermission().getPermission());	
-		}
+//		org.bukkit.permissions.Permission p = Bukkit.getPluginManager().getPermission(getPermission().getFullPermission());
+//		if (p != null) {
+//			p.setDefault(getPermission().getDefaultValue());
+//		}else {
+//			Bukkit.getPluginManager().addPermission(getPermission().getPermission());	
+//		}
 	}
 	
 	/**
@@ -178,18 +177,19 @@ public abstract class CommandBase implements TabExecutor{
 		Plugin plugin = Plugin.get();
 		if (!plugin.getDescription().getCommands().containsKey(getName())) return;
 		Map<String, Object> command = Plugin.get().getDescription().getCommands().get(getName());
-		
-		if (command.containsKey("description"))
-			setDescription((String) command.get("description"));
-		
-		if (command.containsKey("aliases"))
-			setAliases(((ImmutableList<?>) command.get("aliases")).toArray(new String[0]));
 
+//TODO required?
+//		if (command.containsKey("description"))
+//			setDescription((String) command.get("description"));
+//		
+//		if (command.containsKey("aliases"))
+//			setAliases(((ImmutableList<?>) command.get("aliases")).toArray(new String[0]));
+//
 //		if (command.containsKey("permission"))
-//			setPermissionNode((String) command.get("permission"));
-		
-		if (command.containsKey("usage"))
-			setUsage((String) command.get("usage"));
+//			setPermission((String) command.get("permission"));
+//		
+//		if (command.containsKey("usage"))
+//			setUsage((String) command.get("usage"));
 	}
 	
 	/**
@@ -232,66 +232,66 @@ public abstract class CommandBase implements TabExecutor{
 			return ( this.op ? sender.isOp() : true );
 		}
 		
-		if (sender.hasPermission(getPermission().getFullPermission())) return true;
+		return sender.hasPermission(getPermission());
 		
 		// This permission is also granted if the sender has a wildcard permission of a parent command.
 		//if (!this.explicit) {
-		return hasAsteriskPermission(sender);
+		//return hasAsteriskPermission(sender);
 		//}
 		
 		//return false;
 	}
 	
-	/**
-	 * Recursively checks if the <code>CommandSender</code> object provided, has a wild card permission.
-	 * First we check if there is a wildcard permission of our own permission.
-	 * If not, we check if the permission of the next parent command is present and so on. 
-	 * @param sender An instance of class <code>CommandSender</code>
-	 * @return <code>true</code> if the given <code>CommandSender</code> object has a wildcard permission.
-	 */
-	protected boolean hasAsteriskPermission(CommandSender sender){
-		Permission permission = new Permission(Permission.Asterisk, PermissionDefault.FALSE);
-		permission.setParent(getPermission());
-		permission = buildPermission(permission);
-
-		if (sender.hasPermission(permission.getFullPermission())) return true;
-		if (parent == null) return false;
-		
-		return parent.hasAsteriskPermission(sender);
-	}
+//	/**
+//	 * Recursively checks if the <code>CommandSender</code> object provided, has a wild card permission.
+//	 * First we check if there is a wildcard permission of our own permission.
+//	 * If not, we check if the permission of the next parent command is present and so on. 
+//	 * @param sender An instance of class <code>CommandSender</code>
+//	 * @return <code>true</code> if the given <code>CommandSender</code> object has a wildcard permission.
+//	 */
+//	protected boolean hasAsteriskPermission(CommandSender sender){
+//		Permission permission = new Permission(Permission.Asterisk, PermissionDefault.FALSE);
+//		permission.setParent(getPermission());
+//		permission = buildPermission(permission);
+//
+//		if (sender.hasPermission(permission.getFullPermission())) return true;
+//		if (parent == null) return false;
+//		
+//		return parent.hasAsteriskPermission(sender);
+//	}
 	
-	/**
-	 * Rebuild the permission object of this command object based the <code>permissionNode</code> field of this and all parent commands.
-	 * @return The builded Permission object which as been set to this command.
-	 */
-	public Permission buildPermission(){
-		if (!isNode) return permission;
-		permission = buildPermission(new Permission(getPermission()));
-		return permission;
-	}
+//	/**
+//	 * Rebuild the permission object of this command object based the <code>permissionNode</code> field of this and all parent commands.
+//	 * @return The builded Permission object which as been set to this command.
+//	 */
+//	public Permission buildPermission(){
+//		if (!isNode) return permission;
+//		permission = buildPermission(new Permission(getPermission()));
+//		return permission;
+//	}
 
 	/**
 	 * Build a permission object using the given node as base and the <code>permissionNode</code> field all parent commands.
 	 * @return The builded Permission object.
 	 */
-	protected Permission buildPermission(Permission node){
-		CommandBase parent = getParent();
-		Permission permission = node;
-				
-		while (parent != null) {
-			Permission parentNode = new Permission(parent.getPermission());
-			
-			if (permission.getNode().isEmpty()) {
-				permission = parentNode;
-			}else {
-				permission.setParent(parentNode);	
-			}
-			
-			parent = parent.getParent();  // next
-		}
-		
-		return permission;
-	}
+//	protected Permission buildPermission(Permission node){
+//		CommandBase parent = getParent();
+//		Permission permission = node;
+//				
+//		while (parent != null) {
+//			Permission parentNode = new Permission(parent.getPermission());
+//			
+//			if (permission.getNode().isEmpty()) {
+//				permission = parentNode;
+//			}else {
+//				permission.setParent(parentNode);	
+//			}
+//			
+//			parent = parent.getParent();  // next
+//		}
+//		
+//		return permission;
+//	}
 	
 	/**
 	 * Returns a list of all matching sub commands and defined tab values for the given argument.
@@ -427,7 +427,7 @@ public abstract class CommandBase implements TabExecutor{
 			cmd.setParent(this);
 			this.commands.add(cmd);
 			//TODO improve permission
-			cmd.buildPermission();
+			//cmd.buildPermission();
 			cmd.initCommandPermission();
 			
 		} catch (InstantiationException e) {
@@ -488,11 +488,7 @@ public abstract class CommandBase implements TabExecutor{
 	public Permission getPermission(){
 		return permission;
 	}
-	
-	public String getPermissionNode(){
-		return permission.getNode();
-	}
-	
+		
 	public String[] getTabList() {
 		return tabList;
 	}
@@ -521,24 +517,18 @@ public abstract class CommandBase implements TabExecutor{
 		this.usage = usage;
 	}
 		
-	public void setPermission(String permission){
-		setPermission(permission, PermissionDefault.FALSE);
+	public void setPermission(String permission, boolean defaultValue){
+		setPermission(permission, defaultValue ? PermissionDefault.TRUE : PermissionDefault.FALSE);
 	}
 	
 	public void setPermission(String permission, PermissionDefault defaultValue){
-		setPermissionNode(permission, defaultValue);
-		isNode = false;
+		setPermission(new Permission(permission, defaultValue));
 	}
 	
-	public void setPermissionNode(String permissionNode){
-		setPermissionNode(permissionNode, PermissionDefault.FALSE);
+	public void setPermission(Permission permission){
+		this.permission = permission;
 	}
-	
-	public void setPermissionNode(String permissionNode, PermissionDefault defaultValue){
-		this.permission = new Permission(permissionNode, defaultValue);
-		isNode = true;
-	}
-	
+
 	public void setTabList(String...tabValue){
 		tabList = tabValue;
 	}
