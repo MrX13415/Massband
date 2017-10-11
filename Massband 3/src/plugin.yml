@@ -10,7 +10,15 @@ commands:
   massband:
     aliases: [mb]
     description: Manage Massband
-    permission:
-      massband.command      
+    permission: massband.command      
     usage: |
            /<command> [command]
+
+permissions:
+  massband.*:
+     description: Gives access to all Massband commands
+     children:
+       massband.command: true
+  massband.command:
+     description: Massband
+     default: false

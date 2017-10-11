@@ -4,8 +4,8 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Comparator;
 import java.util.List;
-import java.util.Map;
 
+import org.apache.commons.lang.StringUtils;
 import org.bukkit.Bukkit;
 import org.bukkit.command.Command;
 import org.bukkit.command.CommandSender;
@@ -15,14 +15,12 @@ import org.bukkit.entity.Player;
 import org.bukkit.permissions.Permission;
 import org.bukkit.permissions.PermissionDefault;
 
-import com.google.common.collect.ImmutableList;
-
 import net.icelane.massband.Plugin;
 
 /**
  * Abstract API for easy command implementation in Bukkit.
  * @author MrX13415
- * @version 2.1
+ * @version 2.2
  */
 public abstract class CommandBase implements TabExecutor{
 
@@ -134,7 +132,7 @@ public abstract class CommandBase implements TabExecutor{
 			// register and init the given class as command
 			CommandBase cmd = (CommandBase) cmdClass.newInstance();
 			cmd.setname(cmd.name());
-			cmd.setupCommandDefinition();
+//			cmd.setupCommandDefinition();
 			cmd.initialize(); 
 			//cmd.buildPermission();
 			cmd.initPluginCommand();
@@ -148,51 +146,77 @@ public abstract class CommandBase implements TabExecutor{
 	}
 	
 	private void initPluginCommand(){
+		
 		pluginCommand = Plugin.get().getCommand(name);
-		pluginCommand.setAliases(Arrays.asList(aliases));
 		pluginCommand.setExecutor(this);
-		pluginCommand.setUsage(usage);
-		pluginCommand.setDescription(description);
-
-		initCommandPermission();
-	}
-	
-	private void initCommandPermission() {
-		if (getPermission() == null) return;
+		
+		if (pluginCommand.getAliases().isEmpty())
+			pluginCommand.setAliases(Arrays.asList(aliases));
+		
+		if (StringUtils.isEmpty(pluginCommand.getDescription()))
+			pluginCommand.setDescription(description);
+		else description = pluginCommand.getDescription();
+		
+		if (StringUtils.isEmpty(pluginCommand.getUsage()))
+			pluginCommand.setUsage(usage);
+		else usage = pluginCommand.getUsage();
+		
+		String permStr = pluginCommand.getPermission();
+		permission = Bukkit.getPluginManager().getPermission(permStr);
 		
 		// add the permission if its not already known to the server.
-		if (Bukkit.getPluginManager().getPermission(getPermission().getName()) == null)
-			Bukkit.getPluginManager().addPermission(getPermission());	
+		if (permission == null) {
+			permission = new Permission(permStr, PermissionDefault.FALSE);
+			Bukkit.getPluginManager().addPermission(permission);	
+		}
 		
-		//TODO: add wildcard permission if command has subcommands
-//		if (parent != null && parent.getPermission() != null) {
-//			getPermission().addParent(parent.getPermission(),
-//					getPermission().getDefault() == PermissionDefault.TRUE || getPermission().getDefault() == PermissionDefault.NOT_OP);
-//		}
+		if (StringUtils.isEmpty(pluginCommand.getPermissionMessage()))
+			pluginCommand.setPermissionMessage(CommandText.getPermissionDenied(this));
+		
+		if (hasSubCommands()) {
+			Permission wildcardPermission = new Permission(String.format("%s.*", permStr), PermissionDefault.FALSE); 
+			//TODO: add description and such...
+		
+			// add root permission ...
+			wildcardPermission.getChildren().put(
+					permStr,
+					permission.getDefault() == PermissionDefault.TRUE);
+			
+			// add all sub command permissions ...
+			for (CommandBase cmd : commands) {
+				wildcardPermission.getChildren().put(
+						cmd.getPermission().getName(),
+						cmd.getPermission().getDefault() == PermissionDefault.TRUE);
+			}
+			
+			wildcardPermission.recalculatePermissibles();
+			
+			if (Bukkit.getPluginManager().getPermission(wildcardPermission.getName()) == null) 
+				Bukkit.getPluginManager().addPermission(wildcardPermission);
+		}
 	}
 	
-	/**
-	 * Reads any command settings defined in the <code>plugin.yml</code> for this command name and sets them.
-	 * Settings not defined in the <code>plugin.yml</code> won't be changed.
-	 */
-	public void setupCommandDefinition(){
-		Plugin plugin = Plugin.get();
-		if (!plugin.getDescription().getCommands().containsKey(getName())) return;
-		Map<String, Object> command = Plugin.get().getDescription().getCommands().get(getName());
-
-//TODO improve!
-		if (command.containsKey("description"))
-			setDescription((String) command.get("description"));
-		
-		if (command.containsKey("aliases"))
-			setAliases(((ImmutableList<?>) command.get("aliases")).toArray(new String[0]));
-
-		if (command.containsKey("permission"))
-			setPermission((String) command.get("permission"), true);
-		
-		if (command.containsKey("usage"))
-			setUsage((String) command.get("usage"));
-	}
+//	/**
+//	 * Reads any command settings defined in the <code>plugin.yml</code> for this command name and sets them.
+//	 * Settings not defined in the <code>plugin.yml</code> won't be changed.
+//	 */
+//	public void setupCommandDefinition(){
+//		Plugin plugin = Plugin.get();
+//		if (!plugin.getDescription().getCommands().containsKey(getName())) return;
+//		Map<String, Object> command = Plugin.get().getDescription().getCommands().get(getName());
+//
+//		if (command.containsKey("description"))
+//			setDescription((String) command.get("description"));
+//		
+//		if (command.containsKey("aliases"))
+//			setAliases(((ImmutableList<?>) command.get("aliases")).toArray(new String[0]));
+//
+//		if (command.containsKey("permission"))
+//			setPermission((String) command.get("permission"), true);
+//		
+//		if (command.containsKey("usage"))
+//			setUsage((String) command.get("usage"));
+//	}
 	
 	/**
 	 * Whether the given <code>CommandSender</code> object is a player.
@@ -226,14 +250,14 @@ public abstract class CommandBase implements TabExecutor{
 	 * @return <code>true</code> if the given <code>CommandSender</code> object has use permissions.
 	 */
 	public boolean hasPermission(CommandSender sender){
-		//TODO Wildcard permission and disallowed permission not working together.
 		Plugin plugin = Plugin.get();
 		
 		// advanced permissions arn't available ...
 		if (!plugin.isPermissionsEnabled() || this.opOnly ) {
 			return ( this.op ? sender.isOp() : true );
 		}
-		
+	
+		if (getPermission() == null) return true;
 		return sender.hasPermission(getPermission());
 		
 		// This permission is also granted if the sender has a wildcard permission of a parent command.
@@ -424,19 +448,26 @@ public abstract class CommandBase implements TabExecutor{
 			// init the given class as sub command
 			CommandBase cmd = (CommandBase) cmdClass.newInstance();
 			cmd.setname(cmd.name());
-			cmd.setupCommandDefinition();
+//			cmd.setupCommandDefinition();
 			cmd.initialize(); 
 			cmd.setParent(this);
 			this.commands.add(cmd);
-			//TODO improve permission
 			//cmd.buildPermission();
-			cmd.initCommandPermission();
+			//cmd.initCommandPermission();
 			
 		} catch (InstantiationException e) {
 			throw new RuntimeException("Unable to register the provied class as sub command.");
 		} catch (IllegalAccessException e) {
 			throw new RuntimeException("Unable to register the provied class as sub command.");
 		}
+	}
+	
+	public boolean isSubCommands() {
+		return parent != null;
+	}
+	
+	public boolean hasSubCommands() {
+		return commands.size() > 0;
 	}
 	
 	public ArrayList<CommandBase> getCommands() {

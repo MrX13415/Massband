@@ -76,7 +76,7 @@ Effects:
 		
 		// define permission
 		if ( Plugin.get().isPermissionsEnabled() && command.getPermission() != null && !command.isOpOnly()){
-			out_perm = String.format(format_perm, command.getPermission());
+			out_perm = String.format(format_perm, command.getPermission().getName());
 		}
 				
 		// define usage
@@ -121,8 +121,14 @@ Effects:
 			parent  = parent.getParent();
 		}
 		
+		// permission
+		String out_perm = command.isOP() ? "OP" : "";
+		if ( Plugin.get().isPermissionsEnabled() && command.getPermission() != null && !command.isOpOnly()){
+			out_perm = command.getPermission().getName();
+		}
+				
 		// define header and basic output
-		String out_header = String.format(format_header, parents, label, command.isOpOnly() ? "OP" : command.getPermission());
+		String out_header = String.format(format_header, parents, label, out_perm);
 
 		return out_header;
 	}
