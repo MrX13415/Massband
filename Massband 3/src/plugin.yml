@@ -10,5 +10,7 @@ commands:
   massband:
     aliases: [mb]
     description: Manage Massband
+    permission:
+      massband.command      
     usage: |
            /<command> [command]
