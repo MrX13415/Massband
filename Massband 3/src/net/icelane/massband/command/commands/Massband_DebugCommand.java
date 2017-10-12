@@ -4,6 +4,7 @@ import org.bukkit.command.Command;
 import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
 
+import net.icelane.massband.Plugin;
 import net.icelane.massband.command.CommandBase;
 import net.icelane.massband.core.Massband;
 
@@ -33,7 +34,17 @@ public class Massband_DebugCommand extends CommandBase{
 			}
 			return true;
 		}
-				
+		
+		if (Massband.isDebug() && sender.isOp() && args.length == 2 && args[0].equalsIgnoreCase("_permission")){
+			Plugin.get().setPermissionsEnabled(args[1].equalsIgnoreCase("true") || args[1].equalsIgnoreCase("1"));
+			if (Plugin.get().isPermissionsEnabled())
+				sender.sendMessage("§aDebug: /!\\ §6Permissions enabled");
+			else
+				sender.sendMessage("§cDebug: /!\\ §6Permissions disabled!");
+			
+			return true;
+		}
+		
 		return false;
 	}
 
