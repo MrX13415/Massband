@@ -5,6 +5,7 @@ import org.bukkit.permissions.Permission;
 import org.bukkit.permissions.PermissionDefault;
 
 import net.icelane.massband.Plugin;
+import net.icelane.massband.core.Massband;
 
 public class CommandText {
 
@@ -62,9 +63,9 @@ Effects:
 		// command info
 		String label   = command.getName();
 		String aliases = command.getAliasesString();
-		String usage   = command.getUsage();
-		String desc    = command.getDescription();
-		String help    = command.getHelp();
+		String usage   = command.getUsage().trim();
+		String desc    = command.getDescription().trim();
+		String help    = command.getHelp().trim();
 		 
 		// get list of parent commands
 		String parents = "";
@@ -112,14 +113,15 @@ Effects:
 				if (sender == null) break;
 				// if we don't have the permission, skip it ...
 				if (!cmd.hasPermission(sender)) continue;
+				if (cmd.debugRequired && !Massband.isDebug()) continue;
 				break;
 			default: break;
 			}
 			
 			out_args += String.format(format_cmd, cmd.getName(), cmd.getUsage(), cmd.getDescription());
-			
 			if (command.getCommands().size() - command.getCommands().indexOf(cmd) > 1) out_args += "\n";
 		}
+		if (!out_args.isEmpty()) out_args = "\n" + out_args;
 		
 		return out_header + out_desc + out_perm + out_usage + out_args;
 	}
