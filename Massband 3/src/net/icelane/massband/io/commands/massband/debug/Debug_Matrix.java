@@ -32,7 +32,7 @@ public class Debug_Matrix extends CommandBase{
 	public void initialize() {
 		setDescription("Create matrix of markers.");
 		setUsage("<dx> <dy> <y>");
-		setPermission("massband.debug.matrix", false);
+		setPermission("massband.debug.matrix", true);
 		setInGameOnly(true);
 		setDebugRequired(true);
 	}
