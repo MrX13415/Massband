@@ -1,12 +1,12 @@
-package net.icelane.massband.command.commands;
+package net.icelane.massband.io.commands.massband;
 
 import org.bukkit.command.Command;
 import org.bukkit.command.CommandSender;
 
 import net.icelane.massband.Plugin;
-import net.icelane.massband.command.CommandBase;
+import net.icelane.massband.io.CommandBase;
 
-public class Massband_InfoCommand extends CommandBase{
+public class Massband_Info extends CommandBase{
 
 	@Override
 	public String name() {

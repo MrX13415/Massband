@@ -1,24 +1,24 @@
-package net.icelane.massband.command.commands;
+package net.icelane.massband.io.commands.massband;
 
 import org.bukkit.command.Command;
 import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
 
-import net.icelane.massband.command.CommandBase;
 import net.icelane.massband.core.Massband;
+import net.icelane.massband.io.CommandBase;
 
-public class Massband_SettingsCommand extends CommandBase{
+public class Massband_Limit extends CommandBase{
 
 	@Override
 	public String name() {
-		return "settings";
+		return "limit";
 	}
 	
 	@Override
 	public void initialize() {
-		setAliases("setting", "set");
-		setDescription("Change various settings for you personal.");
-		setPermission("massband.command.settings", true);
+		setAliases("limited", "limit", "lm");
+		setDescription("Set the number of markers to be placed to 1.");
+		setPermission("massband.command.count", true);
 		setInGameOnly(true);
 	}
 

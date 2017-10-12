@@ -1,15 +1,15 @@
-package net.icelane.massband.command.commands;
+package net.icelane.massband.io.commands.massband;
 
 import org.bukkit.command.Command;
 import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
 
-import net.icelane.massband.command.CommandBase;
 import net.icelane.massband.core.Marker;
 import net.icelane.massband.core.Marker.MeasureMode;
+import net.icelane.massband.io.CommandBase;
 import net.icelane.massband.core.Massband;
 
-public class Massband_ModeCommand extends CommandBase{
+public class Massband_Mode extends CommandBase{
 
 	@Override
 	public String name() {

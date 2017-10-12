@@ -1,24 +1,24 @@
-package net.icelane.massband.command.commands;
+package net.icelane.massband.io.commands.massband;
 
 import org.bukkit.command.Command;
 import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
 
-import net.icelane.massband.command.CommandBase;
 import net.icelane.massband.core.Massband;
+import net.icelane.massband.io.CommandBase;
 
-public class Massband_ResetCommand extends CommandBase{
+public class Massband_Clear extends CommandBase{
 
 	@Override
 	public String name() {
-		return "reset";
+		return "clear";
 	}
 	
 	@Override
 	public void initialize() {
-		setAliases("rst");
-		setDescription("Resets your settings to default.");
-		setPermission("massband.command.reset", true);
+		setAliases("clr", "remove");
+		setDescription("Removes all markers");
+		setPermission("massband.command.clear", true);
 		setInGameOnly(true);
 	}
 
@@ -31,9 +31,9 @@ public class Massband_ResetCommand extends CommandBase{
 	public boolean command(Player player, Command cmd, String label, String[] args) {
 		Massband obj = Massband.get(player);
 		
-		obj.reset();
+		obj.getMarkers(player.getWorld()).removeAll();
 		
-		player.sendMessage("§Settings have been reset to default");
+		player.sendMessage("§7All markers have been removed");
 		
 		return true;
 	}

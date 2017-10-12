@@ -5,12 +5,12 @@ import java.util.logging.Logger;
 
 import org.bukkit.plugin.java.JavaPlugin;
 
-import net.icelane.massband.command.CommandBase;
-import net.icelane.massband.command.commands.MassbandCommand;
 import net.icelane.massband.event.EntityEvents;
 import net.icelane.massband.event.InventoryEvents;
 import net.icelane.massband.event.PlayerEvents;
 import net.icelane.massband.event.WorldEvents;
+import net.icelane.massband.io.CommandBase;
+import net.icelane.massband.io.commands.MassbandCommand;
 
 public abstract class Server {
 
