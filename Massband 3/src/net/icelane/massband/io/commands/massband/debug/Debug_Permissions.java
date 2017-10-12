@@ -5,6 +5,7 @@ import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
 
 import net.icelane.massband.Plugin;
+import net.icelane.massband.Server;
 import net.icelane.massband.io.CommandBase;
 
 public class Debug_Permissions extends CommandBase{
@@ -19,18 +20,21 @@ public class Debug_Permissions extends CommandBase{
 		setAliases("permission", "perm");
 		setDescription("Enable/Disable Permissions for Massband.");
 		setUsage("[true|false]");
-		setPermission("massband.debug.permission", false);
+		setPermission("massband.debug.permission", true);
 		setDebugRequired(true);
 	}
 
 	@Override
 	public boolean command(CommandSender sender, Command cmd, String label, String[] args) {	
 		if (args.length == 1){
+			// enable or disable permissions ...
 			Plugin.get().setPermissionsEnabled(args[0].equalsIgnoreCase("true") || args[0].equalsIgnoreCase("1"));
+			Server.logger().warning("Permissions " + (Plugin.get().isPermissionsEnabled() ? "enabled" : "disabled!"));
+			
 			if (Plugin.get().isPermissionsEnabled())
-				sender.sendMessage("§cDebug: §6/!\\ §aPermissions enabled");
+				if (sender instanceof Player) sender.sendMessage("§cDebug: §6/!\\ §aPermissions enabled");
 			else
-				sender.sendMessage("§cDebug: §6/!\\ §cPermissions disabled!");
+				if (sender instanceof Player) sender.sendMessage("§cDebug: §6/!\\ §cPermissions disabled!");
 			
 			return true;
 		}
