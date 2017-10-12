@@ -6,6 +6,8 @@ import org.bukkit.entity.Player;
 
 import net.icelane.massband.core.Massband;
 import net.icelane.massband.io.CommandBase;
+import net.icelane.massband.io.commands.massband.debug.Debug_Matrix;
+import net.icelane.massband.io.commands.massband.debug.Debug_Permissions;
 
 public class Massband_Debug extends CommandBase{
 
@@ -20,6 +22,9 @@ public class Massband_Debug extends CommandBase{
 		setDescription("Debug command. peep bop.");
 		setUsage("[true|false]");
 		setPermission("massband.debug", false);
+		
+		addCommand(Debug_Matrix.class);
+		addCommand(Debug_Permissions.class);
 	}
 
 	@Override
