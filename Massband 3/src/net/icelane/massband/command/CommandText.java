@@ -1,6 +1,8 @@
 package net.icelane.massband.command;
 
 import org.bukkit.command.CommandSender;
+import org.bukkit.permissions.Permission;
+import org.bukkit.permissions.PermissionDefault;
 
 import net.icelane.massband.Plugin;
 
@@ -69,7 +71,7 @@ Effects:
 		// define header and basic output
 		String out_header = String.format(format_header, parents, label, aliases);
 		String out_desc   = String.format(format_desc, desc);
-		String out_perm   = command.isOP() ? String.format(format_perm, "OP") : "";
+		String out_perm   = "";
 		String out_usage  = (command.getCommands().size() > 0) ? String.format(format_usage, "<command>") : "";
 		String out_args   = "";
 
@@ -79,8 +81,14 @@ Effects:
 		}
 		
 		// define permission
-		if ( Plugin.get().isPermissionsEnabled() && command.getPermission() != null && !command.isOpOnly()){
-			out_perm = String.format(format_perm, command.getPermission().getName());
+		if ( command.getPermission() != null){
+			if (Plugin.get().isPermissionsEnabled()) {
+				out_perm = String.format(format_perm, command.getPermission().getName());	
+			}
+			else if (command.getPermission().getDefault() == PermissionDefault.FALSE ||
+					command.getPermission().getDefault() == PermissionDefault.OP) {
+				out_perm = String.format(format_perm, "OP");
+			}
 		}
 				
 		// define usage
@@ -110,25 +118,44 @@ Effects:
 		return out_header + out_desc + out_perm + out_usage + out_args;
 	}
 	
-	public static String getPermissionDenied(CommandBase command){
-		// output formats 
-		String format_header = "§cDENIED §aCommand: /%s§c%s §aPermission: §c%s";
-		
-		// command info
-		String label   = command.getName();
-	
-		// get list of parent commands
+	public static String getFullCommandName(CommandBase command, boolean parentOnly) {
 		String parents = "";
 		CommandBase parent = command.getParent();
 		while (parent != null) {
 			parents = parent.getName() + " " + parents;
 			parent  = parent.getParent();
 		}
+		return parentOnly ? parents : String.format("%s %s", command.getName());
+	}
+	
+	public static String getPermissionDenied(CommandBase command){
+		// output formats 
+		String format_header = "§cDENIED §aCommand: /%s§c%s %s";
+		String format_perm = "§aPermission: §c%s";
 		
+		// command info
+		String label   = command.getName();
+		// get full parent command name
+		String parents = getFullCommandName(command, true);
+
 		// permission
-		String out_perm = command.isOP() ? "OP" : "";
-		if ( Plugin.get().isPermissionsEnabled() && command.getPermission() != null && !command.isOpOnly()){
-			out_perm = command.getPermission().getName();
+		String out_perm = "";
+		CommandBase parentcmd = command.getParent();
+		Permission perm = command.getPermission();
+			
+		while ( parentcmd != null && perm == null){
+			perm = parentcmd.getPermission();
+			parentcmd = parentcmd.getParent();
+		}
+				
+		if ( command.getPermission() != null){
+			if (Plugin.get().isPermissionsEnabled()) {
+				out_perm = String.format(format_perm, command.getPermission().getName());	
+			}
+			else if (command.getPermission().getDefault() == PermissionDefault.FALSE ||
+					command.getPermission().getDefault() == PermissionDefault.OP) {
+				out_perm = String.format(format_perm, "OP");
+			}
 		}
 				
 		// define header and basic output

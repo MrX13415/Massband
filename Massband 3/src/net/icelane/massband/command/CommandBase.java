@@ -58,8 +58,6 @@ public abstract class CommandBase implements TabExecutor{
 	protected String help           = "";
 	protected String usage          = "";
 	protected Permission permission = null;
-	protected boolean op            = false;  //TODO: Still required?
-	protected boolean opOnly        = false;  //TODO: Still required?
 	protected boolean inGameOnly    = false;
 	protected Visibility visibility = Visibility.Permission;
 	protected String[] tabList      = {};
@@ -132,9 +130,7 @@ public abstract class CommandBase implements TabExecutor{
 			// register and init the given class as command
 			CommandBase cmd = (CommandBase) cmdClass.newInstance();
 			cmd.setname(cmd.name());
-//			cmd.setupCommandDefinition();
 			cmd.initialize(); 
-			//cmd.buildPermission();
 			cmd.initPluginCommand();
 			return cmd;
 			
@@ -145,8 +141,14 @@ public abstract class CommandBase implements TabExecutor{
 		}
 	}
 	
-	private void initPluginCommand(){
-		
+	/**
+	 * Initialized the command and registers the corresponding executer to the Server.
+	 * For main commands, definitions made in the "plugin.yml" have priority over those made to the it's object itself.
+	 * <p>
+	 * If this command has sub commands defined a wildcard permission gets created containg all sub command permissions. 
+	 * </p>
+	 */
+	protected void initPluginCommand(){
 		pluginCommand = Plugin.get().getCommand(name);
 		pluginCommand.setExecutor(this);
 		
@@ -189,6 +191,7 @@ public abstract class CommandBase implements TabExecutor{
 			
 			// add all sub command permissions ...
 			for (CommandBase cmd : commands) {
+				if (cmd.getPermission() == null) continue;
 				wildcardPermission.getChildren().put(
 						cmd.getPermission().getName(),
 						cmd.getPermission().getDefault() == PermissionDefault.TRUE);
@@ -246,31 +249,15 @@ public abstract class CommandBase implements TabExecutor{
 	 * Whether the given <code>CommandSender</code> object has permission to use this command.
 	 * Permission will also be granted if a wildcard permission of any parent command is present.
 	 * <p>
-	 * Wildcard permission can be disabled by setting <code>setExplicit(...)</code> of command object in question to <code>false</code>.
-	 * Permission will then only granted if the permission has been set explicit to the <code>CommandSender</code> object.</p>
-	 * <p>
-	 * If permissions has been disable for this plug-in, access will be determined if this command has been marked for "OP only" and whether the player is OP.
+	 * If no permissions has been set for this command acces will be granted.
 	 * </p>
 	 * @param sender An instance of class <code>CommandSender</code>
 	 * @return <code>true</code> if the given <code>CommandSender</code> object has use permissions.
 	 */
 	public boolean hasPermission(CommandSender sender){
-		Plugin plugin = Plugin.get();
-		
-		// advanced permissions arn't available ...
-		if (!plugin.isPermissionsEnabled() || this.opOnly ) {
-			return ( this.op ? sender.isOp() : true );
-		}
-	
 		if (getPermission() == null) return true;
+
 		return sender.hasPermission(getPermission());
-		
-		// This permission is also granted if the sender has a wildcard permission of a parent command.
-		//if (!this.explicit) {
-		//return hasAsteriskPermission(sender);
-		//}
-		
-		//return false;
 	}
 	
 //	/**
@@ -301,10 +288,10 @@ public abstract class CommandBase implements TabExecutor{
 //		return permission;
 //	}
 
-	/**
-	 * Build a permission object using the given node as base and the <code>permissionNode</code> field all parent commands.
-	 * @return The builded Permission object.
-	 */
+//	/**
+//	 * Build a permission object using the given node as base and the <code>permissionNode</code> field all parent commands.
+//	 * @return The builded Permission object.
+//	 */
 //	protected Permission buildPermission(Permission node){
 //		CommandBase parent = getParent();
 //		Permission permission = node;
@@ -453,13 +440,10 @@ public abstract class CommandBase implements TabExecutor{
 			// init the given class as sub command
 			CommandBase cmd = (CommandBase) cmdClass.newInstance();
 			cmd.setname(cmd.name());
-//			cmd.setupCommandDefinition();
 			cmd.initialize(); 
 			cmd.setParent(this);
 			this.commands.add(cmd);
-			//cmd.buildPermission();
-			//cmd.initCommandPermission();
-			
+
 		} catch (InstantiationException e) {
 			throw new RuntimeException("Unable to register the provied class as sub command.");
 		} catch (IllegalAccessException e) {
@@ -570,27 +554,6 @@ public abstract class CommandBase implements TabExecutor{
 	public void setTabList(String...tabValue){
 		tabList = tabValue;
 	}
-	
-	public void setOp(boolean op) {
-		this.op = op;
-	}
-
-	public boolean isOP(){
-		return this.op;
-	}
-	
-	public boolean isOpOnly() {
-		return opOnly;
-	}
-
-	public void setOpOnly(boolean opOnly) {
-		this.opOnly = opOnly;
-		setOp(opOnly);
-	}
-
-	public boolean isOp() {
-		return op;
-	}
 
 	public boolean isInGameOnly() {
 		return inGameOnly;
@@ -599,18 +562,6 @@ public abstract class CommandBase implements TabExecutor{
 	public void setInGameOnly(boolean inGameOnly) {
 		this.inGameOnly = inGameOnly;
 	}
-
-//	public boolean isexplicit() {
-//		return explicit;
-//	}
-//
-//	/**
-//	 * Weather the command allows permission via wildcard permission of a parent command.
-//	 * @param explicit
-//	 */
-//	public void setExplicit(boolean explicit) {
-//		this.explicit = explicit;
-//	}
 
 	public Visibility getVisibility() {
 		return visibility;
