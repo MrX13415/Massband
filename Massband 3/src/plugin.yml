@@ -19,6 +19,8 @@ permissions:
      description: Gives access to all Massband commands
      children:
        massband.command: true
+  massband.debug:
+     description: Gives access to all debug commands of Massband.
   massband.command:
-     description: Massband
-     default: false
+     description: Root permission of the Massband command
+     default: true
