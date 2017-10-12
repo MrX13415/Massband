@@ -58,8 +58,8 @@ public abstract class CommandBase implements TabExecutor{
 	protected String help           = "";
 	protected String usage          = "";
 	protected Permission permission = null;
-	protected boolean op            = false;
-	protected boolean opOnly        = false;
+	protected boolean op            = false;  //TODO: Still required?
+	protected boolean opOnly        = false;  //TODO: Still required?
 	protected boolean inGameOnly    = false;
 	protected Visibility visibility = Visibility.Permission;
 	protected String[] tabList      = {};
@@ -174,9 +174,14 @@ public abstract class CommandBase implements TabExecutor{
 			pluginCommand.setPermissionMessage(CommandText.getPermissionDenied(this));
 		
 		if (hasSubCommands()) {
-			Permission wildcardPermission = new Permission(String.format("%s.*", permStr), PermissionDefault.FALSE); 
-			//TODO: add description and such...
-		
+			String wildcardstr = String.format("%s.*", permStr);
+			
+			Permission wildcardPermission = Bukkit.getPluginManager().getPermission(wildcardstr);
+			if (wildcardPermission == null) {
+				wildcardPermission = new Permission(wildcardstr, PermissionDefault.FALSE);
+				wildcardPermission.setDescription(CommandText.getWildCardDescription(this));
+			}
+			
 			// add root permission ...
 			wildcardPermission.getChildren().put(
 					permStr,

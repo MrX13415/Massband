@@ -34,6 +34,10 @@ Effects:
 	RESET:         §r
 */
 
+	public static String getWildCardDescription(CommandBase command) {
+		return String.format("Gives access to all %s sub commands", command.getName());
+	}
+	
 	public static String getIngameOnly(CommandBase command){
 		String format = "§cOnly for ingame usage!";
 		return format;
