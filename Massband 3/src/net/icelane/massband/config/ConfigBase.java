@@ -15,7 +15,7 @@ import java.util.regex.Pattern;
 
 import net.icelane.massband.Plugin;
 import net.icelane.massband.Server;
-import net.icelane.massband.config.configs.Config;
+import net.icelane.massband.config.configs.Defaults;
 
 public abstract class ConfigBase {
 
@@ -245,7 +245,7 @@ public abstract class ConfigBase {
 	private static ArrayList<Entry<?>> getEntryList(){
 		ArrayList<Entry<?>> list = new ArrayList<>();
 		 
-		Field[] fields = Config.class.getDeclaredFields();
+		Field[] fields = Defaults.class.getDeclaredFields();
 
 		for (Field field : fields) {
 		    if (Modifier.isStatic(field.getModifiers()) && Entry.class.isAssignableFrom(field.getType())) {		    	

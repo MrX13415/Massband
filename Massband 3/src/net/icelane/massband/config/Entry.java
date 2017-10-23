@@ -52,6 +52,33 @@ public abstract class Entry<T> {
 	
 	public abstract T valueOf(String value);
 	
+// TODO: improve value of ...
+//	public static Number asNumber(String str, Class<? extends Number> param) throws UnsupportedOperationException {
+//	    try {
+//	        /*
+//	         * Try to access the staticFactory method for: 
+//	         * Byte, Short, Integer, Long, Double, and Float
+//	         */
+//	        Method m = param.getMethod("valueOf", String.class);
+//	        Object o = m.invoke(param, str);
+//	        return param.cast(o);
+//	    } catch (NoSuchMethodException e1) {
+//	        /* Try to access the constructor for BigDecimal or BigInteger*/
+//	        try {
+//	            Constructor<? extends Number> ctor = param
+//	                    .getConstructor(String.class);
+//	            return ctor.newInstance(str);
+//	        } catch (ReflectiveOperationException e2) {
+//	            /* AtomicInteger and AtomicLong not supported */
+//	            throw new UnsupportedOperationException(
+//	                    "Cannot convert string to " + param.getName());
+//	        }
+//	    } catch (ReflectiveOperationException e2) {
+//	        throw new UnsupportedOperationException("Cannot convert string to "
+//	                + param.getName());
+//	    }   
+//	}
+	
 	@Override
 	public String toString() {
 		return value.toString();

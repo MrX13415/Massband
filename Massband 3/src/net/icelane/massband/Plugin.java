@@ -6,7 +6,7 @@ import org.bukkit.Bukkit;
 import org.bukkit.configuration.file.FileConfiguration;
 import org.bukkit.plugin.java.JavaPlugin;
 
-import net.icelane.massband.config.configs.Config;
+import net.icelane.massband.config.configs.Defaults;
 import net.icelane.massband.core.Massband;
 
 public class Plugin extends JavaPlugin{
@@ -35,8 +35,8 @@ public class Plugin extends JavaPlugin{
 	public void onEnable() {
 		super.onEnable();
 		
-		Config.initialize(Config.class);
-		Config.save();
+		Defaults.initialize(Defaults.class);
+		Defaults.save();
 		
 		Server.registerEvents();
 		Server.registerCommands();

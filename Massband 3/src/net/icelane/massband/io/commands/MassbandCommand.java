@@ -4,7 +4,7 @@ import org.bukkit.command.Command;
 import org.bukkit.command.CommandSender;
 
 import net.icelane.massband.Plugin;
-import net.icelane.massband.config.configs.Config;
+import net.icelane.massband.config.configs.Defaults;
 import net.icelane.massband.io.CommandBase;
 import net.icelane.massband.io.commands.massband.Massband_Clear;
 import net.icelane.massband.io.commands.massband.Massband_Count;
@@ -49,13 +49,13 @@ public class MassbandCommand extends CommandBase{
 
 		//**** Hidden features ****
 		if (sender.isOp() && args.length == 1 && args[0].equalsIgnoreCase("_load")){
-			Config.load();
+			Defaults.load();
 			sender.sendMessage("§c(i) §6Massband config loaded");
 			return true;
 		}
 		
 		if (sender.isOp() && args.length == 1 && args[0].equalsIgnoreCase("_save")){
-			Config.save();
+			Defaults.save();
 			sender.sendMessage("§c(i) §6Massband config saved");
 			return true;
 		}

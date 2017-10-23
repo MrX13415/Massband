@@ -13,11 +13,11 @@ public class Config extends ConfigBase {
 		return "config.yml";
 	}
 
-	public static Entry_Enum<Material> interact_material   = Entry.define("interact.material", Material.class, Material.STICK, "");
-	public static Entry_Boolean interact_preventAction     = Entry.define("interact.prevent-action", true, "");
-	public static Entry_Boolean interact_switchbuttons     = Entry.define("interact.switch-buttons", false, "");
-	public static Entry_Long interact_doubleClickTimeFrame = Entry.define("interact.doubleclick-timeframe", 150L, "ms");
+	public static Entry_Double defaultEntityLineOffset = Entry.define("marker.LineOffset", 0.3, "");	
 	
-	public static Entry_Boolean marker_showOwnerTags     = Entry.define("marker.showOwnerTags", true, "");
-		
+	public static Entry_Boolean marker_showOwnerTags     = Entry.define("marker.OwnerTags.Enable", true, "");
+	public static Entry_Long defaultOwnerHideTicks = Entry.define("marker.OwnerTags.HideTicks", 20L * 3, "ticks (20 tick => 1 sec)");
+	public static Entry_Long defaultOwnerShowDelayTicks = Entry.define("marker.OwnerTags.DelayTicks", 10L, "ticks (1 tick => 50 ms)");
+
+	
 }
