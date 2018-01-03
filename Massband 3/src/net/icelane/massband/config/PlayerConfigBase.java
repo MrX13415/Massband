@@ -17,6 +17,10 @@ public abstract class PlayerConfigBase<T extends PlayerConfigBase<T>> extends Co
 		config.loadDefault();
 		return config;
 	}
+
+	public static <T extends PlayerConfigBase<T>> T getDefault(Class<T> cfgclass) {
+		return PlayerConfigBase.initialize(null, cfgclass);
+	}
 	
 	@Override
 	public String name() {
@@ -73,6 +77,7 @@ public abstract class PlayerConfigBase<T extends PlayerConfigBase<T>> extends Co
 	}
 	
 	protected void setPlayer(Player player) {
+		if (player == null) return;
 		this.uuid = player.getUniqueId();
 	}
 
