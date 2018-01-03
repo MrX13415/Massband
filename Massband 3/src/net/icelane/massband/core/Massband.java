@@ -15,6 +15,7 @@ import org.bukkit.event.world.ChunkLoadEvent;
 import org.bukkit.event.world.ChunkUnloadEvent;
 
 import net.icelane.massband.Server;
+import net.icelane.massband.config.configs.PlayerConfig;
 import net.icelane.massband.minecraft.HoloText;
 
 public class Massband {
@@ -24,12 +25,14 @@ public class Massband {
 	private static boolean debug;
 	
 	private Player player;
+	private PlayerConfig config;
 	private HashMap<String, Marker> worldMarkersList = new HashMap<>(); // String => World.Name
 	private Interact interact;
 	
 	private Massband(Player player) {
 		this.player = player;
-		this.interact = new Interact(this);
+		this.config = PlayerConfig.initialize(player);
+		load();
 	}
 		
 	public static Massband newInstance(Player player){
@@ -48,15 +51,13 @@ public class Massband {
 		return list.get(uuid);
 	}
 
-	public static void load(){
-		
-	}
-
-	public static void save(){
-		
+	public void load(){
+		this.config.load();
+		this.interact = new Interact(this);
 	}
 	
 	public void reset(){
+		this.config.loadDefault();
 		this.interact = new Interact(this);
 	}
 	
@@ -81,7 +82,7 @@ public class Massband {
 	}
 	
 	public void join(PlayerJoinEvent event){
-		load();
+		
 	}
 
 	public void quit(PlayerQuitEvent event){
@@ -169,6 +170,10 @@ public class Massband {
 		return interact;
 	}
 
+	public PlayerConfig config() {
+		return config;
+	}
+	
 	public static boolean isDebug() {
 		return debug;
 	}
