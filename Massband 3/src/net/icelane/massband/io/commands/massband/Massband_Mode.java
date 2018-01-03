@@ -24,7 +24,7 @@ public class Massband_Mode extends CommandBase{
 				+ "\n   §71: §cblocks    §7Measurs block distance in X or Y direction or 45 degrees diagonal."
 				+ "\n   §72: §cvectors   §7Measures the vector distance between the center points of blocks.");
 		setPermission("massband.command.mode", true);
-		setUsage("[blocks|vectors]");
+		setUsage("blocks|vectors");
 		setInGameOnly(true);
 		setTabList("blocks", "vectors");
 	}

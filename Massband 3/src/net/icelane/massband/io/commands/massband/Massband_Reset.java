@@ -32,7 +32,7 @@ public class Massband_Reset extends CommandBase{
 		Massband obj = Massband.get(player);
 		obj.reset();
 		
-		player.sendMessage("§Settings have been reset to default");
+		player.sendMessage("§7Settings for §cMassband §7has been reset to default");
 		
 		return true;
 	}

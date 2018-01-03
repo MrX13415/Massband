@@ -20,7 +20,7 @@ public class Massband_Debug extends CommandBase{
 	public void initialize() {
 		setAliases("debug");
 		setDescription("Debug command. peep bop.");
-		setUsage("[true|false]");
+		setUsage("true|false");
 		setPermission("massband.debug", false);
 		
 		addCommand(Debug_Matrix.class);
