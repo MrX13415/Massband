@@ -39,7 +39,7 @@ public class Massband_Config extends CommandBase{
 
 		while (args.length > 0) {
 			String arg = args[args.length - 1];
-			String pre = args.length > 1 ? args[args.length - 2] : "";
+			String pre = args.length > 1 ? args[args.length - 2] : arg;
 			ConfigBase<?> config = getConfig(sender, args[0]);
 			
 			if (args.length == 1) {
@@ -50,7 +50,7 @@ public class Massband_Config extends CommandBase{
 				break;
 			}
 
-			if (args.length == 2) {
+			if (args.length == 2 && config instanceof PlayerConfig) {
 				tabList = addConfigEntries(tabList, config, arg);	
 			}
 						
@@ -119,13 +119,49 @@ public class Massband_Config extends CommandBase{
 	
 	@Override
 	public boolean command(CommandSender sender, Command cmd, String label, String[] args) {
-		return true;
+		String arg0 = args.length > 0 ? args[0] : "";
+		String arg = args.length >= 1 ? args[args.length - 1] : arg0;
+		String pre = args.length >= 2 ? args[args.length - 2] : arg;
+		boolean isDefault = arg.equals(Default);
+		
+		ConfigBase<?> config = getConfig(sender, arg0);
+		Entry<?> entry = null;
+		
+		if (config == null) return false;
+		
+		if (isDefault)
+			sender.sendMessage("§6Default settings for Players");
+		else if (config instanceof PlayerConfig)
+			sender.sendMessage("§6Settings for Player: §c" + ((PlayerConfig)config).getPlayer().getName());
+		if (config instanceof Config)
+			sender.sendMessage("§6Massband settings");
+		
+		if (args.length == 0) {
+			
+		}else{
+			entry = config.getEntry(pre);
+			if (entry == null) {
+				sender.sendMessage("§cUnable to find given settings entry!");
+				return true;
+			}
+
+			sender.sendMessage(String.format("§7 - §a%s§7: §c%s §7(default: §9%s§7)", 
+					entry.getPath().replaceAll("\\.", "§7.§a"),
+					entry.get().toString(),
+					entry.getDefault().toString()));
+			
+			
+			return true;
+		}
+		
+		return false;
 	}
 
 	@Override
 	public boolean command(Player player, Command cmd, String label, String[] args) {
-		Massband obj = Massband.get(player);
+		return true;
 
+		
 		
 		//mb config <setting> <value>
 //		
@@ -145,8 +181,6 @@ public class Massband_Config extends CommandBase{
 //			int count = obj.getMarkers(player.getWorld()).getMaxCount();
 //			player.sendMessage("§7Marker count: §c" + (count == -1 ? "No Limit" : count));		
 //		}
-		
-		return true;
 	}
 
 }
