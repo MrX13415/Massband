@@ -13,7 +13,6 @@ import org.bukkit.event.player.PlayerSwapHandItemsEvent;
 import org.bukkit.inventory.EquipmentSlot;
 import org.bukkit.inventory.ItemStack;
 
-import net.icelane.massband.config.configs.Defaults;
 import net.icelane.massband.core.Marker.BlockAxis;
 import net.icelane.massband.core.Marker.MarkerSettings;
 import net.icelane.massband.core.Marker.MeasureMode;
@@ -22,11 +21,6 @@ public class Interact {
 
 	private Massband massband;
 	
-	private Material material     = (Material) Defaults.interact_material.get();
-	private boolean preventAction = Defaults.interact_preventAction.get();
-	private boolean switchButtons = Defaults.interact_switchbuttons.get();
-	private long doubleClickDelta = Defaults.interact_doubleClickTimeFrame.get(); //ms 
-
 	private long lastInteractTime = System.nanoTime();
 	private Action lastInteractAction;
 	private EquipmentSlot lastInteractSlot;
@@ -36,7 +30,7 @@ public class Interact {
 	public Interact(Massband obj) {
 		this.massband = obj;
 	}
-	
+
 	public void interact(PlayerInteractEvent event){
 		Marker markers = getMassband().getMarkers(event.getPlayer().getWorld());
 		Block block    = event.getClickedBlock();
@@ -48,12 +42,12 @@ public class Interact {
 		if (block == null) return;
 		if (face == null) return;
 		if (item == null) return;
-		if (item.getType() != this.material) return;
+		if (item.getType() != this.getMaterial()) return;
 		
 		// handle double click ...
 		long time  = System.nanoTime();
 		long delta = (time - lastInteractTime) / 1000000; //ms
-		boolean doubleclick = (delta > 0 && delta <= doubleClickDelta);
+		boolean doubleclick = (delta > 0 && delta <= getDoubleClickDelta());
 		if (lastInteractAction != action) doubleclick = false;
 		if (lastInteractSlot != slot) doubleclick = false;
 		// must be the same block ...
@@ -84,7 +78,7 @@ public class Interact {
 		Action right = Action.RIGHT_CLICK_BLOCK;
 		Action left = Action.LEFT_CLICK_BLOCK;
 		
-		if (switchButtons){
+		if (isSwitchButtons()){
 			left = Action.RIGHT_CLICK_BLOCK;
 			right = Action.LEFT_CLICK_BLOCK;
 		}
@@ -150,7 +144,7 @@ public class Interact {
 			}
 		}
 
-		if (preventAction) event.setCancelled(true);
+		if (isPreventAction()) event.setCancelled(true);
 	}
 	
 	public void blockBreak(BlockBreakEvent event){
@@ -170,8 +164,8 @@ public class Interact {
 	}
 	
 	public void swapHandItem(PlayerSwapHandItemsEvent event) {
-		if (event.getMainHandItem().getType() == material
-			|| event.getOffHandItem().getType() == material) {
+		if (event.getMainHandItem().getType() == getMaterial()
+			|| event.getOffHandItem().getType() == getMaterial()) {
 			
 			massband.showMarkers(event.getPlayer().getWorld());
 		}else{
@@ -194,7 +188,7 @@ public class Interact {
 		if (player == null) return;
 		
 		// cancel if item to be picked up is not our "material" ...
-		if (pickupItem == null || pickupItem.getType() != material) return;
+		if (pickupItem == null || pickupItem.getType() != getMaterial()) return;
 		
 		// cancel if main hand slot is not empty ...
 		if (!isItemHeld(player.getInventory().getItemInMainHand(), Material.AIR)) return;
@@ -236,35 +230,36 @@ public class Interact {
 	}
 		
 	public boolean isItemHeld(ItemStack hand) {
-		return isItemHeld(hand, material);
+		return isItemHeld(hand, getMaterial());
 	}
 	
 	public boolean isItemHeld(ItemStack hand, Material material) {
 		return hand != null && hand.getType() == material;
 	}
 	
-	public Material getMaterial() {
-		return material;
-	}
-
 	public Massband getMassband() {
 		return massband;
 	}
+		
+	public Material getMaterial() {
+		return (Material) massband.config().interact_material.get();
+	}	
 
 	public boolean isPreventAction() {
-		return preventAction;
+		return massband.config().interact_preventAction.get();
 	}
 
 	public boolean isSwitchButtons() {
-		return switchButtons;
+		return massband.config().interact_switchbuttons.get();
+	}
+	
+	public long getDoubleClickDelta() {
+		return massband.config().interact_doubleClickTimeFrame.get();
 	}
 
 	public long getLastInteractTime() {
 		return lastInteractTime;
 	}
 
-	public long getDoubleClickDelta() {
-		return doubleClickDelta;
-	}
-
+	
 }
