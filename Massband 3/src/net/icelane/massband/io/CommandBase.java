@@ -360,7 +360,7 @@ public abstract class CommandBase implements TabExecutor{
 		if (args.length > 1){			
 			for (CommandBase cmd : this.commands) 
 			{
-				if (cmd.isCommand(args[args.length - 2])){
+				if (cmd.isCommand(args[0])){
 					// call sub command
 					return cmd.onTabComplete(sender, command, alias, getArgsOnly(args));
 				}
