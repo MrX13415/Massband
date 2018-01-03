@@ -4,7 +4,6 @@ import java.io.File;
 import java.io.FileWriter;
 import java.io.IOException;
 import java.lang.reflect.Field;
-import java.lang.reflect.Modifier;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.util.ArrayList;
@@ -15,29 +14,28 @@ import java.util.regex.Pattern;
 
 import net.icelane.massband.Plugin;
 import net.icelane.massband.Server;
-import net.icelane.massband.config.configs.Defaults;
 
-public abstract class ConfigBase {
+public abstract class ConfigBase<T extends ConfigBase<T>> {
 
 	public static boolean debug;
-	
-	private static ConfigBase config; 
-	
+
 	private static String format_entry   = "%s: %s      %s";
 	private static String format_comment = "# %s";
 	private static String regex_entry    = "(\\s*)([^:]*)\\s*:(.*(?:\\\\#).*|[^#]*)(?:#(.*))?";
 	private static String regex_comment  = "\\s*#.*";
 	
-	public static void initialize(Class<? extends ConfigBase> cfgclass) {
+	private Class<T> configClass;
+	  
+	
+	public static <T extends ConfigBase<T>> T initialize(Class<T> cfgclass) {
 		try {
-			config = cfgclass.newInstance();
+			T config = cfgclass.newInstance();
+			config.setConfigClass(cfgclass);
+			return config;
 		} catch (InstantiationException | IllegalAccessException ex) {
 			Server.logger().log(Level.WARNING, "An error occured while initializing the configuration.", ex);
 		}
-	}
-	
-	public static ConfigBase get() {
-		return config;
+		return null;
 	}
 	
 	/**
@@ -50,22 +48,30 @@ public abstract class ConfigBase {
 	 */
 	public abstract String name();
 
-	public static void load() {
-		process(false);  // load
+	public T load() {
+		process(getFilePath(), false, true);  // load
+		return configClass.cast(this);
+	}
+
+	public void save() {
+		process(getFilePath(), true, true);  // save
 	}
 	
-	public static void save() {
-		process(true);  // save
-	}
-	
-	private static void process(boolean save) {
+	protected void process(File file, boolean save, boolean createAlways) {
 		try {
 			
 			ArrayList<String> sections = new ArrayList<>();
 			String lastKey = "";
 			int  sectionlvl = 0;
-						
-			List<String> lines = Files.readAllLines(get().getFilePath().toPath(), StandardCharsets.UTF_8);			
+			
+			// create the file if not presant			
+			if (!file.exists()) {
+				if (createAlways) save = true;
+				if (save) creatFile(file);
+				else return;
+			}
+			
+			List<String> lines = Files.readAllLines(file.toPath(), StandardCharsets.UTF_8);			
 			ArrayList<Entry<?>> queue = getEntryList(); 
 
 			int lineIndex = -1;
@@ -152,7 +158,7 @@ public abstract class ConfigBase {
 				searchEntries(lines, queue, 0);
 
 				// write the actual file (lines) to disk ...
-				saveToDisk(lines);
+				saveToDisk(file, lines);
 			}
 	
 			lines.clear();
@@ -160,12 +166,19 @@ public abstract class ConfigBase {
 			Server.logger().log(Level.WARNING, "Error: Unable process config data while " + (save ? "saving" : "loading") + " the config file.", ex);
 		}
 	}
+	
+	public static boolean creatFile(File file) {
+		try {
+			if (!file.getParentFile().exists()) file.getParentFile().mkdirs();
+			return file.createNewFile();
+		} catch (IOException e) { }
+		return false;
+	}
 
-	public static void saveToDisk(List<String> lines) {		
+	public static void saveToDisk(File file, List<String> lines) {		
 		FileWriter writer = null;
 		try {
-			File file = get().getFilePath();
-			if (!file.getParentFile().exists()) file.getParentFile().mkdirs();
+			if (!file.exists()) creatFile(file);
 
 			writer = new FileWriter(file);
 			
@@ -181,11 +194,11 @@ public abstract class ConfigBase {
 		}		
 	}
 	
-	public static void saveDefault() {
-		ArrayList<String> lines = new ArrayList<>();
-		searchEntries(lines, getEntryList(), 0);
-		saveToDisk(lines);
-	}
+//	public static void ssaveDefault() {
+//		ArrayList<String> lines = new ArrayList<>();
+//		searchEntries(lines, getEntryList(), 0);
+//		//saveToDisk(lines);
+//	}
 	
 	public File getFilePath(){
 		return new File(getBasePath(), name());
@@ -242,25 +255,31 @@ public abstract class ConfigBase {
 		return lines;
 	}
 	
-	private static ArrayList<Entry<?>> getEntryList(){
+	private ArrayList<Entry<?>> getEntryList(){
 		ArrayList<Entry<?>> list = new ArrayList<>();
 		 
-		Field[] fields = Defaults.class.getDeclaredFields();
+		Field[] fields = getConfigClass().getDeclaredFields();
 
 		for (Field field : fields) {
-		    if (Modifier.isStatic(field.getModifiers()) && Entry.class.isAssignableFrom(field.getType())) {		    	
+		    if (Entry.class.isAssignableFrom(field.getType())) {		    	
 		    	try {
-		    		list.add( (Entry<?>) field.get(null) );
+		    		list.add( (Entry<?>) field.get(this) );
 					
-				} catch (IllegalArgumentException ex) {
-					Server.logger().log(Level.WARNING, "Error: Unable process config data.", ex);
-				} catch (IllegalAccessException ex) {
+				} catch (IllegalArgumentException | IllegalAccessException ex) {
 					Server.logger().log(Level.WARNING, "Error: Unable process config data.", ex);
 				}
 		    }
 		}
 		
 		return list;
+	}
+
+	protected Class<T> getConfigClass() {
+		return configClass;
+	}
+	
+	protected void setConfigClass(Class<T> configClass) {
+		this.configClass = configClass;
 	}
 
 }
