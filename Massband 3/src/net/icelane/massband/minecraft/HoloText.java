@@ -22,7 +22,6 @@ import org.bukkit.util.Vector;
 
 import net.icelane.massband.Server;
 import net.icelane.massband.config.configs.Config;
-import net.icelane.massband.config.configs.Defaults;
 import net.icelane.massband.core.Marker;
 
 public class HoloText {
@@ -32,9 +31,9 @@ public class HoloText {
 	public static final String metadata_OwnerUUID = "OwnerUUID";
 	public static final String metadata_IsOwnerTag = "IsOwnerTag";
 	
-	private static double defaultEntityLineOffset = Config.defaultEntityLineOffset.get(); // 0.3;	
-	private static long defaultOwnerHideTicks = Config.defaultOwnerHideTicks.get(); //20L * 3; //ticks (20 tick => 1 sec)
-	private static long defaultOwnerShowDelayTicks = Config.defaultOwnerShowDelayTicks.get(); //10L; //ticks (1 tick => 50 ms)
+	private static double defaultEntityLineOffset = Config.get().defaultEntityLineOffset.get(); // 0.3;	
+	private static long defaultOwnerHideTicks = Config.get().defaultOwnerHideTicks.get(); //20L * 3; //ticks (20 tick => 1 sec)
+	private static long defaultOwnerShowDelayTicks = Config.get().defaultOwnerShowDelayTicks.get(); //10L; //ticks (1 tick => 50 ms)
 
 	private static Plugin plugin;
 	
@@ -50,7 +49,7 @@ public class HoloText {
 	private double lineOffset = defaultEntityLineOffset;
 	private boolean visible;
 	
-	private boolean ownerTagsEnabled = Config.marker_showOwnerTags.get();
+	private boolean ownerTagsEnabled = Config.get().marker_showOwnerTags.get();
 	private boolean ownerShown;
 	private int ownerNameEntityId;
 	private long ownerHideTaskTicks;
@@ -446,7 +445,7 @@ public class HoloText {
 	
 	public static void showOwnerTagsOnPlayerMove(PlayerMoveEvent event){
 		// owner tags are disabled!
-		if (!Defaults.marker_showOwnerTags.get()) return;
+		if (!Config.get().marker_showOwnerTags.get()) return;
 		
 		// run only 4 times per second ...
 		if (System.currentTimeMillis() - ownerTags_LastRun < 250) return;

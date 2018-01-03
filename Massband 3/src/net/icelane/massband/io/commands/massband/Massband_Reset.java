@@ -30,7 +30,6 @@ public class Massband_Reset extends CommandBase{
 	@Override
 	public boolean command(Player player, Command cmd, String label, String[] args) {
 		Massband obj = Massband.get(player);
-		
 		obj.reset();
 		
 		player.sendMessage("§Settings have been reset to default");
