@@ -15,6 +15,10 @@ public class PlayerConfig extends PlayerConfigBase<PlayerConfig> {
 		return PlayerConfigBase.initialize(player, PlayerConfig.class);
 	}
 
+	public static PlayerConfig getDefault() {
+		return PlayerConfigBase.getDefault(PlayerConfig.class);
+	}
+	
 	// ---------- CONFIG ---------- //
 	
 	@Override
