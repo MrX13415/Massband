@@ -32,7 +32,6 @@ public class Massband {
 	private Massband(Player player) {
 		this.player = player;
 		this.config = PlayerConfig.initialize(player);
-		load();
 	}
 		
 	public static Massband newInstance(Player player){
@@ -52,12 +51,17 @@ public class Massband {
 	}
 
 	public void load(){
-		this.config.load();
+		config().load();
 		this.interact = new Interact(this);
 	}
 	
+	public void save(){
+		config().save();
+	}
+	
 	public void reset(){
-		this.config.loadDefault();
+		config().loadDefault();
+		config().save();
 		this.interact = new Interact(this);
 	}
 	
@@ -82,10 +86,11 @@ public class Massband {
 	}
 	
 	public void join(PlayerJoinEvent event){
-		
+		load();
 	}
 
 	public void quit(PlayerQuitEvent event){
+		save();
 		clean();
 	}
 	
