@@ -255,7 +255,7 @@ public abstract class ConfigBase<T extends ConfigBase<T>> {
 		return lines;
 	}
 	
-	private ArrayList<Entry<?>> getEntryList(){
+	public ArrayList<Entry<?>> getEntryList(){
 		ArrayList<Entry<?>> list = new ArrayList<>();
 		 
 		Field[] fields = getConfigClass().getDeclaredFields();
@@ -273,7 +273,19 @@ public abstract class ConfigBase<T extends ConfigBase<T>> {
 		
 		return list;
 	}
-
+	
+	public Entry<?> getEntry(String path){
+		ArrayList<Entry<?>> list = getEntryList();
+		path = path.trim().toLowerCase();
+		
+		for (Entry<?> entry : list) {
+			if (entry.getPath().toLowerCase().contains(path)) return entry;
+		}
+		
+		return null;
+	}
+	
+	
 	protected Class<T> getConfigClass() {
 		return configClass;
 	}
