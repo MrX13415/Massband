@@ -11,89 +11,78 @@ import org.bukkit.entity.Player;
 import net.icelane.massband.Server;
 import net.icelane.massband.config.ConfigBase;
 import net.icelane.massband.config.Entry;
-import net.icelane.massband.config.configs.Config;
 import net.icelane.massband.config.configs.PlayerConfig;
 import net.icelane.massband.core.Massband;
 import net.icelane.massband.io.CommandBase;
 
-public class Massband_Config extends CommandBase{
+public class Massband_Settings extends CommandBase{
 
 	public static final String Default = "default";
 	
 	@Override
 	public String name() {
-		return "config";
+		return "settings";
 	}
 	
 	@Override
 	public void initialize() {
-		setAliases("settings", "cfg", "set");
+		setAliases("cfg", "set");
 		setDescription("Allows changes to any Massband settings.");
-		setPermission("massband.command.config", true);
-		setUsage("[<playerName>|default] <config entry> [value]");
+		setPermission("massband.command.settings", true);
+		setUsage("[player] <config entry> [value]");
+		
+		
 	}
 
 	@Override
 	public List<String> onTabComplete(CommandSender sender, Command command, String alias, String[] args) {
 		List<String> tabList = super.onTabComplete(sender, command, alias, args);
+	
+		String arg0 = args.length > 0 ? args[0].trim().toLowerCase() : "";
 
-		while (args.length > 0) {
-			String arg = args[args.length - 1];
-			String pre = args.length > 1 ? args[args.length - 2] : arg;
-			ConfigBase<?> config = getConfig(sender, args[0]);
-			
-			if (args.length == 1) {
-				if (Default.contains(arg.toLowerCase().trim())) 
-					tabList.add(Default);
-				
-				tabList = addConfigEntries(tabList, config, arg);
-				break;
+		ConfigBase<?> config = getConfig(sender);
+		int argOffset = 0;
+		
+		if (args.length <= 1) {
+			tabList.addAll(getTabListOfflinePlayers(arg0));
+		}
+					
+		if (args.length >= 2) {
+			Player targetPlayer = Server.get().getPlayer(arg0);
+			if (targetPlayer != null) {
+				config = getConfig((CommandSender)targetPlayer);
+				argOffset = 1;
 			}
-
-			if (args.length == 2 && config instanceof PlayerConfig) {
-				tabList = addConfigEntries(tabList, config, arg);	
-			}
-						
-			if (args.length > 1 && args.length <= 3) {				
-				tabList = addConfigEntryValues(tabList, config, pre);	
-			}
-			
-			break; //only once!
 		}
 		
+		if (config != null) {
+			if (args.length <= (1 + argOffset))
+				tabList = addConfigEntries(tabList, config, args[0 + argOffset]);	
+		}
+		
+		if (args.length == (2 + argOffset)) {
+			tabList = addConfigEntryValues(tabList, config, args[0 + argOffset], args[1 + argOffset]);				
+		}
+	
 		tabList.sort(Comparator.naturalOrder());
 		return tabList; 		
 	}
 	
-	private ConfigBase<?> getConfig(CommandSender sender, String arg) {
-
-		if (arg.equals(Default)) {
-			//default
-			return PlayerConfig.getDefault();
-		}
-		
-		Player player = Server.get().getPlayer(arg);
-		if (player != null) {
-			//player
-			return Massband.get(player).config();
-		}
-		
+	protected ConfigBase<?> getConfig(CommandSender sender) {
 		if (sender instanceof Player) {
-			//player
 			return  Massband.get((Player)sender).config();
 		}
-			
-		//console
-		return Config.get();
+		return null;
 	}
 	
-	private List<String> addConfigEntries(List<String> tabList, ConfigBase<?> config, String arg) {
+	protected List<String> addConfigEntries(List<String> tabList, ConfigBase<?> config, String arg) {
 		if (config == null) return tabList;
 		ArrayList<Entry<?>> configEntries = config.getEntryList();
-
+		arg = arg.trim().toLowerCase();
+		
 		if (configEntries != null) {
 			for (Entry<?> entry : configEntries) {
-				String path = entry.getPath();
+				String path = entry.getPath().trim().toLowerCase();
 				
 				if (path.contains(arg)) {
 					tabList.add(path);
@@ -103,84 +92,97 @@ public class Massband_Config extends CommandBase{
 		return tabList;
 	}
 	
-	private List<String> addConfigEntryValues(List<String> tabList, ConfigBase<?> config, String pre) {
+	protected List<String> addConfigEntryValues(List<String> tabList, ConfigBase<?> config, String entrystr, String arg) {
 		if (config == null) return tabList;
-		Entry<?> entry = config.getEntry(pre);
-				
-		if (entry != null) {
-			tabList.add(entry.getDefault().toString());
-			if (!entry.getDefault().toString().equals(entry.get().toString())) {
-				tabList.add(entry.get().toString());
-			}
-		}
+		Entry<?> entry = config.getEntry(entrystr);
+		arg = arg.trim().toLowerCase();
 		
+		if (entry != null) {
+			for (String value : entry.getValues()) {
+				if (value.toLowerCase().trim().contains(arg))
+					tabList.add(value);
+			}
+		}		
 		return tabList;
 	}
 	
 	@Override
 	public boolean command(CommandSender sender, Command cmd, String label, String[] args) {
-		String arg0 = args.length > 0 ? args[0] : "";
-		String arg = args.length >= 1 ? args[args.length - 1] : arg0;
-		String pre = args.length >= 2 ? args[args.length - 2] : arg;
-		boolean isDefault = arg.equals(Default);
-		
-		ConfigBase<?> config = getConfig(sender, arg0);
-		Entry<?> entry = null;
-		
-		if (config == null) return false;
-		
-		if (isDefault)
-			sender.sendMessage("§6Default settings for Players");
-		else if (config instanceof PlayerConfig)
-			sender.sendMessage("§6Settings for Player: §c" + ((PlayerConfig)config).getPlayer().getName());
-		if (config instanceof Config)
-			sender.sendMessage("§6Massband settings");
-		
-		if (args.length == 0) {
-			
-		}else{
-			entry = config.getEntry(pre);
-			if (entry == null) {
-				sender.sendMessage("§cUnable to find given settings entry!");
-				return true;
-			}
+		// Usage: [player] <entry> [value]
+		//      [0]      [1]      [2]      
+		// A 1  -        -        -         -> A: list whole config
+		// A 2  player   -        -         -> A: list whole config
+		// B 1  entry    -        -         -> B: get entry value
+		// B 2  player   entry    -         -> B: get entry value
+		// C 1  entry    value    -         -> C: set entry value
+		// C 2  player   entry    value     -> C: set entry value
 
-			sender.sendMessage(String.format("§7 - §a%s§7: §c%s §7(default: §9%s§7)", 
-					entry.getPath().replaceAll("\\.", "§7.§a"),
-					entry.get().toString(),
-					entry.getDefault().toString()));
-			
-			
+		// Try to find the target player 
+		Player targetPlayer = null;
+		if (args.length > 0) targetPlayer = Server.get().getPlayer(args[0].trim());
+		
+		boolean targetSelf = targetPlayer == null;
+		
+		if (targetSelf && !(sender instanceof Player)) {
+			sender.sendMessage("§cError: player not found!");	
 			return true;
 		}
 		
+		// Retrieve config ...
+		ConfigBase<?> config = null;
+		if (targetSelf) config = getConfig(sender);  // self
+		else config = getConfig((CommandSender)targetPlayer);  // other player
+
+		if (config == null) {
+			sender.sendMessage("§cError: config null!");			
+			return true;
+		}
+		
+		// A: List all settings of the config ...
+		if ((targetSelf && args.length == 0) || (!targetSelf && args.length == 1)) {
+			sender.sendMessage("§aSettings for Player: §c" + ((PlayerConfig)config).getPlayer().getName());
+			
+			List<Entry<?>> entryList = config.getEntryList();
+			for (Entry<?> entry : entryList) {
+				
+				sender.sendMessage(String.format("§7 - §6%s§7: §c%s §7(default: §9%s§7)", 
+						entry.getPath().replaceAll("\\.", "§c.§6"),
+						entry.get().toString(),
+						entry.getDefault().toString()));
+			}
+			return true;
+		}
+		
+		// Try to find an entry ...
+		Entry<?> entry = config.getEntry(targetSelf ? args[0].trim() : args[1].trim());
+		
+		if (entry == null) {
+			sender.sendMessage("§cError: entry null!");
+			return true;
+		}
+
+		// B: Return the value of a specific entry ...
+		if ((targetSelf && args.length == 1) || (!targetSelf && args.length == 2)) {
+			sender.sendMessage("§aSettings for Player: §c" + ((PlayerConfig)config).getPlayer().getName());
+			sender.sendMessage(String.format("§7 - §6%s§7: §c%s   §7(default: §9%s§7)", 
+					entry.getPath().replaceAll("\\.", "§c.§6"),
+					entry.get().toString(),
+					entry.getDefault().toString()));
+			return true;
+		}
+
+		// C: Change the value of a specific entry ...
+		if ((targetSelf && args.length == 2) || args.length == 3) {
+			String value = targetSelf ? args[1].trim() : args[2].trim();
+			return true;		
+		}
+
 		return false;
 	}
 
 	@Override
 	public boolean command(Player player, Command cmd, String label, String[] args) {
-		return true;
-
-		
-		
-		//mb config <setting> <value>
-//		
-//		if (args.length == 1){
-//			try{
-//				int value = Integer.valueOf(args[0]);
-//				if (value < 1 && value > -1 ) value = 1;  // min marker count is 1!
-//				if (value < 0) value = -1;  // no "limit"
-//
-//				obj.getMarkers(player.getWorld()).setMaxCount(value);
-//				
-//				player.sendMessage("§7Marker count set to: §c" +  (value == -1 ? "No Limit" : value));
-//			}catch (NumberFormatException ex){
-//				player.sendMessage("§cError: incorrect argument!");
-//			}
-//		}else{
-//			int count = obj.getMarkers(player.getWorld()).getMaxCount();
-//			player.sendMessage("§7Marker count: §c" + (count == -1 ? "No Limit" : count));		
-//		}
+		return command((CommandSender)player, cmd, label, args);
 	}
 
 }
