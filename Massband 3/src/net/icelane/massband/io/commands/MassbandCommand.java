@@ -10,7 +10,7 @@ import net.icelane.massband.config.configs.Config;
 import net.icelane.massband.core.Massband;
 import net.icelane.massband.io.CommandBase;
 import net.icelane.massband.io.commands.massband.Massband_Clear;
-import net.icelane.massband.io.commands.massband.Massband_Config;
+import net.icelane.massband.io.commands.massband.Massband_Settings;
 import net.icelane.massband.io.commands.massband.Massband_Count;
 import net.icelane.massband.io.commands.massband.Massband_Debug;
 import net.icelane.massband.io.commands.massband.Massband_Info;
@@ -35,7 +35,7 @@ public class MassbandCommand extends CommandBase{
 		addCommand(Massband_NoLimit.class);
 		addCommand(Massband_Mode.class);
 		addCommand(Massband_Reset.class);
-		addCommand(Massband_Config.class);
+		addCommand(Massband_Settings.class);
 		addCommand(Massband_Info.class);		
 		addCommand(Massband_Debug.class);
 	}
