@@ -22,6 +22,10 @@ public abstract class PlayerConfigBase<T extends PlayerConfigBase<T>> extends Co
 		return PlayerConfigBase.initialize(null, cfgclass);
 	}
 	
+	public boolean isDefault() {
+		return uuid == null;
+	}
+	
 	@Override
 	public String name() {
 		return defaultName();
