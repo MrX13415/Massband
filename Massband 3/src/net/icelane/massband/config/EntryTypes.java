@@ -1,7 +1,6 @@
 package net.icelane.massband.config;
 
 import java.util.Arrays;
-import java.util.stream.Stream;
 
 public final class EntryTypes {
 
