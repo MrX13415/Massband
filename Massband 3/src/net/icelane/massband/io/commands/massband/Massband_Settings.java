@@ -14,6 +14,8 @@ import net.icelane.massband.config.Entry;
 import net.icelane.massband.config.configs.PlayerConfig;
 import net.icelane.massband.core.Massband;
 import net.icelane.massband.io.CommandBase;
+import net.icelane.massband.io.commands.massband.settings.Settings_Config;
+import net.icelane.massband.io.commands.massband.settings.Settings_Default;
 
 public class Massband_Settings extends CommandBase{
 
@@ -31,7 +33,8 @@ public class Massband_Settings extends CommandBase{
 		setPermission("massband.command.settings", true);
 		setUsage("[player] <config entry> [value]");
 		
-		
+		addCommand(Settings_Default.class);
+		addCommand(Settings_Config.class);
 	}
 
 	@Override
@@ -39,15 +42,16 @@ public class Massband_Settings extends CommandBase{
 		List<String> tabList = super.onTabComplete(sender, command, alias, args);
 	
 		String arg0 = args.length > 0 ? args[0].trim().toLowerCase() : "";
-
+		boolean other = IsOtherPlayersEnabled(sender);
+		
 		ConfigBase<?> config = getConfig(sender);
 		int argOffset = 0;
 		
-		if (args.length <= 1) {
+		if (other && args.length <= 1) {
 			tabList.addAll(getTabListOfflinePlayers(arg0));
 		}
 					
-		if (args.length >= 2) {
+		if (other && args.length >= 2) {
 			Player targetPlayer = Server.get().getPlayer(arg0);
 			if (targetPlayer != null) {
 				config = getConfig((CommandSender)targetPlayer);
@@ -106,6 +110,36 @@ public class Massband_Settings extends CommandBase{
 		return tabList;
 	}
 	
+	protected boolean IsOtherPlayersEnabled(CommandSender sender) {
+		return true;
+	}
+	
+	public String getSettingsHeaderText(ConfigBase<?> config) {
+		return "§aSettings for Player: §c" + ((PlayerConfig)config).getPlayer().getName();
+	}
+	
+	public String getSettingEntryText(ConfigBase<?> config, Entry<?> entry) {
+		String defStrPart = "";
+		String defaultVal = "";
+		
+		if (config instanceof PlayerConfig && !((PlayerConfig)config).isDefault()){
+			Entry<?> entryDefault = PlayerConfig.getDefault().getEntry(entry.getPath());
+			if (entryDefault != null) defaultVal = entryDefault.get().toString();
+		}else {
+			defaultVal = entry.getDefault().toString();
+		}
+			
+		if (!defaultVal.isEmpty()) {
+			defStrPart = String.format("   §7(default: §9%s§7)", defaultVal);
+		}
+
+		return String.format("§7 - §6%s§7: §c%s%s", 
+				entry.getPath().replaceAll("\\.", "§c.§6"),
+				entry.get().toString(),
+				defStrPart);	
+	}
+	
+	
 	@Override
 	public boolean command(CommandSender sender, Command cmd, String label, String[] args) {
 		// Usage: [player] <entry> [value]
@@ -117,13 +151,15 @@ public class Massband_Settings extends CommandBase{
 		// C 1  entry    value    -         -> C: set entry value
 		// C 2  player   entry    value     -> C: set entry value
 
+		boolean other = IsOtherPlayersEnabled(sender);
+		
 		// Try to find the target player 
 		Player targetPlayer = null;
-		if (args.length > 0) targetPlayer = Server.get().getPlayer(args[0].trim());
+		if (other && args.length > 0) targetPlayer = Server.get().getPlayer(args[0].trim());
 		
 		boolean targetSelf = targetPlayer == null;
 		
-		if (targetSelf && !(sender instanceof Player)) {
+		if (other && targetSelf && !(sender instanceof Player)) {
 			sender.sendMessage("§cError: player not found!");	
 			return true;
 		}
@@ -140,22 +176,18 @@ public class Massband_Settings extends CommandBase{
 		
 		// A: List all settings of the config ...
 		if ((targetSelf && args.length == 0) || (!targetSelf && args.length == 1)) {
-			sender.sendMessage("§aSettings for Player: §c" + ((PlayerConfig)config).getPlayer().getName());
+			sender.sendMessage(getSettingsHeaderText(config));
 			
 			List<Entry<?>> entryList = config.getEntryList();
 			for (Entry<?> entry : entryList) {
-				
-				sender.sendMessage(String.format("§7 - §6%s§7: §c%s §7(default: §9%s§7)", 
-						entry.getPath().replaceAll("\\.", "§c.§6"),
-						entry.get().toString(),
-						entry.getDefault().toString()));
+				sender.sendMessage(getSettingEntryText(config, entry));
 			}
 			return true;
 		}
 		
 		// Try to find an entry ...
 		Entry<?> entry = config.getEntry(targetSelf ? args[0].trim() : args[1].trim());
-		
+
 		if (entry == null) {
 			sender.sendMessage("§cError: entry null!");
 			return true;
@@ -163,11 +195,8 @@ public class Massband_Settings extends CommandBase{
 
 		// B: Return the value of a specific entry ...
 		if ((targetSelf && args.length == 1) || (!targetSelf && args.length == 2)) {
-			sender.sendMessage("§aSettings for Player: §c" + ((PlayerConfig)config).getPlayer().getName());
-			sender.sendMessage(String.format("§7 - §6%s§7: §c%s   §7(default: §9%s§7)", 
-					entry.getPath().replaceAll("\\.", "§c.§6"),
-					entry.get().toString(),
-					entry.getDefault().toString()));
+			sender.sendMessage(getSettingsHeaderText(config));
+			sender.sendMessage(getSettingEntryText(config, entry));
 			return true;
 		}
 
