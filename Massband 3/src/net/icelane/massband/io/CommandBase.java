@@ -7,6 +7,7 @@ import java.util.List;
 
 import org.apache.commons.lang.StringUtils;
 import org.bukkit.Bukkit;
+import org.bukkit.OfflinePlayer;
 import org.bukkit.command.Command;
 import org.bukkit.command.CommandSender;
 import org.bukkit.command.PluginCommand;
@@ -16,6 +17,7 @@ import org.bukkit.permissions.Permission;
 import org.bukkit.permissions.PermissionDefault;
 
 import net.icelane.massband.Plugin;
+import net.icelane.massband.Server;
 import net.icelane.massband.core.Massband;
 
 /**
@@ -313,6 +315,47 @@ public abstract class CommandBase implements TabExecutor{
 //		return permission;
 //	}
 	
+	public List<String> getTabListPlayers(String arg){
+		ArrayList<String> resultList = new ArrayList<>();
+		arg = arg.toLowerCase().trim();
+		
+		for (Player player : Server.get().getOnlinePlayers()) {
+			String obj = player.getName();
+			if (obj.toLowerCase().contains(arg)) {
+				resultList.add(obj);
+			}
+		}		
+		return resultList;
+	}
+	
+	public List<String> getTabListOfflinePlayers(String arg){
+		ArrayList<String> resultList = new ArrayList<>();
+		arg = arg.toLowerCase().trim();
+		
+		for (OfflinePlayer player : Server.get().getOfflinePlayers()) {
+			String obj = player.getName();
+			if (obj.toLowerCase().contains(arg)) {
+				resultList.add(obj);
+			}
+		}		
+		return resultList;
+	}
+
+	
+//	public List<String> getTabList(Collection<?> collection, Method method, String arg){
+//		ArrayList<String> resultList = new ArrayList<>();
+//		arg = arg.toLowerCase().trim();
+//		
+//		for (Object object : collection) {
+//			try {
+//				if (method.invoke(object, new Object[0]).toString().toLowerCase().contains(arg)) {
+//					resultList.add(object.toString());
+//				}
+//			} catch (Exception ex) { }
+//		}		
+//		return resultList;
+//	}
+
 	/**
 	 * Returns a list of all matching sub commands and defined tab values for the given argument.
 	 * @param arg A command argument.

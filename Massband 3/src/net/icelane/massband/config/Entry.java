@@ -13,11 +13,13 @@ public abstract class Entry<T> {
 	private String comment = "";
 	private T defaultValue;
 	private T value;
+	private String[] values;
 	
 	public static <T> Entry<T> define(Entry<T> entry, String path, T value, String comment){
 		entry.setPath(path);
 		entry.setComment(comment);
 		entry.setDefault(value);
+		entry.setValues(entry.getDefault().toString());
 		entry.set(entry.getDefault());
 		return entry;
 	}
@@ -49,7 +51,7 @@ public abstract class Entry<T> {
 //	public static Entry_ define(String path,  value, String comment){
 //		return (Entry_) define(new Entry_(), path, value, comment);
 //	}
-	
+		
 	public abstract T valueOf(String value);
 	
 // TODO: improve value of ...
@@ -78,6 +80,10 @@ public abstract class Entry<T> {
 //	                + param.getName());
 //	    }   
 //	}
+	
+	public String[] getValues() {
+		return values;
+	}
 	
 	@Override
 	public String toString() {
@@ -108,6 +114,10 @@ public abstract class Entry<T> {
 
 	public T get() {
 		return value;
+	}
+	
+	public void setValues(String... values) {
+		this.values = values;
 	}
 	
 	public void setPath(String path) {
