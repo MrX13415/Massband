@@ -83,16 +83,26 @@ public class MassbandCommand extends CommandBase{
 			//**** Hidden Features ****
 			if (args[0].equalsIgnoreCase("_load") && sender.isOp()){
 				Player player = Server.get().getPlayer(args[1].trim());
-				Massband.get(player).config().load();
-				sender.sendMessage("§c(i) §6Massband config for player '" + player.getName() + "' loaded");
+				if (player != null)
+				{
+					Massband.get(player).config().load();
+					sender.sendMessage("§c(i) §6Massband config for player '" + player.getName() + "' loaded");
+				}else {
+					sender.sendMessage("§cError: Player not found: " + args[1].trim());		
+				}
 				return true;
 			}
 			
 			
 			if (args[0].equalsIgnoreCase("_save") && sender.isOp()){
 				Player player = Server.get().getPlayer(args[1].trim());
-				Massband.get(player).config().save();
-				sender.sendMessage("§c(i) §6Massband config for player '" + player.getName() + "' saved");
+				if (player != null)
+				{
+					Massband.get(player).config().save();
+					sender.sendMessage("§c(i) §6Massband config for player '" + player.getName() + "' saved");
+				}else {
+					sender.sendMessage("§cError: Player not found: " + args[1].trim());		
+				}
 				return true;
 			}
 			//*************************
