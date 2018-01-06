@@ -156,7 +156,7 @@ public abstract class CommandBase implements TabExecutor{
 		pluginCommand = Plugin.get().getCommand(name);
 		pluginCommand.setExecutor(this);
 		
-		if (pluginCommand.getAliases().isEmpty())
+		if (!pluginCommand.getAliases().isEmpty())
 			pluginCommand.setAliases(Arrays.asList(aliases));
 		
 		if (StringUtils.isEmpty(pluginCommand.getDescription()))
