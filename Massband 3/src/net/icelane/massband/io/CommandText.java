@@ -138,8 +138,8 @@ Effects:
 	
 	public static String getPermissionDenied(CommandBase command){
 		// output formats 
-		String format_header = "§cDENIED §aCommand: /%s§c%s %s";
-		String format_perm = "§aPermission: §c%s";
+		String format_header = "§cDENIED §aCommand: §7/%s§c%s %s";
+		String format_perm = "§aPermission: §6%s";
 		
 		// command info
 		String label   = command.getName();

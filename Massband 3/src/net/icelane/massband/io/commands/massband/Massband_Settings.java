@@ -31,7 +31,7 @@ public class Massband_Settings extends CommandBase{
 		setAliases("cfg", "set");
 		setDescription("Allows changes to any Massband settings.");
 		setPermission("massband.command.settings", true);
-		setUsage("[player] <config entry> [value]");
+		setUsage("<command>|[player] <config entry> [value]");
 		
 		addCommand(Settings_Default.class);
 		addCommand(Settings_Config.class);
@@ -139,10 +139,10 @@ public class Massband_Settings extends CommandBase{
 		}
 		
 		if (oldValue != null) {
-			oldValPart = String.format("§7%s §7-> ", oldValue.trim());
+			oldValPart = String.format("§f%s §7-> ", oldValue.trim());
 		}
 
-		return String.format("§7 - §6%s§7: %s§c%s%s", 
+		return String.format("§f - §6%s §7=  %s§c%s%s", 
 				entry.getPath().replaceAll("\\.", "§c.§6"),
 				oldValPart,
 				entry.get().toString(),
@@ -221,7 +221,7 @@ public class Massband_Settings extends CommandBase{
 				sender.sendMessage(getSettingsHeaderText(config));
 				sender.sendMessage(getSettingEntryText(config, entry, oldValue));
 				config.save();
-				sender.sendMessage("§5Value changed.");
+				sender.sendMessage("§aValue changed to: §c" + value);
 			}else{
 				sender.sendMessage("§cError: Invalid value: " + value);
 			}
