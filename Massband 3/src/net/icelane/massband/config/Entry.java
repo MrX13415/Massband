@@ -136,8 +136,13 @@ public abstract class Entry<T> {
 		this.value = value;
 	}
 
-	public void setValueOf(String value) {
-		this.value = valueOf(value);
+	public boolean setValueOf(String value) {
+		T newValue = valueOf(value);
+		if (newValue.toString().equalsIgnoreCase(value)) {
+			this.value = newValue;
+			return true;
+		}
+		return false;
 	}
 	
 }
