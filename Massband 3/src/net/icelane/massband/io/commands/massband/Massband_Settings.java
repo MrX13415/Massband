@@ -119,7 +119,12 @@ public class Massband_Settings extends CommandBase{
 	}
 	
 	public String getSettingEntryText(ConfigBase<?> config, Entry<?> entry) {
-		String defStrPart = "";
+		return getSettingEntryText(config, entry, null);	
+	}
+	
+	public String getSettingEntryText(ConfigBase<?> config, Entry<?> entry, String oldValue) {
+		String oldValPart = "";
+		String defStrPart = "";		
 		String defaultVal = "";
 		
 		if (config instanceof PlayerConfig && !((PlayerConfig)config).isDefault()){
@@ -132,9 +137,14 @@ public class Massband_Settings extends CommandBase{
 		if (!defaultVal.isEmpty()) {
 			defStrPart = String.format("   §7(default: §9%s§7)", defaultVal);
 		}
+		
+		if (oldValue != null) {
+			oldValPart = String.format("§7%s §7-> ", oldValue.trim());
+		}
 
-		return String.format("§7 - §6%s§7: §c%s%s", 
+		return String.format("§7 - §6%s§7: %s§c%s%s", 
 				entry.getPath().replaceAll("\\.", "§c.§6"),
+				oldValPart,
 				entry.get().toString(),
 				defStrPart);	
 	}
@@ -160,7 +170,7 @@ public class Massband_Settings extends CommandBase{
 		boolean targetSelf = targetPlayer == null;
 		
 		if (other && targetSelf && !(sender instanceof Player)) {
-			sender.sendMessage("§cError: player not found!");	
+			sender.sendMessage("§cError: Player not found: " + args[0].trim());	
 			return true;
 		}
 		
@@ -186,10 +196,11 @@ public class Massband_Settings extends CommandBase{
 		}
 		
 		// Try to find an entry ...
-		Entry<?> entry = config.getEntry(targetSelf ? args[0].trim() : args[1].trim());
+		String entryStr = targetSelf ? args[0].trim() : args[1].trim();
+		Entry<?> entry = config.getEntry(entryStr);
 
 		if (entry == null) {
-			sender.sendMessage("§cError: entry null!");
+			sender.sendMessage("§cError: Config entry not found: " + entryStr);
 			return true;
 		}
 
@@ -201,8 +212,20 @@ public class Massband_Settings extends CommandBase{
 		}
 
 		// C: Change the value of a specific entry ...
-		if ((targetSelf && args.length == 2) || args.length == 3) {
+		if ((targetSelf && args.length == 2) || args.length == 3) {		
 			String value = targetSelf ? args[1].trim() : args[2].trim();
+			String oldValue = entry.get().toString();
+			boolean ok = entry.setValueOf(value);
+			
+			if (ok) {
+				sender.sendMessage(getSettingsHeaderText(config));
+				sender.sendMessage(getSettingEntryText(config, entry, oldValue));
+				config.save();
+				sender.sendMessage("§5Value changed.");
+			}else{
+				sender.sendMessage("§cError: Invalid value: " + value);
+			}
+			
 			return true;		
 		}
 
