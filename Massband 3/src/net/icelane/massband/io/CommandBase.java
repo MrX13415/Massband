@@ -156,8 +156,9 @@ public abstract class CommandBase implements TabExecutor{
 		pluginCommand = Plugin.get().getCommand(name);
 		pluginCommand.setExecutor(this);
 		
-		if (!pluginCommand.getAliases().isEmpty())
+		if (pluginCommand.getAliases().isEmpty())
 			pluginCommand.setAliases(Arrays.asList(aliases));
+		else this.aliases = pluginCommand.getAliases().toArray(new String[] {});
 		
 		if (StringUtils.isEmpty(pluginCommand.getDescription()))
 			pluginCommand.setDescription(description);
@@ -572,7 +573,7 @@ public abstract class CommandBase implements TabExecutor{
 	public void setAliases(String...alias){
 		aliases = alias;
 	}
-	
+
 	private void setname(String name) {
 		this.name = name;
 	}
