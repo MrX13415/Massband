@@ -76,6 +76,13 @@ public class MassbandCommand extends CommandBase{
 				sender.sendMessage("§c(i) §6Massband config saved");
 				return true;
 			}
+			
+			if (args[0].equalsIgnoreCase("_clean") && sender.isOp()){
+				sender.sendMessage("§c(i) §6Running cleanup...");
+				Massband.removeAllMarkers(sender);
+				sender.sendMessage("§c(i) §6Cleanup done");
+				return true;
+			}
 			//*************************
 		}
 		
