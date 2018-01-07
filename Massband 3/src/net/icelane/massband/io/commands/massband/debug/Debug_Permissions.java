@@ -42,9 +42,9 @@ public class Debug_Permissions extends CommandBase{
 		return false;
 	}
 
-	@Override
-	public boolean command(Player player, Command cmd, String label, String[] args) {
-		return true;
-	}
+//	@Override
+//	public boolean command(Player player, Command cmd, String label, String[] args) {
+//		return true;
+//	}
 
 }

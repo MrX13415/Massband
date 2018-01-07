@@ -32,10 +32,10 @@ public class Massband_Debug extends CommandBase{
 		if (args.length == 1){
 			if (args[0].equalsIgnoreCase("true") || args[0].equalsIgnoreCase("1")){
 				Massband.setDebug(true);
-				if (sender instanceof Player) sender.sendMessage("§cDebug: §6/!\\ §aDebug enabled");
+				if (sender instanceof Player) sender.sendMessage("§7Debug: §6/!\\ §aDebug enabled");
 			}else{
 				Massband.setDebug(false);
-				if (sender instanceof Player) sender.sendMessage("§cDebug: §6/!\\ §cDebug disabled");
+				if (sender instanceof Player) sender.sendMessage("§7Debug: §6/!\\ §cDebug disabled");
 			}
 			return true;
 		}
@@ -43,9 +43,9 @@ public class Massband_Debug extends CommandBase{
 		return false;
 	}
 
-	@Override
-	public boolean command(Player player, Command cmd, String label, String[] args) {
-		return true;
-	}
+//	@Override
+//	public boolean command(Player player, Command cmd, String label, String[] args) {
+//		return true;
+//	}
 
 }
