@@ -12,7 +12,6 @@ import org.bukkit.block.BlockFace;
 import org.bukkit.entity.ArmorStand;
 import org.bukkit.entity.Entity;
 import org.bukkit.entity.Player;
-import org.bukkit.metadata.MetadataValue;
 import org.bukkit.util.Vector;
 
 import net.icelane.massband.Plugin;
@@ -84,14 +83,7 @@ public class Marker {
 	}
 	
 	public static boolean isMarker(org.bukkit.plugin.Plugin plugin, ArmorStand entity) {
-		if (entity == null) return false;
-		
-		// check if Massband marker ...
-		MetadataValue objectType = HoloText.getMetadata(plugin, entity, HoloText.metadata_Identifier);
-		if (objectType == null) return false;
-		if (objectType.asString().equals(Marker.Metadata_Identifier)) return true;
-
-		return false;
+		return HoloText.isIdentifier(plugin, Marker.Metadata_Identifier, entity);
 	}
 	
 	public Marker(Player player, World world) {
