@@ -20,7 +20,7 @@ public class Debug_Permissions extends CommandBase{
 		setAliases("permission", "perm");
 		setDescription("Enable/Disable Permissions for Massband.");
 		setUsage("[true|false]");
-		setPermission("massband.debug.permission", false);
+		setPermission("massband.debug.permission", true);
 		setDebugRequired(true);
 	}
 
