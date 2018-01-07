@@ -37,9 +37,13 @@ public class Plugin extends JavaPlugin{
 		
 		Config.initialize();
 		Config.get().load();
+		Config.get().save();
 		
 		Server.registerEvents();
 		Server.registerCommands();
+		
+		if (Config.get().cleanupEnabled.get()) 
+			Massband.removeAllMarkers(null);
 	}
 	
 	@Override
