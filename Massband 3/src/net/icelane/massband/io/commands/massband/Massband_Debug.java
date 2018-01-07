@@ -43,9 +43,4 @@ public class Massband_Debug extends CommandBase{
 		return false;
 	}
 
-//	@Override
-//	public boolean command(Player player, Command cmd, String label, String[] args) {
-//		return true;
-//	}
-
 }
