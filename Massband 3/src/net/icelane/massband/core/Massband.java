@@ -72,8 +72,9 @@ public class Massband {
 			if (count == 0) continue; 
 			
 			Server.logger().info(String.format("[%s] %s Markers removed from world", world.getName(), count));
-			if (sender == null && sender instanceof Player) continue;
-			sender.sendMessage(String.format("§9World: §7[§5%s§7] §c%s §6Markers removed", world.getName(), count));		
+			if (sender == null) continue;
+			if (sender instanceof Player) 
+				sender.sendMessage(String.format("§9World: §7[§5%s§7] §c%s §6Markers removed", world.getName(), count));		
 		}
 	}
 	
