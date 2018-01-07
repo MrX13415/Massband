@@ -74,7 +74,7 @@ public class HoloText {
 	public static void initialize(Plugin plugin) {
 		HoloText.plugin = plugin;
 	}
-
+	
 	public static HoloText create(Player player, World world, Block block, String text){
 		return create(player, world, block, BlockFace.UP, text);		
 	}
@@ -96,6 +96,20 @@ public class HoloText {
 		return holotext;
 	}
 	
+	public static HoloText getObject(ArmorStand entity) {
+		return getObject(net.icelane.massband.Plugin.get(), entity);
+	}
+	
+	protected static HoloText getObject(Plugin plugin, ArmorStand entity) {
+		if (entity == null) return null;
+		
+		// get the HoloText object it belongs to ...
+		MetadataValue hlobject = HoloText.getMetadata(plugin, entity, HoloText.metadata_Object);
+		if (hlobject == null) return null; 
+		if (hlobject.value() instanceof HoloText) return (HoloText) hlobject.value();
+		return null;
+	}
+	
 	public static MetadataValue getMetadata(Entity entity, String metadataKey) {
 		return getMetadata(plugin, entity, metadataKey);
 	}
@@ -108,7 +122,7 @@ public class HoloText {
 		}
 		return null;
 	}
-	
+		
 	/**
 	 * Prepares a default set of meta data to this object.
 	 * Containing a given identifier and the UUID of the player created this object.
@@ -458,14 +472,21 @@ public class HoloText {
 			if (!(entity instanceof ArmorStand)) continue;
 			
 			// check of Massband marker ...
-			MetadataValue objectType = HoloText.getMetadata(plugin, entity, HoloText.metadata_Identifier);
-			if (objectType == null || !objectType.asString().equals(Marker.Metadata_Identifier)) continue;
+			//MetadataValue objectType = HoloText.getMetadata(plugin, entity, HoloText.metadata_Identifier);
+			//if (objectType == null || !objectType.asString().equals(Marker.Metadata_Identifier)) continue;
 
 			// get the HoloText object it belongs to ...
-			MetadataValue hlobject = HoloText.getMetadata(plugin, entity, HoloText.metadata_Object);
-			if (hlobject == null || !(hlobject.value() instanceof HoloText)) continue;
+			//MetadataValue hlobject = HoloText.getMetadata(plugin, entity, HoloText.metadata_Object);
+			//if (hlobject == null || !(hlobject.value() instanceof HoloText)) continue;
 
-			HoloText marker = (HoloText) hlobject.value();
+			// check of Massband marker ...
+			if (!Marker.isMarker(plugin, (ArmorStand)entity)) continue;
+
+			// get the HoloText object it belongs to ...
+			HoloText marker = HoloText.getObject(plugin, (ArmorStand)entity);
+			if (marker == null) continue;
+			
+			//HoloText marker = (HoloText) hlobject.value();
 			// show the owner tag if the player is not the owner itself.
 			if (!marker.isOwner(event.getPlayer())) marker.showOwner();
 		}		
