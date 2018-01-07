@@ -110,6 +110,23 @@ public class HoloText {
 		return null;
 	}
 	
+	public static boolean isIdentifier(org.bukkit.plugin.Plugin plugin, String identifier, ArmorStand entity) {
+		if (entity == null) return false;
+		
+		// check if Massband marker ...
+		MetadataValue objectType = HoloText.getMetadata(plugin, entity, HoloText.metadata_Identifier);
+		if (objectType != null) {
+			if (objectType.asString().equals(identifier)) return true;
+		}
+		
+		// check if the scoreboard tag is present ...
+		for (String tag : entity.getScoreboardTags()) {
+			if (tag.equals(identifier)) return true;
+		}
+		
+		return false;
+	}
+	
 	public static MetadataValue getMetadata(Entity entity, String metadataKey) {
 		return getMetadata(plugin, entity, metadataKey);
 	}
@@ -149,8 +166,10 @@ public class HoloText {
 	private static void writeMetadata(ArmorStand entity, HoloText holotext) {
 		entity.setMetadata(metadata_Object, new FixedMetadataValue(plugin, holotext));
 		
-		if (holotext.identifier != null) 
+		if (holotext.identifier != null) {
 			entity.setMetadata(metadata_Identifier, holotext.identifier);
+			entity.addScoreboardTag(holotext.identifier.asString());
+		}
 		if (holotext.ownerUUID != null)
 			entity.setMetadata(metadata_OwnerUUID, holotext.ownerUUID);
 	}
