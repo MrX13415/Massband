@@ -19,7 +19,7 @@ public class Settings_Config extends Massband_Settings{
 	public void initialize() {
 		setAliases("config", "cfg");
 		setDescription("Allows changes to the Massband configuration.");
-		setPermission("massband.command.settings.config", true);
+		setPermission("massband.command.settings.config", false);
 		setUsage("<config entry> [value]");
 	}
 

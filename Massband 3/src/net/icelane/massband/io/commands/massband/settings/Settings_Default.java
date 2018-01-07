@@ -19,7 +19,7 @@ public class Settings_Default extends Massband_Settings{
 	public void initialize() {
 		setAliases("defaults", "def");
 		setDescription("Allows changes to default settings for all players.");
-		setPermission("massband.command.settings.default", true);
+		setPermission("massband.command.settings.default", false);
 		setUsage("<config entry> [value]");
 	}
 
