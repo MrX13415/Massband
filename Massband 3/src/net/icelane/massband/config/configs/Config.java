@@ -25,9 +25,11 @@ public class Config extends ConfigBase<Config> {
 		return "config.yml";
 	}
 
-	public Entry_Double defaultEntityLineOffset = Entry.define("marker.LineOffset", 0.3, "");	
+	public Entry_Boolean cleanupEnabled = Entry.define("cleanup.enabled", true, "This will remove any leftover \"markers\" on server startup.");
 	
-	public Entry_Boolean marker_showOwnerTags     = Entry.define("marker.OwnerTags.Enable", true, "");
+	public Entry_Double defaultEntityLineOffset = Entry.define("marker.LineOffset", 0.3, "The space between multiple lines of a marker.");	
+	
+	public Entry_Boolean marker_showOwnerTags     = Entry.define("marker.OwnerTags.Enable", true, "Shows the name of the player a marker belongs to.");
 	public Entry_Long defaultOwnerHideTicks = Entry.define("marker.OwnerTags.HideTicks", 20L * 3, "ticks (20 tick => 1 sec)");
 	public Entry_Long defaultOwnerShowDelayTicks = Entry.define("marker.OwnerTags.DelayTicks", 10L, "ticks (1 tick => 50 ms)");
 
