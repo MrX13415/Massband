@@ -1,6 +1,7 @@
 package net.icelane.massband.core;
 
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.List;
 
 import org.bukkit.Chunk;
@@ -8,8 +9,10 @@ import org.bukkit.Location;
 import org.bukkit.World;
 import org.bukkit.block.Block;
 import org.bukkit.block.BlockFace;
+import org.bukkit.entity.ArmorStand;
 import org.bukkit.entity.Entity;
 import org.bukkit.entity.Player;
+import org.bukkit.metadata.MetadataValue;
 import org.bukkit.util.Vector;
 
 import net.icelane.massband.Plugin;
@@ -64,6 +67,32 @@ public class Marker {
 	
 	private double distance;
 	
+	public static int removeAll(World world) {		
+		Collection<ArmorStand> enitties = world.getEntitiesByClass(ArmorStand.class);
+		int count = 0;
+		
+		for (ArmorStand armorStand : enitties) {
+			if (!Marker.isMarker(armorStand)) continue;
+			armorStand.remove();
+			count++;
+		}
+		return count;
+	}
+	
+	public static boolean isMarker(ArmorStand entity) {
+		return isMarker(Plugin.get(), entity);
+	}
+	
+	public static boolean isMarker(org.bukkit.plugin.Plugin plugin, ArmorStand entity) {
+		if (entity == null) return false;
+		
+		// check if Massband marker ...
+		MetadataValue objectType = HoloText.getMetadata(plugin, entity, HoloText.metadata_Identifier);
+		if (objectType == null) return false;
+		if (objectType.asString().equals(Marker.Metadata_Identifier)) return true;
+
+		return false;
+	}
 	
 	public Marker(Player player, World world) {
 		HoloText.initialize(Plugin.get());
@@ -71,7 +100,6 @@ public class Marker {
 		this.world = world;
 	}
 
-	
 	public void hideAll(){
 		for (HoloText marker : markerList){
 			marker.hide();
@@ -382,11 +410,9 @@ public class Marker {
 		return format_markerLast;
 	}
 
-
 	public void setFormat_markerLast(String format_markerLast) {
 		this.format_markerLast = format_markerLast;
 	}
-
 
 	public void setFormat_marker(String format_marker) {
 		this.format_marker = format_marker;
@@ -437,7 +463,7 @@ public class Marker {
 			default: return "";
 		}
 	}
-	
+		
 	public class MarkerSettings{
 		
 		private BlockAxis axis = BlockAxis.None;
