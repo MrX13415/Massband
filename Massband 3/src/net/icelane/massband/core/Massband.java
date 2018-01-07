@@ -5,6 +5,7 @@ import java.util.Map.Entry;
 import java.util.UUID;
 
 import org.bukkit.World;
+import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
 import org.bukkit.event.player.PlayerInteractEvent;
 import org.bukkit.event.player.PlayerJoinEvent;
@@ -63,6 +64,17 @@ public class Massband {
 		config().loadDefault();
 		config().save();
 		this.interact = new Interact(this);
+	}
+	
+	public static void removeAllMarkers(CommandSender sender) {
+		for (World world : Server.get().getWorlds()) {
+			int count = Marker.removeAll(world);
+			if (count == 0) continue; 
+			
+			Server.logger().info(String.format("[%s] %s Markers removed from world", world.getName(), count));
+			if (sender == null && sender instanceof Player) continue;
+			sender.sendMessage(String.format("§9World: §7[§5%s§7] §c%s §6Markers removed", world.getName(), count));		
+		}
 	}
 	
 	public static void cleanAll(){
