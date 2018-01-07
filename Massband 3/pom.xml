@@ -2,7 +2,7 @@
   <modelVersion>4.0.0</modelVersion>
   <groupId>net.icelane</groupId>
   <artifactId>Massband</artifactId>
-  <version>3.0.4-SNAPSHOT</version>
+  <version>3.0.5-SNAPSHOT</version>
   <name>Massband</name>
   <repositories>
     <repository>
@@ -15,14 +15,12 @@
     <dependency>
         <groupId>org.spigotmc</groupId>
         <artifactId>spigot-api</artifactId>
-        <version>1.12-R0.1-SNAPSHOT</version>
         <scope>provided</scope>
     </dependency>
     <!--Bukkit API-->
     <dependency>
         <groupId>org.bukkit</groupId>
         <artifactId>bukkit</artifactId>
-        <version>1.12-R0.1-SNAPSHOT</version>
         <scope>provided</scope>
     </dependency>
   </dependencies>  
@@ -47,4 +45,18 @@
       </plugin>
     </plugins>
   </build>
+  <dependencyManagement>
+  	<dependencies>
+  		<dependency>
+  			<groupId>org.spigotmc</groupId>
+  			<artifactId>spigot-api</artifactId>
+  			<version>1.12.2-R0.1-SNAPSHOT</version>
+  		</dependency>
+  		<dependency>
+  			<groupId>org.bukkit</groupId>
+  			<artifactId>bukkit</artifactId>
+  			<version>1.12.2-R0.1-SNAPSHOT</version>
+  		</dependency>
+  	</dependencies>
+  </dependencyManagement>
 </project>
