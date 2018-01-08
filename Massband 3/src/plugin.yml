@@ -1,7 +1,7 @@
 main: net.icelane.massband.Plugin
 
 name: Massband
-version: 3.0.5 beta
+version: 3.0.7 beta
 description: Various measuring tools for making the players building life a bit easier.
 author: MrX13415
 website: https://dev.bukkit.org/bukkit-plugins/massband/
