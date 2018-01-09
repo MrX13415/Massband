@@ -51,21 +51,53 @@ public abstract class CommandBase implements TabExecutor{
 		Permission
 	}
 	
+	public enum FailReason{
+		/**
+		 * The command hasn't been run yet.
+		 */
+		Unknown,
+		/**
+		 * The command was successful.
+		 */
+		None,
+		/**
+		 * The '?' parameter has been set and therefore help was requested.
+		 */
+		Help,
+		/**
+		 * The command has failed for being not recognized or due to invalid syntax.
+		 */
+		Invalid,
+		/**
+		 * The command has failed due to insufficient permission.
+		 */
+		Permissions,
+		/**
+		 * The command requires debug mode.
+		 */
+		Debug
+	}
+	
+	
 	// Command specific
 	// ---
 	protected PluginCommand pluginCommand;
 	
-	protected String name           = "";
-	protected String[] aliases      = {};
-	protected String description    = "";
-	protected String help           = "";
-	protected String usage          = "";
-	protected Permission permission = null;
-	protected boolean debugRequired = false;
-	protected boolean inGameOnly    = false;
-	protected Visibility visibility = Visibility.Permission;
-	protected String[] tabList      = {};
+	protected String name              = "";			// The "main" name of the command.
+	protected String[] aliases         = {};			// Any additional aliases.
+	protected String description       = "";			// A brief description what this command will do.
+	protected String help              = "";			// More detailed help.
+	protected String usage             = "";			// The "usage" string, defining what parameters the command has.
+	protected Permission permission    = null;			// The permission to be allow to use this command
 	
+	protected boolean debugRequired    = false;			// Weather this command requires the debug mode.
+	protected boolean inGameOnly       = false;			// Weather this command can only be run in game.
+	
+	protected Visibility visibility    = Visibility.Permission;
+	protected FailReason failReason  = FailReason.Unknown;
+	protected String[] tabList         = {};
+	
+	protected ArrayList<Permission> subPermissions = new ArrayList<>();
 	protected ArrayList<CommandBase> commands = new ArrayList<>();
 	protected CommandBase parent = null;
 
@@ -149,7 +181,7 @@ public abstract class CommandBase implements TabExecutor{
 	 * Initialized the command and registers the corresponding executer to the Server.
 	 * For main commands, definitions made in the "plugin.yml" have priority over those made to the it's object itself.
 	 * <p>
-	 * If this command has sub commands defined a wildcard permission gets created containg all sub command permissions. 
+	 * If this command has sub commands defined, a wildcard permission gets created containing all sub command permissions. 
 	 * </p>
 	 */
 	protected void initPluginCommand(){
@@ -202,35 +234,24 @@ public abstract class CommandBase implements TabExecutor{
 						cmd.getPermission().getDefault() == PermissionDefault.TRUE);
 			}
 			
+			// add all additional sub permissions ...
+			for (Permission permission : subPermissions) {
+				// add the permission to the server first ...
+				Bukkit.getPluginManager().addPermission(permission);	
+				
+				// add it to the wildcard permission ...
+				wildcardPermission.getChildren().put(
+						permission.getName(),
+						permission.getDefault() == PermissionDefault.TRUE);
+			}
+
 			wildcardPermission.recalculatePermissibles();
 			
 			if (Bukkit.getPluginManager().getPermission(wildcardPermission.getName()) == null) 
 				Bukkit.getPluginManager().addPermission(wildcardPermission);
 		}
 	}
-	
-//	/**
-//	 * Reads any command settings defined in the <code>plugin.yml</code> for this command name and sets them.
-//	 * Settings not defined in the <code>plugin.yml</code> won't be changed.
-//	 */
-//	public void setupCommandDefinition(){
-//		Plugin plugin = Plugin.get();
-//		if (!plugin.getDescription().getCommands().containsKey(getName())) return;
-//		Map<String, Object> command = Plugin.get().getDescription().getCommands().get(getName());
-//
-//		if (command.containsKey("description"))
-//			setDescription((String) command.get("description"));
-//		
-//		if (command.containsKey("aliases"))
-//			setAliases(((ImmutableList<?>) command.get("aliases")).toArray(new String[0]));
-//
-//		if (command.containsKey("permission"))
-//			setPermission((String) command.get("permission"), true);
-//		
-//		if (command.containsKey("usage"))
-//			setUsage((String) command.get("usage"));
-//	}
-	
+		
 	/**
 	 * Whether the given <code>CommandSender</code> object is a player.
 	 * @param sender An instance of class <code>CommandSender</code>
@@ -254,7 +275,7 @@ public abstract class CommandBase implements TabExecutor{
 	 * Whether the given <code>CommandSender</code> object has permission to use this command.
 	 * Permission will also be granted if a wildcard permission of any parent command is present.
 	 * <p>
-	 * If no permissions has been set for this command acces will be granted.
+	 * If no permissions has been set for this command access will be granted.
 	 * </p>
 	 * @param sender An instance of class <code>CommandSender</code>
 	 * @return <code>true</code> if the given <code>CommandSender</code> object has use permissions.
@@ -419,11 +440,13 @@ public abstract class CommandBase implements TabExecutor{
 		
 		// check permissions
 		if (!hasPermission(sender)){
+			setFailReason(FailReason.Permissions);
 			sender.sendMessage(CommandText.getPermissionDenied(this));
 			return false;
 		}
 
 		if (debugRequired && !Massband.isDebug()) {
+			setFailReason(FailReason.Debug);
 			sender.sendMessage(CommandText.getDebugRequired(this));
 			return false;
 		}
@@ -439,7 +462,8 @@ public abstract class CommandBase implements TabExecutor{
 		}
 		
 		// process command
-		if (args.length == 1 && args[0].equals("?")){
+		if (args.length > 1 && args[args.length - 1].equals("?")){
+			setFailReason(FailReason.Help);
 			sender.sendMessage(CommandText.getHelp(this, sender));
 			return true;
 		}else{
@@ -456,9 +480,13 @@ public abstract class CommandBase implements TabExecutor{
 			}
 			
 			// send help text on false result
-			if (!result) sender.sendMessage(CommandText.getHelp(this, sender));
+			if (!result) {
+				if (getFailReason() == FailReason.None) setFailReason(FailReason.Invalid);
+				if (getFailReason() == FailReason.Invalid || getFailReason() == FailReason.Help)
+					sender.sendMessage(CommandText.getHelp(this, sender));
+			}
 			
-			return true;
+			return result;
 		}
 	}
 
@@ -601,6 +629,18 @@ public abstract class CommandBase implements TabExecutor{
 	public void setPermission(Permission permission){
 		this.permission = permission;
 	}
+	
+	public void addSubPermission(String permission, boolean defaultValue) {
+		addSubPermission(permission, defaultValue ? PermissionDefault.TRUE : PermissionDefault.FALSE);
+	}
+	
+	public void addSubPermission(String permission, PermissionDefault defaultValue) {
+		addSubPermission(new Permission(permission, defaultValue));
+	}
+	
+	public void addSubPermission(Permission permission) {
+		subPermissions.add(permission);
+	}
 
 	public void setTabList(String...tabValue){
 		tabList = tabValue;
@@ -620,6 +660,19 @@ public abstract class CommandBase implements TabExecutor{
 
 	public void setDebugRequired(boolean debugRequired) {
 		this.debugRequired = debugRequired;
+	}
+
+	public FailReason getFailReason() {
+		return failReason;
+	}
+
+	/**
+	 * Specify the correct reason before returning 'false'.
+	 * Use to handle sub permissions. 
+	 * @param falseReason The reason way the command failed.
+	 */
+	public void setFailReason(FailReason falseReason) {
+		this.failReason = falseReason;
 	}
 
 	public Visibility getVisibility() {
