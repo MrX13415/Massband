@@ -38,7 +38,7 @@ Effects:
 */
 
 	public static String getWildCardDescription(CommandBase command) {
-		return String.format("Gives access to all %s sub commands", command.getName());
+		return String.format("Gives full access to the %s command.", command.getName());
 	}
 	
 	public static String getIngameOnly(CommandBase command){
@@ -137,6 +137,10 @@ Effects:
 	}
 	
 	public static String getPermissionDenied(CommandBase command){
+		return getPermissionDenied(command, command.getPermission());
+	}
+	
+	public static String getPermissionDenied(CommandBase command, Permission permission){
 		// output formats 
 		String format_header = "§cDENIED §aCommand: §7/%s§c%s %s";
 		String format_perm = "§aPermission: §6%s";
@@ -148,20 +152,20 @@ Effects:
 
 		// permission
 		String out_perm = "";
-		CommandBase parentcmd = command.getParent();
-		Permission perm = command.getPermission();
+		//CommandBase parentcmd = command.getParent();
+		//Permission perm = permission;
 			
-		while ( parentcmd != null && perm == null){
-			perm = parentcmd.getPermission();
-			parentcmd = parentcmd.getParent();
-		}
+		//while ( parentcmd != null && perm == null){
+		//	perm = parentcmd.getPermission();
+		//	parentcmd = parentcmd.getParent();
+		//}
 				
-		if ( command.getPermission() != null){
+		if ( permission != null){
 			if (Plugin.get().isPermissionsEnabled()) {
-				out_perm = String.format(format_perm, command.getPermission().getName());	
+				out_perm = String.format(format_perm, permission.getName());	
 			}
-			else if (command.getPermission().getDefault() == PermissionDefault.FALSE ||
-					command.getPermission().getDefault() == PermissionDefault.OP) {
+			else if (permission.getDefault() == PermissionDefault.FALSE ||
+					permission.getDefault() == PermissionDefault.OP) {
 				out_perm = String.format(format_perm, "OP");
 			}
 		}
