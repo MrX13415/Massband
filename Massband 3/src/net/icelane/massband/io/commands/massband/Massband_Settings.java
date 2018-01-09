@@ -7,6 +7,8 @@ import java.util.List;
 import org.bukkit.command.Command;
 import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
+import org.bukkit.permissions.Permission;
+import org.bukkit.permissions.PermissionDefault;
 
 import net.icelane.massband.Server;
 import net.icelane.massband.config.ConfigBase;
@@ -14,12 +16,14 @@ import net.icelane.massband.config.Entry;
 import net.icelane.massband.config.configs.PlayerConfig;
 import net.icelane.massband.core.Massband;
 import net.icelane.massband.io.CommandBase;
+import net.icelane.massband.io.CommandText;
 import net.icelane.massband.io.commands.massband.settings.Settings_Config;
 import net.icelane.massband.io.commands.massband.settings.Settings_Default;
 
 public class Massband_Settings extends CommandBase{
 
 	public static final String Default = "default";
+	public static final Permission otherPermission = new Permission("massband.command.settings.other", PermissionDefault.FALSE);
 	
 	@Override
 	public String name() {
@@ -35,6 +39,8 @@ public class Massband_Settings extends CommandBase{
 		
 		addCommand(Settings_Default.class);
 		addCommand(Settings_Config.class);
+		
+		addSubPermission(otherPermission);
 	}
 
 	@Override
@@ -169,6 +175,12 @@ public class Massband_Settings extends CommandBase{
 		
 		boolean targetSelf = targetPlayer == null;
 		
+		if (!sender.hasPermission(otherPermission)) {
+			setFailReason(FailReason.Permissions);
+			sender.sendMessage(CommandText.getPermissionDenied(this, otherPermission));
+			return false;
+		}
+		
 		if (other && targetSelf && !(sender instanceof Player)) {
 			sender.sendMessage("§cError: Player not found: " + args[0].trim());	
 			return true;
@@ -230,11 +242,6 @@ public class Massband_Settings extends CommandBase{
 		}
 
 		return false;
-	}
-
-	@Override
-	public boolean command(Player player, Command cmd, String label, String[] args) {
-		return command((CommandSender)player, cmd, label, args);
 	}
 
 }
