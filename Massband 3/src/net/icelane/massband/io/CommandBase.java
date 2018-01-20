@@ -3,6 +3,7 @@ package net.icelane.massband.io;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Comparator;
+import java.util.HashMap;
 import java.util.List;
 
 import org.apache.commons.lang.StringUtils;
@@ -90,6 +91,10 @@ public abstract class CommandBase implements TabExecutor{
 	protected String usage             = "";			// The "usage" string, defining what parameters the command has.
 	protected Permission permission    = null;			// The permission to be allow to use this command
 	
+	protected ArrayList<Permission> subPermissions        = new ArrayList<>();	// Sub Permission required for specific parts of the command
+	protected HashMap<Permission[], String> subPermsUsage       = new HashMap<>();	// May replace the "normal" usage text if specific permissions are given.
+	protected HashMap<Permission[], String> subPermsDescription = new HashMap<>();	// May replace the "normal" description text if specific permissions are given.
+	
 	protected boolean debugRequired    = false;			// Weather this command requires the debug mode.
 	protected boolean inGameOnly       = false;			// Weather this command can only be run in game.
 	
@@ -97,7 +102,6 @@ public abstract class CommandBase implements TabExecutor{
 	protected FailReason failReason  = FailReason.Unknown;
 	protected String[] tabList         = {};
 	
-	protected ArrayList<Permission> subPermissions = new ArrayList<>();
 	protected ArrayList<CommandBase> commands = new ArrayList<>();
 	protected CommandBase parent = null;
 
@@ -186,34 +190,38 @@ public abstract class CommandBase implements TabExecutor{
 	 */
 	protected void initPluginCommand(){
 		pluginCommand = Plugin.get().getCommand(name);
-		pluginCommand.setExecutor(this);
 		
-		if (pluginCommand.getAliases().isEmpty())
-			pluginCommand.setAliases(Arrays.asList(aliases));
-		else this.aliases = pluginCommand.getAliases().toArray(new String[] {});
-		
-		if (StringUtils.isEmpty(pluginCommand.getDescription()))
-			pluginCommand.setDescription(description);
-		else description = pluginCommand.getDescription();
-		
-		if (StringUtils.isEmpty(pluginCommand.getUsage()))
-			pluginCommand.setUsage(usage);
-		else usage = pluginCommand.getUsage();
-		
-		String permStr = pluginCommand.getPermission();
-		permission = Bukkit.getPluginManager().getPermission(permStr);
-		
-		// add the permission if its not already known to the server.
-		if (permission == null) {
-			permission = new Permission(permStr, PermissionDefault.FALSE);
-			Bukkit.getPluginManager().addPermission(permission);	
+		// only for main commands ...
+		if (pluginCommand != null) {
+			pluginCommand.setExecutor(this);
+			
+			if (pluginCommand.getAliases().isEmpty())
+				pluginCommand.setAliases(Arrays.asList(aliases));
+			else this.aliases = pluginCommand.getAliases().toArray(new String[] {});
+			
+			if (StringUtils.isEmpty(pluginCommand.getDescription()))
+				pluginCommand.setDescription(description);
+			else description = pluginCommand.getDescription();
+			
+			if (StringUtils.isEmpty(pluginCommand.getUsage()))
+				pluginCommand.setUsage(usage);
+			else usage = pluginCommand.getUsage();
+			
+			String permStr = pluginCommand.getPermission();
+			permission = Bukkit.getPluginManager().getPermission(permStr);
+			
+			// add the permission if its not already known to the server.
+			if (permission == null) {
+				permission = new Permission(permStr, PermissionDefault.FALSE);
+				Bukkit.getPluginManager().addPermission(permission);	
+			}
+			
+			if (StringUtils.isEmpty(pluginCommand.getPermissionMessage()))
+				pluginCommand.setPermissionMessage(CommandText.getPermissionDenied(this));
 		}
 		
-		if (StringUtils.isEmpty(pluginCommand.getPermissionMessage()))
-			pluginCommand.setPermissionMessage(CommandText.getPermissionDenied(this));
-		
 		if (hasSubCommands()) {
-			String wildcardstr = String.format("%s.*", permStr);
+			String wildcardstr = String.format("%s.*", permission.getName());
 			
 			Permission wildcardPermission = Bukkit.getPluginManager().getPermission(wildcardstr);
 			if (wildcardPermission == null) {
@@ -223,7 +231,7 @@ public abstract class CommandBase implements TabExecutor{
 			
 			// add root permission ...
 			wildcardPermission.getChildren().put(
-					permStr,
+					permission.getName(),
 					permission.getDefault() == PermissionDefault.TRUE);
 			
 			// add all sub command permissions ...
@@ -235,10 +243,17 @@ public abstract class CommandBase implements TabExecutor{
 			}
 			
 			// add all additional sub permissions ...
-			for (Permission permission : subPermissions) {
-				// add the permission to the server first ...
-				Bukkit.getPluginManager().addPermission(permission);	
+			for (Permission permission : subPermissions) {				
+				Permission svrPerm = Bukkit.getPluginManager().getPermission(permission.getName());
 				
+				// add the permission if its not already known to the server.
+				if (svrPerm == null) {
+					// add the permission to the server first ...
+					Bukkit.getPluginManager().addPermission(permission);	
+				} else {
+					permission = svrPerm;
+				}
+					
 				// add it to the wildcard permission ...
 				wildcardPermission.getChildren().put(
 						permission.getName(),
@@ -437,16 +452,18 @@ public abstract class CommandBase implements TabExecutor{
 	
 	@Override
 	public boolean onCommand(CommandSender sender, Command command, String alias, String[] args){
-		
+
 		// check permissions
 		if (!hasPermission(sender)){
 			setFailReason(FailReason.Permissions);
+			
 			sender.sendMessage(CommandText.getPermissionDenied(this));
 			return false;
 		}
 
 		if (debugRequired && !Massband.isDebug()) {
 			setFailReason(FailReason.Debug);
+			
 			sender.sendMessage(CommandText.getDebugRequired(this));
 			return false;
 		}
@@ -462,11 +479,15 @@ public abstract class CommandBase implements TabExecutor{
 		}
 		
 		// process command
-		if (args.length > 1 && args[args.length - 1].equals("?")){
+		if (args.length > 0 && args[args.length - 1].equals("?")){
 			setFailReason(FailReason.Help);
+			
 			sender.sendMessage(CommandText.getHelp(this, sender));
 			return true;
 		}else{
+			// the command is "running" now. If something fails we just send "help" by default.
+			setFailReason(FailReason.Help);
+			
 			boolean result = false;
 			if (isPlayer(sender)){
 				result = command(getPlayer(sender), command, alias, args);
@@ -482,8 +503,10 @@ public abstract class CommandBase implements TabExecutor{
 			// send help text on false result
 			if (!result) {
 				if (getFailReason() == FailReason.None) setFailReason(FailReason.Invalid);
-				if (getFailReason() == FailReason.Invalid || getFailReason() == FailReason.Help)
+				if (getFailReason() == FailReason.Invalid || getFailReason() == FailReason.Help) {
 					sender.sendMessage(CommandText.getHelp(this, sender));
+					return true;
+				}
 			}
 			
 			return result;
@@ -521,6 +544,7 @@ public abstract class CommandBase implements TabExecutor{
 			cmd.setname(cmd.name());
 			cmd.initialize(); 
 			cmd.setParent(this);
+			cmd.initPluginCommand();
 			this.commands.add(cmd);
 
 		} catch (InstantiationException e) {
@@ -578,12 +602,33 @@ public abstract class CommandBase implements TabExecutor{
 		return description;
 	}
 	
+	public String getDescription(CommandSender sender) {
+		for (Permission[] perms : subPermsDescription.keySet()) {
+			for (Permission permission : perms) {
+				if (!sender.hasPermission(permission)) break;
+				return subPermsDescription.get(perms);
+			}
+		}
+		return getDescription();
+	}
+	
 	public String getHelp() {
 		return help;
 	}
 
 	public String getUsage() {
 		return usage;
+	}
+	
+	public String getUsage(CommandSender sender) {
+		for (Permission[] perms : subPermsUsage.keySet()) {
+			for (Permission permission : perms) {
+				boolean p = sender.hasPermission(permission);
+				if (!p) break;
+				return subPermsUsage.get(perms);
+			}
+		}	
+		return getUsage();
 	}
 
 	public Permission getPermission(){
@@ -610,6 +655,11 @@ public abstract class CommandBase implements TabExecutor{
 		this.description = description;
 	}
 
+	public void setDescription(String description, Permission...permissions) {
+		Arrays.sort(permissions, (a,b) -> a.getName().compareTo(b.getName()));
+		subPermsDescription.put(permissions, description);
+	}
+	
 	public void setHelp(String help) {
 		this.help = help;
 	}
@@ -617,9 +667,14 @@ public abstract class CommandBase implements TabExecutor{
 	public void setUsage(String usage) {
 		this.usage = usage;
 	}
-		
+	
+	public void setUsage(String usage, Permission...permissions) {
+		Arrays.sort(permissions, (a,b) -> a.getName().compareTo(b.getName()));
+		subPermsUsage.put(permissions, usage);
+	}
+	
 	public void setPermission(String permission, boolean defaultValue){
-		setPermission(permission, defaultValue ? PermissionDefault.TRUE : PermissionDefault.FALSE);
+		setPermission(permission, defaultValue ? PermissionDefault.TRUE : PermissionDefault.OP);
 	}
 	
 	public void setPermission(String permission, PermissionDefault defaultValue){
@@ -631,7 +686,7 @@ public abstract class CommandBase implements TabExecutor{
 	}
 	
 	public void addSubPermission(String permission, boolean defaultValue) {
-		addSubPermission(permission, defaultValue ? PermissionDefault.TRUE : PermissionDefault.FALSE);
+		addSubPermission(permission, defaultValue ? PermissionDefault.TRUE : PermissionDefault.OP);
 	}
 	
 	public void addSubPermission(String permission, PermissionDefault defaultValue) {

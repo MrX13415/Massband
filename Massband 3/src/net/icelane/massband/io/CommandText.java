@@ -63,8 +63,8 @@ Effects:
 		// command info
 		String label   = command.getName();
 		String aliases = command.getAliasesString();
-		String usage   = command.getUsage().trim();
-		String desc    = command.getDescription().trim();
+		String usage   = command.getUsage(sender).trim();
+		String desc    = command.getDescription(sender).trim();
 		String help    = command.getHelp().trim();
 		 
 		// get list of parent commands
@@ -97,13 +97,9 @@ Effects:
 				out_perm = String.format(format_perm, "OP");
 			}
 		}
-				
-		// define usage
-		if (usage.length() > 0){
-			usage = usage.replace("<command>", command.getNames());
-			out_usage = String.format(format_usage, usage);
-		}
-
+		
+		int visibleCommands = 0;
+		
 		// define commands (args)
 		for (CommandBase cmd : command.getCommands()) {
 			// handle the visibility of the command
@@ -117,11 +113,22 @@ Effects:
 				break;
 			default: break;
 			}
-			
+			// add it ...
 			out_args += String.format(format_cmd, cmd.getName(), cmd.getUsage(), cmd.getDescription());
 			if (command.getCommands().size() - command.getCommands().indexOf(cmd) > 1) out_args += "\n";
+			visibleCommands++;
 		}
 		if (!out_args.isEmpty()) out_args = "\n" + out_args;
+		
+		// define usage
+		if (usage.length() > 0){
+			if (visibleCommands > 0 && !usage.toLowerCase().contains("command")) {
+				usage = "<command> | " + usage;
+			}
+			
+			usage = usage.replace("<self>", command.getNames());
+			out_usage = String.format(format_usage, usage);
+		}
 		
 		return out_header + out_desc + out_perm + out_usage + out_args;
 	}
