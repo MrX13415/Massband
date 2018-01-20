@@ -7,14 +7,14 @@ import org.bukkit.event.world.ChunkUnloadEvent;
 
 import net.icelane.massband.core.Massband;
 
-public class WorldEvents implements Listener{
+public class WorldEvents implements Listener {
 
 	private static WorldEvents eventHandler = new WorldEvents();
 
 	public static WorldEvents getListener(){
 		return eventHandler;
 	}
-	
+		
 	@EventHandler
 	public void onChunkLoad(ChunkLoadEvent event){
 		Massband.chuckLoad(event);
