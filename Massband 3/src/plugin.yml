@@ -12,7 +12,7 @@ commands:
     description: Manage Massband
     permission: massband.command      
     usage: |
-           /<command> [command]
+           /<self> [command]
 
 permissions:
   massband.*:
