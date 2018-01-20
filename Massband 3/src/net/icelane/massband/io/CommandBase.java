@@ -743,7 +743,7 @@ public abstract class CommandBase implements TabExecutor{
 	 * @param args
 	 * @return
 	 */
-	private String[] getArgsOnly(String[] args){
+	public String[] getArgsOnly(String[] args){
 		String[] newArgsArray = new String[args.length - 1];
 		
 		for (int i = 1; i < args.length; i++) {
