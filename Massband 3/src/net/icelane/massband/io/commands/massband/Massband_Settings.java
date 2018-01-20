@@ -23,7 +23,7 @@ import net.icelane.massband.io.commands.massband.settings.Settings_Default;
 public class Massband_Settings extends CommandBase{
 
 	public static final String Default = "default";
-	public static final Permission otherPermission = new Permission("massband.command.settings.other", PermissionDefault.FALSE);
+	public static final Permission otherPermission = new Permission("massband.command.settings.other", PermissionDefault.OP);
 	
 	@Override
 	public String name() {
@@ -33,14 +33,16 @@ public class Massband_Settings extends CommandBase{
 	@Override
 	public void initialize() {
 		setAliases("cfg", "set");
-		setDescription("Allows changes to any Massband settings.");
+		setDescription("Allows changes to your Massband settings.");
 		setPermission("massband.command.settings", true);
-		setUsage("<command>|[player] <config entry> [value]");
+		setUsage("<config entry> [value]");
 		
 		addCommand(Settings_Default.class);
 		addCommand(Settings_Config.class);
 		
 		addSubPermission(otherPermission);
+		setDescription("Allows changes to any Massband settings.", otherPermission);
+		setUsage("[player] <config entry> [value]", otherPermission);
 	}
 
 	@Override
@@ -116,6 +118,13 @@ public class Massband_Settings extends CommandBase{
 		return tabList;
 	}
 	
+	/** 
+	 * Enables or Disables the ability to target other players.
+	 * Needs to return "false" if the config to edit isn't a "PlayerConfig".
+	 *  
+	 * @param sender
+	 * @return
+	 */
 	protected boolean IsOtherPlayersEnabled(CommandSender sender) {
 		return true;
 	}
@@ -168,22 +177,33 @@ public class Massband_Settings extends CommandBase{
 		// C 2  player   entry    value     -> C: set entry value
 
 		boolean other = IsOtherPlayersEnabled(sender);
+		boolean console = !(sender instanceof Player);
 		
 		// Try to find the target player 
 		Player targetPlayer = null;
 		if (other && args.length > 0) targetPlayer = Server.get().getPlayer(args[0].trim());
 		
+		// Determine if the settings are yours or from another player. 
 		boolean targetSelf = targetPlayer == null;
+		if (!targetSelf && !console){
+			targetSelf = targetPlayer.getUniqueId().equals(((Player)sender).getUniqueId());
+			args = getArgsOnly(args); // remove own name from args ...
+		}
 		
-		if (!sender.hasPermission(otherPermission)) {
+		// Not allowed to change other players settings!
+		if (other && !targetSelf && !sender.hasPermission(otherPermission)) {
 			setFailReason(FailReason.Permissions);
 			sender.sendMessage(CommandText.getPermissionDenied(this, otherPermission));
 			return false;
 		}
-		
-		if (other && targetSelf && !(sender instanceof Player)) {
-			sender.sendMessage("§cError: Player not found: " + args[0].trim());	
-			return true;
+
+		// You need to specify a player on console!
+		if (other && console && targetPlayer == null) {
+			if (args.length > 0) {
+				setFailReason(FailReason.Invalid);
+				sender.sendMessage("§cError: Player not found: " + args[0].trim());
+			}			
+			return false;
 		}
 		
 		// Retrieve config ...
