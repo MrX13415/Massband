@@ -741,7 +741,7 @@ public abstract class CommandBase implements TabExecutor{
 	/**
 	 * Removes the first argument of the array, because it is the current command
 	 * @param args
-	 * @return
+	 * @return a new Array containing all elements, except the first element. 
 	 */
 	public String[] getArgsOnly(String[] args){
 		String[] newArgsArray = new String[args.length - 1];
