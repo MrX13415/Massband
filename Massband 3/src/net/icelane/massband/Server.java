@@ -25,8 +25,15 @@ public abstract class Server {
 	public static void registerEvents(){
 		JavaPlugin plugin = Plugin.get();
 
-		get().getPluginManager().registerEvents(PlayerEvents.getListener(), plugin);
-		get().getPluginManager().registerEvents(EntityEvents.getListener(), plugin);
+		if (compatibilityModeRequired()) {			
+			// for 1.11.x and below
+			get().getPluginManager().registerEvents(net.icelane.massband.event.compatibility.PlayerEvents.getListener(), plugin);
+		}else{
+			// for 1.12.x
+			get().getPluginManager().registerEvents(EntityEvents.getListener(), plugin);
+			get().getPluginManager().registerEvents(PlayerEvents.getListener(), plugin);
+		}
+
 		get().getPluginManager().registerEvents(InventoryEvents.getListener(), plugin);
 		get().getPluginManager().registerEvents(WorldEvents.getListener(), plugin);
 	}
@@ -43,5 +50,13 @@ public abstract class Server {
 			logger().log(Level.SEVERE, "BOOM!", ex);
 		}
 		return false;
+	}
+
+	public static boolean compatibilityModeRequired(){
+		try {
+			Class.forName("org.bukkit.event.entity.EntityPickupItemEvent");
+			return false;
+		} catch (Exception e) { }
+		return true;
 	}
 }
