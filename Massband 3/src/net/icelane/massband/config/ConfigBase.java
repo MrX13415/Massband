@@ -155,7 +155,7 @@ public abstract class ConfigBase<T extends ConfigBase<T>> {
 			
 			if (save){
 				// search for missing values and add them ...
-				searchEntries(lines, queue, 0);
+				searchEntries(lines, queue);
 
 				// write the actual file (lines) to disk ...
 				saveToDisk(file, lines);
@@ -214,41 +214,51 @@ public abstract class ConfigBase<T extends ConfigBase<T>> {
 		return indent;
 	}
 	
-	private static List<String> searchEntries(List<String> lines, ArrayList<Entry<?>> queue, int initLevel){;
+	private static List<String> searchEntries(List<String> lines, ArrayList<Entry<?>> queue){;
+		return searchEntries(lines, queue, 0, "");
+	}
+	
+	private static List<String> searchEntries(List<String> lines, ArrayList<Entry<?>> queue, int initLevel, String sectionName){;
 		int level    = initLevel;
-		int index    = 0;
-		int size     = queue.size();
+		int index    = -1;
 		boolean loop = false;
 		
 		while (queue.size() > 0){
+			index++;
+			if (index >= queue.size()){
+				index = 0;
+				// 3rd loop run: we have searched for entries and sub entries, so break ... 
+				if (level > 0 && loop) break;
+				loop = true; // init 2nd loop run ...
+			}
+			
+			// get the current entry ...
 			Entry<?> entry = queue.get(index);
 			String[] sections = entry.getSection().split("\\.");
 			
-			if (sections.length == level){
+			// make sure we only use entries wich fit to the current section ...
+			if (level > 0 && level <= sections.length) {
+				if (!sections[level - 1].equalsIgnoreCase(sectionName)) continue;
+			}
+
+			if (sections.length == level) {
+				// 1st loop run: Add all entries on this section level ...
 				queue.remove(entry);
 				index -= 1;
-				size -= 1;
 				
 				String value = entry.get() == null ? "" : entry.get().toString();
 				String out_comment = "";
 				if (entry.getComment().trim().length() > 0)
 					out_comment = String.format(format_comment, getIndent(level) + entry.getComment());
 					lines.add(String.format(format_entry, getIndent(level) + entry.getKey(), value, out_comment));
-				
-			}else{
-				if (loop){
-					level++;
 					
-					lines.add(String.format(format_entry, getIndent(level - 1) + sections[level - 1], "", ""));
-					
-					searchEntries(lines, queue, level);	
+			}else if (loop){
+				// 2nd loop run: Search for sub entries ...
+				if (sections.length >= level) {
+					lines.add(String.format(format_entry, getIndent(level) + sections[level], "", ""));
+					searchEntries(lines, queue, level + 1, sections[level]);
+					index = 0;
 				}
-			}
-			
-			index++;
-			if (index >= size){
-				index = 0;
-				loop = true;
 			}
 		}
 		
