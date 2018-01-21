@@ -113,8 +113,13 @@ Effects:
 				break;
 			default: break;
 			}
+			
 			// add it ...
-			out_args += String.format(format_cmd, cmd.getName(), cmd.getUsage(), cmd.getDescription());
+			out_args += String.format(format_cmd,
+					cmd.getName(),
+					cmd.getUsage(sender).trim(),
+					cmd.getDescription(sender).trim());
+
 			if (command.getCommands().size() - command.getCommands().indexOf(cmd) > 1) out_args += "\n";
 			visibleCommands++;
 		}
