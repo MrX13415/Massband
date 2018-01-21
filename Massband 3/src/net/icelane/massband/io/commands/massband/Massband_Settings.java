@@ -187,7 +187,7 @@ public class Massband_Settings extends CommandBase{
 		boolean targetSelf = targetPlayer == null;
 		if (!targetSelf && !console){
 			targetSelf = targetPlayer.getUniqueId().equals(((Player)sender).getUniqueId());
-			args = getArgsOnly(args); // remove own name from args ...
+			if (targetSelf) args = getArgsOnly(args); // remove own name from args ...
 		}
 		
 		// Not allowed to change other players settings!
