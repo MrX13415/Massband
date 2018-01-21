@@ -2,7 +2,7 @@
   <modelVersion>4.0.0</modelVersion>
   <groupId>net.icelane</groupId>
   <artifactId>Massband</artifactId>
-  <version>3.0.5-SNAPSHOT</version>
+  <version>3.0.6-SNAPSHOT</version>
   <name>Massband</name>
   <repositories>
     <repository>
