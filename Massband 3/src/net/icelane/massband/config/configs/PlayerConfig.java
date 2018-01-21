@@ -32,24 +32,26 @@ public class PlayerConfig extends PlayerConfigBase<PlayerConfig> {
 	}
 	
 	public Entry_Enum<Material> interact_material =
-			Entry.define("interact.material",
+			Entry.define("Interact.Material",
 					Material.class,
 					Material.STICK, 
-					"");
+					"The material a player needs to hold, to be able to set markers.");
 	
 	public Entry_Boolean interact_preventAction = 
-			Entry.define("interact.prevent-action",
+			Entry.define("Interact.Prevent-Action",
 					true,
-					"");
+					"Weather the default action (e.g. \"breaking a block\") should be preventet,",
+					"when the \"interact material\" is been holded.");
 	
 	public Entry_Boolean interact_switchbuttons = 
-			Entry.define("interact.switch-buttons",
+			Entry.define("Interact.Switch-Buttons",
 					false,
-					"");
+					"Inverts actions of the left and right mouse buttons. Usefull for left-handed.");
 	
 	public Entry_Long interact_doubleClickTimeFrame = 
-			Entry.define("interact.doubleclick-timeframe",
+			Entry.define("Interact.DoubleClick-TimeFrame",
 					150L,
-					"ms");
+					"The time frame, which defines when two clicks are counted as \"double click\".",
+					"In Milliseconds.");
 
 }
