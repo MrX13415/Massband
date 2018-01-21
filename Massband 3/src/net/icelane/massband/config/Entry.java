@@ -10,33 +10,33 @@ import net.icelane.massband.config.EntryTypes.Entry_String;
 public abstract class Entry<T> {
 
 	private String path = "";
-	private String comment = "";
+	private String[] comments = new String[0];
 	private T defaultValue;
 	private T value;
 	private String[] values;
 	
-	public static <T> Entry<T> define(Entry<T> entry, String path, T value, String comment){
+	public static <T> Entry<T> define(Entry<T> entry, String path, T value, String... comment){
 		entry.setPath(path);
-		entry.setComment(comment);
+		entry.setComments(comment);
 		entry.setDefault(value);
 		entry.setValues(entry.getDefault().toString());
 		entry.set(entry.getDefault());
 		return entry;
 	}
 	
-	public static Entry_String define(String path, String value, String comment){
+	public static Entry_String define(String path, String value, String... comment){
 		return (Entry_String) define(new Entry_String(), path, value, comment);
 	}
 	
-	public static Entry_Boolean define(String path, Boolean value, String comment){
+	public static Entry_Boolean define(String path, Boolean value, String... comment){
 		return (Entry_Boolean) define(new Entry_Boolean(), path, value, comment);
 	}
 	
-	public static Entry_Long define(String path, Long value, String comment){
+	public static Entry_Long define(String path, Long value, String... comment){
 		return (Entry_Long) define(new Entry_Long(), path, value, comment);
 	}
 	
-	public static Entry_Integer define(String path, Integer value, String comment){
+	public static Entry_Integer define(String path, Integer value, String... comment){
 		return (Entry_Integer) define(new Entry_Integer(), path, value, comment);
 	}
 	
@@ -104,8 +104,8 @@ public abstract class Entry<T> {
 		return path.substring(path.lastIndexOf(".") + 1);
 	}
 	
-	public String getComment() {
-		return comment;
+	public String[] getComments() {
+		return comments;
 	}
 
 	public T getDefault() {
@@ -124,8 +124,8 @@ public abstract class Entry<T> {
 		this.path = path;
 	}
 
-	public void setComment(String comment) {
-		this.comment = comment;
+	public void setComments(String... comment) {
+		this.comments = comment;
 	}
 
 	public void setDefault(T defaultValue) {
