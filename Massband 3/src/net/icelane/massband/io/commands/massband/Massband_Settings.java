@@ -200,10 +200,13 @@ public class Massband_Settings extends CommandBase{
 		// You need to specify a player on console!
 		if (other && console && targetPlayer == null) {
 			if (args.length > 0) {
+				setFailReason(FailReason.None);
+				sender.sendMessage("§cError: §7Player not found: §6" + args[0].trim());
+				return true;
+			}else {
 				setFailReason(FailReason.Invalid);
-				sender.sendMessage("§cError: Player not found: " + args[0].trim());
-			}			
-			return false;
+				return false;
+			}
 		}
 		
 		// Retrieve config ...
@@ -212,7 +215,7 @@ public class Massband_Settings extends CommandBase{
 		else config = getConfig((CommandSender)targetPlayer);  // other player
 
 		if (config == null) {
-			sender.sendMessage("§cError: config null!");			
+			sender.sendMessage("§cError: §7No configuration was found!");			
 			return true;
 		}
 		
@@ -232,7 +235,7 @@ public class Massband_Settings extends CommandBase{
 		Entry<?> entry = config.getEntry(entryStr);
 
 		if (entry == null) {
-			sender.sendMessage("§cError: Config entry not found: " + entryStr);
+			sender.sendMessage("§cError: §7Unkown entry: §6" + entryStr);
 			return true;
 		}
 
@@ -255,7 +258,7 @@ public class Massband_Settings extends CommandBase{
 				config.save();
 				sender.sendMessage("§aValue changed to: §c" + value);
 			}else{
-				sender.sendMessage("§cError: Invalid value: " + value);
+				sender.sendMessage("§cError: §7Invalid value: §6" + value);
 			}
 			
 			return true;		
