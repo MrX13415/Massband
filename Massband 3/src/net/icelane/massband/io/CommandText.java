@@ -1,10 +1,12 @@
 package net.icelane.massband.io;
 
 import org.bukkit.command.CommandSender;
+import org.bukkit.entity.Player;
 import org.bukkit.permissions.Permission;
 import org.bukkit.permissions.PermissionDefault;
 
 import net.icelane.massband.Plugin;
+import net.icelane.massband.config.configs.Config;
 import net.icelane.massband.core.Massband;
 
 public class CommandText {
@@ -37,6 +39,25 @@ Effects:
 	RESET:         §r
 */
 
+	public enum PermissionVisibility{
+		/**
+		 * Nobody will see the permission in the help message.
+		 */
+		None,
+		/**
+		 * Only in the console the permission will be displayed.
+		 */
+		Console,
+		/**
+		 * Everyone who is OP will see the permission in the help message.
+		 */
+		OP,
+		/**
+		 * Everyone will see the permission in the help message.
+		 */
+		All
+	}
+	
 	public static String getWildCardDescription(CommandBase command) {
 		return String.format("Gives full access to the %s command.", command.getName());
 	}
@@ -54,11 +75,12 @@ Effects:
 	
 	public static String getHelp(CommandBase command, CommandSender sender){
 		// output formats 
-		String format_header = "\n§aCommand: §7/%1$s§c%2$s §aAliases: §c%3$s";
-		String format_desc   = "\n  §7%1$s";
-		String format_perm   = "\n  §aPermission: §c%1$s";
-		String format_usage  = "\n  §aUsage: §6%1$s";
-		String format_cmd    = "  §f - §c%1$s §6%2$s §7%3$s";
+		String format_header  = "\n§aCommand: §7/%1$s§c%2$s §aAliases: §c%3$s";
+		String format_desc    = "\n  §7%1$s";
+		String format_perm    = "\n  §aPermission: §c%1$s";
+		String format_subPerm = "\n  §a             + §c%1$s";
+		String format_usage   = "\n  §aUsage: §6%1$s";
+		String format_cmd     = "  §f - §c%1$s §6%2$s §7%3$s";
 		
 		// command info
 		String label   = command.getName();
@@ -87,14 +109,37 @@ Effects:
 			out_desc = String.format(format_desc, help); 
 		}
 		
-		// define permission
-		if ( command.getPermission() != null){
-			if (Plugin.get().isPermissionsEnabled()) {
-				out_perm = String.format(format_perm, command.getPermission().getName());	
+		
+		PermissionVisibility permVis = (PermissionVisibility) Config.get().help_permissionVisibility.get();
+		boolean showPerms = false;
+		switch (permVis) {
+		case None:
+			break;
+		case Console:
+		 	showPerms = !(sender instanceof Player); break; 
+		case OP:
+			showPerms = sender.isOp(); break;
+		case All:
+			showPerms = true; break;
+		default: break;
+		}
+		
+		if (showPerms) {
+			// define permission
+			if ( command.getPermission() != null){
+				if (Plugin.get().isPermissionsEnabled()) {
+					out_perm = String.format(format_perm, command.getPermission().getName());	
+				}
+				else if (command.getPermission().getDefault() == PermissionDefault.FALSE ||
+						command.getPermission().getDefault() == PermissionDefault.OP) {
+					out_perm = String.format(format_perm, "OP");
+				}
 			}
-			else if (command.getPermission().getDefault() == PermissionDefault.FALSE ||
-					command.getPermission().getDefault() == PermissionDefault.OP) {
-				out_perm = String.format(format_perm, "OP");
+			
+			for (Permission	subPerm : command.getSubPermissions()) {
+				if (Plugin.get().isPermissionsEnabled()) {
+					out_perm += String.format(format_subPerm, subPerm.getName());	
+				}
 			}
 		}
 		
