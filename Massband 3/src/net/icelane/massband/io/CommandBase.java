@@ -458,14 +458,14 @@ public abstract class CommandBase implements TabExecutor{
 			setFailReason(FailReason.Permissions);
 			
 			sender.sendMessage(CommandText.getPermissionDenied(this));
-			return false;
+			return true;
 		}
 
 		if (debugRequired && !Massband.isDebug()) {
 			setFailReason(FailReason.Debug);
 			
 			sender.sendMessage(CommandText.getDebugRequired(this));
-			return false;
+			return true;
 		}
 		
 		// check for sub commands ...
@@ -697,6 +697,10 @@ public abstract class CommandBase implements TabExecutor{
 		subPermissions.add(permission);
 	}
 
+	public Permission[] getSubPermissions() {
+		return subPermissions.toArray(new Permission[0]);
+	}
+	
 	public void setTabList(String...tabValue){
 		tabList = tabValue;
 	}
