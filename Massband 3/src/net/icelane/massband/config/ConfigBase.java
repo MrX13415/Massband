@@ -11,6 +11,8 @@ import java.util.List;
 import java.util.logging.Level;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
+import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 import net.icelane.massband.Plugin;
 import net.icelane.massband.Server;
@@ -19,10 +21,23 @@ public abstract class ConfigBase<T extends ConfigBase<T>> {
 
 	public static boolean debug;
 
-	private static String format_entry   = "%s: %s      %s";
-	private static String format_comment = "# %s";
+	public static String version = "2";
+			
+	private static String format_entry    = "%1$s%2$s: %3$s";
+	private static String format_comment  = "%1$s# %2$s";
+	private static String format_values   = "Values: %s";
+	private static String format_valSep   = " | ";
+	private static String[] format_header = new String[]{
+			"#-------------------------------------------------------------------------------",
+			"#- %1$s",
+			"#- Config: %2$s",
+			"#- Format Version: %3$s",
+			"#-------------------------------------------------------------------------------",
+			};
+	
 	private static String regex_entry    = "(\\s*)([^:]*)\\s*:(.*(?:\\\\#).*|[^#]*)(?:#(.*))?";
 	private static String regex_comment  = "\\s*#.*";
+	private static String regex_header   = "\\s*#-.*";
 	
 	private Class<T> configClass;
 	  
@@ -129,8 +144,8 @@ public abstract class ConfigBase<T extends ConfigBase<T>> {
 						// check if the value has changed ...
 						if(!value.equals(entry.get().toString())){
 							// define new config line ...
-							String outcmt = commentStr.length() > 0 ? String.format(format_comment, commentStr) : "";	
-							String outLine = String.format(format_entry,  indentStr + keyStr, entry.get().toString(), outcmt);
+							//String outcmt = commentStr.length() > 0 ? String.format(format_comment, commentStr) : "";	
+							String outLine = String.format(format_entry,  indentStr, keyStr, entry.get().toString());
 							lines.set(lineIndex, outLine);
 							
 							if (debug) Server.get().getConsoleSender().sendMessage("§bConig <--- §7Entry: §d" + entry.get().toString());
@@ -154,6 +169,24 @@ public abstract class ConfigBase<T extends ConfigBase<T>> {
 			}
 			
 			if (save){
+				// seach for a header ...
+				boolean headerFound = false;
+				for (String line : lines) {
+					if (line.trim().isEmpty()) continue;
+					if (line.matches(regex_header)) headerFound = true;
+					if (line.matches(regex_entry)) break;
+				}
+				if (!headerFound) {
+					int index = 0;
+					for (String fhLine : format_header) {
+						lines.add(index, String.format(fhLine,
+								Plugin.get().getName(),
+								name(),
+								version));
+						index++;
+					}
+				}
+					
 				// search for missing values and add them ...
 				searchEntries(lines, queue);
 
@@ -246,16 +279,31 @@ public abstract class ConfigBase<T extends ConfigBase<T>> {
 				queue.remove(entry);
 				index -= 1;
 				
+				// comment ...
+				if (entry.getComments().length > 0) {
+					for (String comment : entry.getComments()) {
+						lines.add(String.format(format_comment, getIndent(level), comment.trim()));
+					}
+				}
+				// values ...
+				if (entry.getValues().length > 1) {
+					String values = Stream.of(entry.getValues())
+						    .map(Object::toString)
+						    .collect(Collectors.joining(format_valSep,"",""));
+					
+					lines.add(String.format(format_comment, getIndent(level),
+							String.format(format_values,values)));
+				}
+				
+				// entry ...
 				String value = entry.get() == null ? "" : entry.get().toString();
-				String out_comment = "";
-				if (entry.getComment().trim().length() > 0)
-					out_comment = String.format(format_comment, getIndent(level) + entry.getComment());
-					lines.add(String.format(format_entry, getIndent(level) + entry.getKey(), value, out_comment));
+				lines.add(String.format(format_entry, getIndent(level), entry.getKey(), value));
 					
 			}else if (loop){
 				// 2nd loop run: Search for sub entries ...
 				if (sections.length >= level) {
-					lines.add(String.format(format_entry, getIndent(level) + sections[level], "", ""));
+					lines.add(""); // an empty line between new sections ...
+					lines.add(String.format(format_entry, getIndent(level), sections[level], "", ""));
 					searchEntries(lines, queue, level + 1, sections[level]);
 					index = 0;
 				}
