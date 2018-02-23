@@ -91,11 +91,11 @@ public class Massband {
 	}	
 		
 	public boolean hasItem(){
-		return interact.hasItemInHand(player);
+		return getInteract().hasItemInHand(player);
 	}
 	
 	public void interact(PlayerInteractEvent event){
-		this.interact.interact(event);
+		this.getInteract().interact(event);
 	}
 	
 	public void join(PlayerJoinEvent event){
@@ -185,7 +185,8 @@ public class Massband {
 	}
 
 	public Interact getInteract() {
-		return interact;
+		if (this.interact == null) this.interact = new Interact(this);
+		return this.interact;
 	}
 
 	public PlayerConfig config() {
