@@ -13,6 +13,7 @@ import org.bukkit.permissions.PermissionDefault;
 import net.icelane.massband.Server;
 import net.icelane.massband.config.ConfigBase;
 import net.icelane.massband.config.Entry;
+import net.icelane.massband.config.configs.Config;
 import net.icelane.massband.config.configs.PlayerConfig;
 import net.icelane.massband.core.Massband;
 import net.icelane.massband.io.CommandBase;
@@ -22,13 +23,17 @@ import net.icelane.massband.io.commands.massband.settings.Settings_Default;
 
 public class Massband_Settings extends CommandBase{
 
-	public static final String Default = "default";
+	public static final String ResetCommand = "reset";
+//	public static final String Default = "default";
 	public static final Permission otherPermission = new Permission("massband.command.settings.other", PermissionDefault.OP);
 	
 	@Override
 	public String name() {
 		return "settings";
 	}
+	
+	
+	//TODO: FLOAT value detection is broken!
 	
 	@Override
 	public void initialize() {
@@ -202,7 +207,7 @@ public class Massband_Settings extends CommandBase{
 			if (args.length > 0) {
 				setFailReason(FailReason.None);
 				sender.sendMessage("§cError: §7Player not found: §6" + args[0].trim());
-				return true;
+				return true; // syntax was correct.
 			}else {
 				setFailReason(FailReason.Invalid);
 				return false;
@@ -216,7 +221,7 @@ public class Massband_Settings extends CommandBase{
 
 		if (config == null) {
 			sender.sendMessage("§cError: §7No configuration was found!");			
-			return true;
+			return true; // syntax was correct.
 		}
 		
 		// A: List all settings of the config ...
@@ -227,44 +232,102 @@ public class Massband_Settings extends CommandBase{
 			for (Entry<?> entry : entryList) {
 				sender.sendMessage(getSettingEntryText(config, entry));
 			}
-			return true;
+			return true; // syntax was correct.
 		}
 		
-		// Try to find an entry ...
+		// Entry text 
 		String entryStr = targetSelf ? args[0].trim() : args[1].trim();
+		
+		// Reset ?
+		if (resetRequestConfig(entryStr, config, sender, targetPlayer, targetSelf))
+			return true; // syntax was correct.
+		
+		// Try to find an entry matching our entry text ...
 		Entry<?> entry = config.getEntry(entryStr);
 
 		if (entry == null) {
 			sender.sendMessage("§cError: §7Unkown entry: §6" + entryStr);
-			return true;
+			return true; // syntax was correct.
 		}
 
 		// B: Return the value of a specific entry ...
 		if ((targetSelf && args.length == 1) || (!targetSelf && args.length == 2)) {
-			sender.sendMessage(getSettingsHeaderText(config));
-			sender.sendMessage(getSettingEntryText(config, entry));
-			return true;
+			entryGetValue(config, sender, entry);
+			return true; // syntax was correct.
 		}
 
 		// C: Change the value of a specific entry ...
-		if ((targetSelf && args.length == 2) || args.length == 3) {		
+		if ((targetSelf && args.length == 2) || args.length == 3) {					
 			String value = targetSelf ? args[1].trim() : args[2].trim();
 			String oldValue = entry.get().toString();
-			boolean ok = entry.setValueOf(value);
 			
-			if (ok) {
-				sender.sendMessage(getSettingsHeaderText(config));
-				sender.sendMessage(getSettingEntryText(config, entry, oldValue));
-				config.save();
-				sender.sendMessage("§aValue changed to: §c" + value);
-			}else{
-				sender.sendMessage("§cError: §7Invalid value: §6" + value);
-			}
+			// Reset ?
+			if (resetRequestEntry(value, config, entry, sender, targetPlayer, targetSelf))
+				return true; // syntax was correct.
 			
-			return true;		
+			entrySetValue(config, sender, entry, value, oldValue);	
+			return true; // syntax was correct.
 		}
 
-		return false;
+		return false; // wrong syntax!
 	}
 
+	/**
+	 * B: Return the value of a specific entry.
+	 * @param config
+	 * @param sender
+	 * @param entry
+	 */
+	private void entryGetValue(ConfigBase<?> config, CommandSender sender, Entry<?> entry) {
+		sender.sendMessage(getSettingsHeaderText(config));
+		sender.sendMessage(getSettingEntryText(config, entry));
+	}
+	
+	/**
+	 * C: Change the value of a specific entry.
+	 * @param config
+	 * @param sender
+	 * @param entry
+	 * @param value
+	 * @param oldValue
+	 */
+	private void entrySetValue(ConfigBase<?> config, CommandSender sender, Entry<?> entry, String value, String oldValue) {
+		boolean ok = entry.setValueOf(value);					
+		if (ok) {
+			sender.sendMessage(getSettingsHeaderText(config));
+			sender.sendMessage(getSettingEntryText(config, entry, oldValue));
+			config.save();
+			sender.sendMessage("§aValue changed to: §c" + value);
+		}else{
+			sender.sendMessage("§cError: §7Invalid value: §6" + value);
+		}
+	}
+	
+	private boolean resetRequestConfig(String argument, ConfigBase<?> config, CommandSender sender, Player targetPlayer, boolean targetSelf) {
+		boolean resetRequest = argument.trim().equalsIgnoreCase(ResetCommand.trim());
+		if (!resetRequest) return false;
+			
+		List<Entry<?>> entryList = config.getEntryList();
+		for (Entry<?> entry : entryList) {
+			entry.resetToDefault();
+			sender.sendMessage(getSettingEntryText(config, entry));
+		}
+		
+		String tps = targetPlayer != null ? targetPlayer.getDisplayName() : "<None>";
+		sender.sendMessage("(Player: " + tps + "; TargetSelf: " + targetSelf + ")");
+		sender.sendMessage("§9Config reset to default: §6" + this.getName());
+		return true;
+	}
+	
+	private boolean resetRequestEntry(String argument, ConfigBase<?> config, Entry<?> entry, CommandSender sender, Player targetPlayer, boolean targetSelf) {
+		boolean resetRequest = argument.trim().equalsIgnoreCase(ResetCommand.trim());
+		if (!resetRequest) return false;
+		
+		entry.resetToDefault();
+		String tps = targetPlayer != null ? targetPlayer.getDisplayName() : "<None>";
+		sender.sendMessage("(Player: " + tps + "; TargetSelf: " + targetSelf + ")");
+		sender.sendMessage("§9Entry reset to default!");
+		sender.sendMessage(getSettingEntryText(config, entry));
+		return true;
+	}
 }

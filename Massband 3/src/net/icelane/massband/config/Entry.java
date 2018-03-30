@@ -51,6 +51,10 @@ public abstract class Entry<T> {
 //	public static Entry_ define(String path,  value, String comment){
 //		return (Entry_) define(new Entry_(), path, value, comment);
 //	}
+	
+	public void resetToDefault() {
+		this.value = defaultValue;
+	}
 		
 	public abstract T valueOf(String value);
 	
@@ -90,15 +94,30 @@ public abstract class Entry<T> {
 		return value.toString();
 	}
 	
+	/**
+	 * Returns the whole path of the entry.</br>
+	 * e.g. "something.section.mykey"
+	 * @return The path as String.
+	 */
 	public String getPath() {
 		return path;
 	}
 	
+	/**
+	 * Returns the section part of the entry.</br>
+	 * e.g. "something.section" for something.section.mykey
+	 * @return The section as String.
+	 */
 	public String getSection() {
 		if (!path.contains(".")) return "";
 		return path.substring(0, path.lastIndexOf("."));
 	}
 
+	/**
+	 * Returns the key part of the entry.</br>
+	 * e.g. "mykey" for something.section.mykey
+	 * @return The key as String.
+	 */
 	public String getKey() {
 		if (!path.contains(".")) return path;
 		return path.substring(path.lastIndexOf(".") + 1);
