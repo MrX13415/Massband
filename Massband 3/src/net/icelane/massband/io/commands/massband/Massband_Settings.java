@@ -142,6 +142,14 @@ public class Massband_Settings extends CommandBase{
 		return "§aSettings for Player: §c" + ((PlayerConfig)config).getPlayer().getName();
 	}
 	
+	public String getSettingEntryComment(ConfigBase<?> config, Entry<?> entry) {
+		String result = "";
+		for (String comment : entry.getComments()) {
+			result += String.format("      §7%s\n", comment);	
+		}
+		return result;
+	}
+	
 	public String getSettingEntryText(ConfigBase<?> config, Entry<?> entry) {
 		return getSettingEntryText(config, entry, null);	
 	}
@@ -285,6 +293,7 @@ public class Massband_Settings extends CommandBase{
 	private void entryGetValue(ConfigBase<?> config, CommandSender sender, Entry<?> entry) {
 		sender.sendMessage(getSettingsHeaderText(config));
 		sender.sendMessage(getSettingEntryText(config, entry));
+		sender.sendMessage(getSettingEntryComment(config, entry));
 	}
 	
 	/**
