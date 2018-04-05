@@ -48,6 +48,7 @@ public abstract class Entry<T> {
 		return (Entry_Enum<E>) define(new Entry_Enum<E>(clazz), path, value, comment);
     }
 		
+// Template:
 //	public static Entry_ define(String path,  value, String comment){
 //		return (Entry_) define(new Entry_(), path, value, comment);
 //	}
@@ -57,34 +58,7 @@ public abstract class Entry<T> {
 	}
 	
 	public abstract T valueOf(String value) throws IllegalArgumentException, NullPointerException;
-	
-// TODO: improve value of ...
-//	public static Number asNumber(String str, Class<? extends Number> param) throws UnsupportedOperationException {
-//	    try {
-//	        /*
-//	         * Try to access the staticFactory method for: 
-//	         * Byte, Short, Integer, Long, Double, and Float
-//	         */
-//	        Method m = param.getMethod("valueOf", String.class);
-//	        Object o = m.invoke(param, str);
-//	        return param.cast(o);
-//	    } catch (NoSuchMethodException e1) {
-//	        /* Try to access the constructor for BigDecimal or BigInteger*/
-//	        try {
-//	            Constructor<? extends Number> ctor = param
-//	                    .getConstructor(String.class);
-//	            return ctor.newInstance(str);
-//	        } catch (ReflectiveOperationException e2) {
-//	            /* AtomicInteger and AtomicLong not supported */
-//	            throw new UnsupportedOperationException(
-//	                    "Cannot convert string to " + param.getName());
-//	        }
-//	    } catch (ReflectiveOperationException e2) {
-//	        throw new UnsupportedOperationException("Cannot convert string to "
-//	                + param.getName());
-//	    }   
-//	}
-	
+
 	public String[] getValues() {
 		return values;
 	}
@@ -165,4 +139,32 @@ public abstract class Entry<T> {
 		}
 	}
 	
+	
+// Attempt to improve value of:
+//		public static Number asNumber(String str, Class<? extends Number> param) throws UnsupportedOperationException {
+//		    try {
+//		        /*
+//		         * Try to access the staticFactory method for: 
+//		         * Byte, Short, Integer, Long, Double, and Float
+//		         */
+//		        Method m = param.getMethod("valueOf", String.class);
+//		        Object o = m.invoke(param, str);
+//		        return param.cast(o);
+//		    } catch (NoSuchMethodException e1) {
+//		        /* Try to access the constructor for BigDecimal or BigInteger*/
+//		        try {
+//		            Constructor<? extends Number> ctor = param
+//		                    .getConstructor(String.class);
+//		            return ctor.newInstance(str);
+//		        } catch (ReflectiveOperationException e2) {
+//		            /* AtomicInteger and AtomicLong not supported */
+//		            throw new UnsupportedOperationException(
+//		                    "Cannot convert string to " + param.getName());
+//		        }
+//		    } catch (ReflectiveOperationException e2) {
+//		        throw new UnsupportedOperationException("Cannot convert string to "
+//		                + param.getName());
+//		    }   
+//		}
+		
 }
