@@ -55,8 +55,8 @@ public abstract class Entry<T> {
 	public void resetToDefault() {
 		this.value = defaultValue;
 	}
-		
-	public abstract T valueOf(String value);
+	
+	public abstract T valueOf(String value) throws IllegalArgumentException, NullPointerException;
 	
 // TODO: improve value of ...
 //	public static Number asNumber(String str, Class<? extends Number> param) throws UnsupportedOperationException {
@@ -156,12 +156,13 @@ public abstract class Entry<T> {
 	}
 
 	public boolean setValueOf(String value) {
-		T newValue = valueOf(value);
-		if (newValue.toString().equalsIgnoreCase(value)) {
+		try {
+			T newValue = valueOf(value);
 			this.value = newValue;
 			return true;
+		} catch (IllegalArgumentException|NullPointerException ex) {
+			return false;
 		}
-		return false;
 	}
 	
 }
