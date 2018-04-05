@@ -21,6 +21,8 @@ public class PlayerConfig extends PlayerConfigBase<PlayerConfig> {
 	
 	// ---------- CONFIG ---------- //
 	
+	//TODO: Add settings for default mode configuration (e.g limit/nolimit, etc.)
+	
 	@Override
 	public String defaultName() {
 		return "defaults.yml";

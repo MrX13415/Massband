@@ -9,6 +9,8 @@ import net.icelane.massband.io.CommandBase;
 
 public class Massband_Reset extends CommandBase{
 
+	//TODO: Redefine this ...
+	
 	@Override
 	public String name() {
 		return "reset";
