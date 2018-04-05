@@ -13,7 +13,6 @@ import org.bukkit.permissions.PermissionDefault;
 import net.icelane.massband.Server;
 import net.icelane.massband.config.ConfigBase;
 import net.icelane.massband.config.Entry;
-import net.icelane.massband.config.configs.Config;
 import net.icelane.massband.config.configs.PlayerConfig;
 import net.icelane.massband.core.Massband;
 import net.icelane.massband.io.CommandBase;
@@ -24,7 +23,6 @@ import net.icelane.massband.io.commands.massband.settings.Settings_Default;
 public class Massband_Settings extends CommandBase{
 
 	public static final String ResetCommand = "reset";
-//	public static final String Default = "default";
 	public static final Permission otherPermission = new Permission("massband.command.settings.other", PermissionDefault.OP);
 	
 	@Override
@@ -38,16 +36,16 @@ public class Massband_Settings extends CommandBase{
 	@Override
 	public void initialize() {
 		setAliases("cfg", "set");
-		setDescription("Allows changes to your Massband settings.");
+		setDescription("Allows changes to your personal settings of Massband.");
 		setPermission("massband.command.settings", true);
-		setUsage("<config entry> [value]");
+		setUsage("reset | <config entry> [value]");
 		
 		addCommand(Settings_Default.class);
 		addCommand(Settings_Config.class);
 		
 		addSubPermission(otherPermission);
-		setDescription("Allows changes to any Massband settings.", otherPermission);
-		setUsage("[player] <config entry> [value]", otherPermission);
+		setDescription("Allows changes to the personal settings of Massband for any player.", otherPermission);
+		setUsage("[player] reset | [player] <config entry> [value]", otherPermission);
 	}
 
 	@Override
@@ -73,12 +71,13 @@ public class Massband_Settings extends CommandBase{
 		}
 		
 		if (config != null) {
-			if (args.length <= (1 + argOffset))
-				tabList = addConfigEntries(tabList, config, args[0 + argOffset]);	
+			if (args.length <= (1 + argOffset)) {
+				tabList = addConfigEntries(tabList, config, args[0 + argOffset]);
+			}
 		}
 		
 		if (args.length == (2 + argOffset)) {
-			tabList = addConfigEntryValues(tabList, config, args[0 + argOffset], args[1 + argOffset]);				
+			tabList = addConfigEntryValues(tabList, config, args[0 + argOffset], args[1 + argOffset]);
 		}
 	
 		tabList.sort(Comparator.naturalOrder());
@@ -106,6 +105,10 @@ public class Massband_Settings extends CommandBase{
 				}
 			}
 		}
+		
+		// add the "reset" option
+		if (ResetCommand.toLowerCase().startsWith(arg.toLowerCase())) tabList.add(ResetCommand);
+		
 		return tabList;
 	}
 	
@@ -119,7 +122,11 @@ public class Massband_Settings extends CommandBase{
 				if (value.toLowerCase().trim().contains(arg))
 					tabList.add(value);
 			}
-		}		
+		}
+		
+		// add the "reset" option
+		if (ResetCommand.toLowerCase().startsWith(arg.toLowerCase())) tabList.add(ResetCommand);
+		
 		return tabList;
 	}
 	
@@ -303,31 +310,39 @@ public class Massband_Settings extends CommandBase{
 		}
 	}
 	
+	
+	private boolean isResetRequest(String argument) {
+		return argument.trim().equalsIgnoreCase(ResetCommand.trim());
+	}
+	
 	private boolean resetRequestConfig(String argument, ConfigBase<?> config, CommandSender sender, Player targetPlayer, boolean targetSelf) {
-		boolean resetRequest = argument.trim().equalsIgnoreCase(ResetCommand.trim());
-		if (!resetRequest) return false;
-			
+		if (!isResetRequest(argument)) return false;
+		
+		// reset config
 		List<Entry<?>> entryList = config.getEntryList();
 		for (Entry<?> entry : entryList) {
 			entry.resetToDefault();
 			sender.sendMessage(getSettingEntryText(config, entry));
 		}
 		
-		String tps = targetPlayer != null ? targetPlayer.getDisplayName() : "<None>";
-		sender.sendMessage("(Player: " + tps + "; TargetSelf: " + targetSelf + ")");
-		sender.sendMessage("§9Config reset to default: §6" + this.getName());
+		String msg = String.format("§9Config reset to default: §6%s", this.name);		
+		if (!targetSelf) msg = String.format("§9Config for Player §4%s §9reset to default: §6%s", this.name, targetPlayer.getName());
+		sender.sendMessage(msg);
+		
 		return true;
 	}
 	
 	private boolean resetRequestEntry(String argument, ConfigBase<?> config, Entry<?> entry, CommandSender sender, Player targetPlayer, boolean targetSelf) {
-		boolean resetRequest = argument.trim().equalsIgnoreCase(ResetCommand.trim());
-		if (!resetRequest) return false;
+		if (!isResetRequest(argument)) return false;
 		
+		// reset entry
 		entry.resetToDefault();
-		String tps = targetPlayer != null ? targetPlayer.getDisplayName() : "<None>";
-		sender.sendMessage("(Player: " + tps + "; TargetSelf: " + targetSelf + ")");
-		sender.sendMessage("§9Entry reset to default!");
+		
+		String msg = String.format("§9Entry reset to default.");		
+		if (!targetSelf) msg = String.format("§9Entry reset to default for Player: §4%s", targetPlayer.getName());
+		sender.sendMessage(msg);
 		sender.sendMessage(getSettingEntryText(config, entry));
+		
 		return true;
 	}
 }
