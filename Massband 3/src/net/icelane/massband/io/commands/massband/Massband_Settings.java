@@ -29,10 +29,7 @@ public class Massband_Settings extends CommandBase{
 	public String name() {
 		return "settings";
 	}
-	
-	
-	//TODO: FLOAT value detection is broken!
-	
+
 	@Override
 	public void initialize() {
 		setAliases("cfg", "set");
