@@ -22,6 +22,8 @@ public class Config extends ConfigBase<Config> {
 	
 	// ---------- CONFIG ---------- //
 	
+	//TODO: Add max/min limits for markercount etc. 
+	
 	@Override
 	public String name() {
 		return "config.yml";
