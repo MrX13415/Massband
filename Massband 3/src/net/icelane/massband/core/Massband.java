@@ -27,7 +27,7 @@ public class Massband {
 	
 	private Player player;
 	private PlayerConfig config;
-	private HashMap<String, Marker> worldMarkersList = new HashMap<>(); // String => World.Name
+	private HashMap<UUID, Marker> worldMarkersList = new HashMap<>(); // UUID => World.ID
 	private Interact interact;
 	
 	private Massband(Player player) {
@@ -61,14 +61,13 @@ public class Massband {
 	}
 	
 	public void reset(){
-		config().loadDefault();
-		config().save();
+		this.clean(player.getWorld().getUID());
 		this.interact = new Interact(this);
 	}
 	
 	public static void removeAllMarkers(CommandSender sender) {
 		for (World world : Server.get().getWorlds()) {
-			int count = Marker.removeAll(world);
+			int count = Marker.clean(world);
 			if (count == 0) continue; 
 			
 			Server.logger().info(String.format("[%s] %s Markers removed from world", world.getName(), count));
@@ -78,18 +77,34 @@ public class Massband {
 		}
 	}
 	
+	/**
+	 * Clean all Players.
+	 * @see Massband#clean()
+	 */
 	public static void cleanAll(){
 		for (Entry<UUID, Massband> entry : list.entrySet()){
 			entry.getValue().clean();
 		}
 	}
 	
+	/**
+	 * Removes all markers from all Worlds for this object.
+	 * @see Massband#clean(UUID)
+	 */
 	public void clean(){
-		for (String key : worldMarkersList.keySet()){
-			worldMarkersList.get(key).removeAll();
-		}
+		for (UUID key : worldMarkersList.keySet())
+			clean(key);
 	}	
-		
+	
+	/**
+	 * Removes all markers from given World for this object. 
+	 * @param worldUID The unique Id of a world.
+	 */
+	public void clean(UUID worldUID){
+		worldMarkersList.get(worldUID).removeAll();
+		worldMarkersList.put(worldUID, null);
+	}	
+	
 	public boolean hasItem(){
 		return getInteract().hasItemInHand(player);
 	}
@@ -158,28 +173,28 @@ public class Massband {
 	}
 
 	public Marker getMarkers(World world){
-		Marker m = worldMarkersList.get(world.getName());
+		Marker m = worldMarkersList.get(world.getUID());
 		if (m == null){
 			m = new Marker(player, world);
-			worldMarkersList.put(world.getName(), m);
+			worldMarkersList.put(world.getUID(), m);
 		}
 		return m;
 	}
 	
 	public int getMarkerCount(World world){
-		Marker m = worldMarkersList.get(world.getName());
+		Marker m = worldMarkersList.get(world.getUID());
 		if (m == null) return 0;
 		return m.getCount();
 	}
 	
 	public void hideMarkers(World world){
-		Marker m = worldMarkersList.get(world.getName());
+		Marker m = worldMarkersList.get(world.getUID());
 		if (m == null) return;
 		m.hideAll();
 	}
 	
 	public void showMarkers(World world){
-		Marker m = worldMarkersList.get(world.getName());
+		Marker m = worldMarkersList.get(world.getUID());
 		if (m == null) return;
 		m.showAll();
 	}

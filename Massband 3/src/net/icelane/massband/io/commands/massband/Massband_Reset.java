@@ -9,8 +9,6 @@ import net.icelane.massband.io.CommandBase;
 
 public class Massband_Reset extends CommandBase{
 
-	//TODO: Redefine this ...
-	
 	@Override
 	public String name() {
 		return "reset";
@@ -19,7 +17,7 @@ public class Massband_Reset extends CommandBase{
 	@Override
 	public void initialize() {
 		setAliases("rst");
-		setDescription("Resets your settings to default.");
+		setDescription("Resets all massband parameters to your default settings.");
 		setPermission("massband.command.reset", true);
 		setInGameOnly(true);
 	}
@@ -34,7 +32,7 @@ public class Massband_Reset extends CommandBase{
 		Massband obj = Massband.get(player);
 		obj.reset();
 		
-		player.sendMessage(String.format("§aSettings for Player '§c%s' §ahas been reset to §9default", player.getName()));
+		player.sendMessage(String.format("§aParameters reset to §9default§a.", player.getName()));
 		
 		return true;
 	}
