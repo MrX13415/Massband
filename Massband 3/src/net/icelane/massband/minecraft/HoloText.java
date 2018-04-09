@@ -110,6 +110,22 @@ public class HoloText {
 		return null;
 	}
 	
+	/**
+	 * Weather the given ArmorStand entity can be identified as object created by this class,
+	 * based on the given "identifier" string.
+	 * This method evaluates to true if the one of the following conditions is true:</br>
+	 * </br>
+	 *  - The entity contains a key matching {@link HoloText#metadata_Identifier}
+	 * in the meta data with the given identifier string as value.</br> 
+	 * </br>
+	 *  - The entity contains a scoreboard tag which matches the given identifier string.
+	 * @see #getMetadata(Plugin, Entity, String)
+	 * @see Entity#getScoreboardTags()
+	 * @param plugin The plugin which "holds" the meta data. (Normally it's "this" plugin)
+	 * @param identifier An "identifier" string.
+	 * @param entity The entity to check.
+	 * @return true, if the entity matches the identifier string.
+	 */
 	public static boolean isIdentifier(org.bukkit.plugin.Plugin plugin, String identifier, ArmorStand entity) {
 		if (entity == null) return false;
 		
