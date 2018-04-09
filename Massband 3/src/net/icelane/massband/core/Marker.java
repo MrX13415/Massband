@@ -66,11 +66,17 @@ public class Marker {
 	
 	private double distance;
 	
-	public static int removeAll(World world) {		
-		Collection<ArmorStand> enitties = world.getEntitiesByClass(ArmorStand.class);
+	/**
+	 * Removes all ArmorStand entities in from a given world which are identified as "Marker".
+	 * @see #isMarker(ArmorStand)
+	 * @param world A world object to clean.
+	 * @return The number of the removed entities
+	 */
+	public static int clean(World world) {		
+		Collection<ArmorStand> entities = world.getEntitiesByClass(ArmorStand.class);
 		int count = 0;
 		
-		for (ArmorStand armorStand : enitties) {
+		for (ArmorStand armorStand : entities) {
 			if (!Marker.isMarker(armorStand)) continue;
 			armorStand.remove();
 			count++;
@@ -78,6 +84,13 @@ public class Marker {
 		return count;
 	}
 	
+	/** 
+	 * Weather the given ArmorStand is identified as "Marker"
+	 * based on the meta data attached to it. 
+	 * @see HoloText#isIdentifier(org.bukkit.plugin.Plugin, String, ArmorStand)
+	 * @param entity The entity to check.
+	 * @return True if it was identified as "Marker"
+	 */
 	public static boolean isMarker(ArmorStand entity) {
 		return isMarker(Plugin.get(), entity);
 	}
