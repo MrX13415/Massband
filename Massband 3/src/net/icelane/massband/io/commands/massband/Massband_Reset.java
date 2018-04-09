@@ -17,7 +17,7 @@ public class Massband_Reset extends CommandBase{
 	@Override
 	public void initialize() {
 		setAliases("rst");
-		setDescription("Resets all massband parameters to your default settings.");
+		setDescription("Resets all parameters to your default settings in the current world.");
 		setPermission("massband.command.reset", true);
 		setInGameOnly(true);
 	}
