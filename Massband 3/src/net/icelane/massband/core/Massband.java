@@ -101,7 +101,9 @@ public class Massband {
 	 * @param worldUID The unique Id of a world.
 	 */
 	public void clean(UUID worldUID){
-		worldMarkersList.get(worldUID).removeAll();
+		Marker m = worldMarkersList.get(worldUID);
+		if (m == null) return;
+		m.removeAll();
 		worldMarkersList.put(worldUID, null);
 	}	
 	
