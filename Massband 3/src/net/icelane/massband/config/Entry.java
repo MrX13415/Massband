@@ -1,5 +1,7 @@
 package net.icelane.massband.config;
 
+import java.util.Arrays;
+
 import net.icelane.massband.config.EntryTypes.Entry_Boolean;
 import net.icelane.massband.config.EntryTypes.Entry_Double;
 import net.icelane.massband.config.EntryTypes.Entry_Enum;
@@ -111,6 +113,16 @@ public abstract class Entry<T> {
 	
 	public void setValues(String... values) {
 		this.values = values;
+	}
+	
+	public void addValues(String... values) {
+	    final int N = this.values.length;
+	   
+	    String[] arr = Arrays.copyOf(this.values, N + values.length);	    
+	    for (int index = 0; index < values.length; index++)
+	    	arr[N + index] = values[index];
+	    
+	    setValues(arr);
 	}
 	
 	public void setPath(String path) {
