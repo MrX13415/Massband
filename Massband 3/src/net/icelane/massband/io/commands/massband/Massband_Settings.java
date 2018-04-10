@@ -343,6 +343,7 @@ public class Massband_Settings extends CommandBase{
 		
 		// reset entry
 		entry.resetToDefault();
+		config.save();
 		
 		String msg = String.format("§9Entry reset to default.");		
 		if (!targetSelf) msg = String.format("§9Entry reset to default for Player: §4%s", targetPlayer.getName());
