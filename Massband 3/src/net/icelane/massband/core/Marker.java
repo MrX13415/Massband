@@ -38,7 +38,7 @@ public class Marker {
 
 	private Player player;
 	private World world;
-
+	
 	private String format_markerFirst    = "§c#\n%1$s";                  // (1) additional info
 	private String format_markerLast     = "§7(%1$s§7) §6%2$s\n§9%3$s";  // (1) marker count (2) length (3) area
 	private String format_marker         = "§7#%1$s: §a%2$s";            // (1) marker index (2) length
@@ -60,12 +60,24 @@ public class Marker {
 	private ArrayList<BlockFace> faceList = new ArrayList<>();
 	private ArrayList<MarkerSettings> settingsList = new ArrayList<>();
 	
-	private MeasureMode mode = MeasureMode.BLOCKS;
-	private int maxCount     = 1;
+	private MeasureMode mode      = MeasureMode.BLOCKS;
+	private int maxCount          = 1;
 	private BlockAxis ignoredAxis = BlockAxis.None;
 	
 	private double distance;
 	
+	public Marker(Player player, World world) {
+		HoloText.initialize(Plugin.get());
+		this.player = player;
+		this.world = world;
+		
+		// get defaults for the current player 
+		Massband obj = Massband.get(player);
+		mode = (MeasureMode) obj.config().default_mode.get();
+		maxCount = obj.config().default_markercount.get();
+		ignoredAxis = (BlockAxis) obj.config().default_ignoredAxis.get();
+	}
+
 	/**
 	 * Removes all ArmorStand entities in from a given world which are identified as "Marker".
 	 * @see #isMarker(ArmorStand)
@@ -99,12 +111,6 @@ public class Marker {
 		return HoloText.isIdentifier(plugin, Marker.Metadata_Identifier, entity);
 	}
 	
-	public Marker(Player player, World world) {
-		HoloText.initialize(Plugin.get());
-		this.player = player;
-		this.world = world;
-	}
-
 	public void hideAll(){
 		for (HoloText marker : markerList){
 			marker.hide();

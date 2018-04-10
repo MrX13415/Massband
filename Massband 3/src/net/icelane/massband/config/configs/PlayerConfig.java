@@ -6,8 +6,11 @@ import org.bukkit.entity.Player;
 import net.icelane.massband.config.Entry;
 import net.icelane.massband.config.EntryTypes.Entry_Boolean;
 import net.icelane.massband.config.EntryTypes.Entry_Enum;
+import net.icelane.massband.config.EntryTypes.Entry_Integer;
 import net.icelane.massband.config.EntryTypes.Entry_Long;
 import net.icelane.massband.config.PlayerConfigBase;
+import net.icelane.massband.core.Marker.BlockAxis;
+import net.icelane.massband.core.Marker.MeasureMode;
 
 public class PlayerConfig extends PlayerConfigBase<PlayerConfig> {
 
@@ -21,8 +24,6 @@ public class PlayerConfig extends PlayerConfigBase<PlayerConfig> {
 	
 	// ---------- CONFIG ---------- //
 	
-	//TODO: Add settings for default mode configuration (e.g limit/nolimit, etc.)
-	
 	@Override
 	public String defaultName() {
 		return "defaults.yml";
@@ -32,6 +33,29 @@ public class PlayerConfig extends PlayerConfigBase<PlayerConfig> {
 	public String name(Player player) {
 		return String.format("players/%s.yml", player.getUniqueId());
 	}
+	
+	@Override
+	public void postInitialize() {
+		default_markercount.addValues("-1");
+	}
+	
+	
+	public Entry_Integer default_markercount = 
+			Entry.define("Default.MarkerCount",
+					1,
+					"The default count of markers to be placed. (-1 for no limit.)");
+	
+	public Entry_Enum<MeasureMode> default_mode = 
+			Entry.define("Default.Mode",
+					MeasureMode.class,
+					MeasureMode.BLOCKS,
+					"The default mode to use for measurement.");
+	
+	public Entry_Enum<BlockAxis> default_ignoredAxis =
+			Entry.define("Default.IgnoredAxis",
+					BlockAxis.class,
+					BlockAxis.None,
+					"The axis to be ignored by default, during measurement.");
 	
 	public Entry_Enum<Material> interact_material =
 			Entry.define("Interact.Material",
