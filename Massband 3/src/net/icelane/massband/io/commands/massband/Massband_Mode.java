@@ -5,7 +5,7 @@ import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
 
 import net.icelane.massband.core.Marker;
-import net.icelane.massband.core.Marker.MeasureUnit;
+import net.icelane.massband.core.Marker.MeasureMode;
 import net.icelane.massband.io.CommandBase;
 import net.icelane.massband.core.Massband;
 
@@ -40,12 +40,12 @@ public class Massband_Mode extends CommandBase{
 		
 		if (args.length == 1){
 			try{
-				MeasureUnit value = null;
+				MeasureMode value = null;
 				int valueInt = -1;
 				try{valueInt = Integer.valueOf(args[0]);}catch (NumberFormatException ex){}
 				
 				int index = 0; 
-				for (MeasureUnit mode : Marker.MeasureUnit.values()){
+				for (MeasureMode mode : Marker.MeasureMode.values()){
 					if (index == valueInt) valueInt = index;
 					if (mode.toString().toLowerCase().contains(args[0].toLowerCase().trim())){
 						value = mode;
@@ -53,9 +53,9 @@ public class Massband_Mode extends CommandBase{
 					index++;
 				}
 				
-				if (value == null) value = Marker.MeasureUnit.values()[valueInt];  
+				if (value == null) value = Marker.MeasureMode.values()[valueInt];  
 				
-				obj.getMarkers(player.getWorld()).setUnit(value);
+				obj.getMarkers(player.getWorld()).setMode(value);
 				obj.getMarkers(player.getWorld()).recalculate();
 				
 				player.sendMessage("§7Measuring mode set to: §c" + value.toString().toLowerCase());
@@ -63,7 +63,7 @@ public class Massband_Mode extends CommandBase{
 				player.sendMessage("§cError: incorrect argument!");
 			}
 		}else{
-			player.sendMessage("§7Measuring mode: §c" + obj.getMarkers(player.getWorld()).getUnit().toString().toLowerCase());		
+			player.sendMessage("§7Measuring mode: §c" + obj.getMarkers(player.getWorld()).getMode().toString().toLowerCase());		
 		}
 		
 		return true;
