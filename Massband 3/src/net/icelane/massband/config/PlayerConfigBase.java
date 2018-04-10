@@ -42,6 +42,13 @@ public abstract class PlayerConfigBase<T extends PlayerConfigBase<T>> extends Co
 	public abstract String defaultName();
 	
 	/**
+	 * Use to alter the defined entries after they are initialized.
+	 */
+	public void postInitialize() {
+		
+	}
+	
+	/**
 	 * The name and extension of this config file. May also specify a relative
 	 * path.<br>
 	 * <br>
@@ -54,6 +61,7 @@ public abstract class PlayerConfigBase<T extends PlayerConfigBase<T>> extends Co
 	@Override
 	public T load() {
 		process(getFilePath(), false, false);  // load
+		postInitialize();
 		return getConfigClass().cast(this);
 	}
 	
@@ -73,6 +81,7 @@ public abstract class PlayerConfigBase<T extends PlayerConfigBase<T>> extends Co
 	
 	@Override
 	public File getFilePath(){
+		if (getPlayer() == null) return super.getFilePath();
 		return new File(getBasePath(), name(getPlayer()));
 	}
 	
