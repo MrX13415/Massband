@@ -5,6 +5,7 @@ import net.icelane.massband.config.Entry;
 import net.icelane.massband.config.EntryTypes.Entry_Boolean;
 import net.icelane.massband.config.EntryTypes.Entry_Double;
 import net.icelane.massband.config.EntryTypes.Entry_Enum;
+import net.icelane.massband.config.EntryTypes.Entry_Integer;
 import net.icelane.massband.config.EntryTypes.Entry_Long;
 import net.icelane.massband.io.CommandText;
 
@@ -29,6 +30,16 @@ public class Config extends ConfigBase<Config> {
 		return "config.yml";
 	}
 
+	public Entry_Integer limits_Marker_PlayerMaxCount = 
+			Entry.define("Limits.Marker.PlayerMaxCount",
+					Integer.MAX_VALUE,
+					"The absolut maximum number of markers a single player is allowed to place.");
+	
+	public Entry_Integer limits_Marker_GlobalMaxCount = 
+			Entry.define("Limits.Marker.GlobalMaxCount",
+					Integer.MAX_VALUE,
+					"The absolut maximum number of markers to be place on the whole server.");
+	
 	public Entry_Boolean cleanupEnabled = 
 			Entry.define("Cleanup.Enabled",
 					true,
