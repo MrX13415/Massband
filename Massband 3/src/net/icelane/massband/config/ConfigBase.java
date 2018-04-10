@@ -63,8 +63,16 @@ public abstract class ConfigBase<T extends ConfigBase<T>> {
 	 */
 	public abstract String name();
 
+	/**
+	 * Use to alter the defined entries after they are initialized.
+	 */
+	public void postInitialize() {
+		
+	}
+	
 	public T load() {
 		process(getFilePath(), false, true);  // load
+		postInitialize();
 		return configClass.cast(this);
 	}
 
