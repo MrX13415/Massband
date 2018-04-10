@@ -32,7 +32,7 @@ public class Massband {
 	
 	private Massband(Player player) {
 		this.player = player;
-		this.config = PlayerConfig.initialize(player);
+		config(); //initialize config
 	}
 		
 	public static Massband newInstance(Player player){
@@ -207,6 +207,7 @@ public class Massband {
 	}
 
 	public PlayerConfig config() {
+		if (config == null) config = PlayerConfig.initialize(player);
 		return config;
 	}
 	
