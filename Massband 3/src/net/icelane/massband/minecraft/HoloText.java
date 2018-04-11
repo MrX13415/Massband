@@ -626,15 +626,15 @@ public class HoloText {
 	}
 
 	public static double getEntityLineOffset() {
-		return Config.get().defaultEntityLineOffset.get(); // default: 0.3
+		return Config.get().marker_LineOffset.get(); // default: 0.3
 	}
 	
 	public static long getOwnerHideTicks() {
-		return Config.get().defaultOwnerHideTicks.get(); //default: 20L * 3 ; in ticks (20 tick => 1 sec)
+		return Config.get().marke_OwnerHideTicks.get(); //default: 20L * 3 ; in ticks (20 tick => 1 sec)
 	}
 	
 	public static long getOwnerShowDelayTicks() {
-		return Config.get().defaultOwnerShowDelayTicks.get(); //default: 10L ; in ticks (1 tick => 50 ms)
+		return Config.get().marker_OwnerShowDelayTicks.get(); //default: 10L ; in ticks (1 tick => 50 ms)
 	}
 
 	public String getOwnerNameFormat() {
