@@ -32,7 +32,7 @@ public class Massband_NoLimit extends CommandBase{
 		Massband obj = Massband.get(player);
 		
 		obj.getMarkers(player.getWorld()).setMaxCount(-1);
-		player.sendMessage("§7Marker count set to: §cNo Limit");
+		player.sendMessage("§aMarker count set to: §cNo Limit");
 		
 		return true;
 	}

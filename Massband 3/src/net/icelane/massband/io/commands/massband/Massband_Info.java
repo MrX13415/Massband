@@ -23,7 +23,7 @@ public class Massband_Info extends CommandBase{
 	@Override
 	public boolean command(CommandSender sender, Command cmd, String label, String[] args) {
 		Plugin plugin = Plugin.get();
-		sender.sendMessage("§a" + plugin.getName() + " §cversion §9" + plugin.getDescription().getVersion());
+		sender.sendMessage(String.format("§a%s §cversion §9$s", plugin.getName(), plugin.getDescription().getVersion()));
 		return true;
 	}
 	

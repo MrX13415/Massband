@@ -75,7 +75,7 @@ public class VectorUtil {
 	}
 	
 	/**
-	 * Returns weather the cross sign between to vectors is positive.
+	 * Returns weather the cross sign between two vectors is positive.
 	 * @param v The first vector.
 	 * @param w The second vector.
 	 * @return True if cross is positive. False if negative or zero.

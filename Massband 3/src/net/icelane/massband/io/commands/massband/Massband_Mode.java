@@ -58,12 +58,12 @@ public class Massband_Mode extends CommandBase{
 				obj.getMarkers(player.getWorld()).setMode(value);
 				obj.getMarkers(player.getWorld()).recalculate();
 				
-				player.sendMessage("§7Measuring mode set to: §c" + value.toString().toLowerCase());
+				player.sendMessage(String.format("§aMeasuring mode set to: §c%s", value.toString().toLowerCase()));
 			}catch (Exception ex){
-				player.sendMessage("§cError: incorrect argument!");
+				player.sendMessage("§cError: §6incorrect argument!");
 			}
 		}else{
-			player.sendMessage("§7Measuring mode: §c" + obj.getMarkers(player.getWorld()).getMode().toString().toLowerCase());		
+			player.sendMessage(String.format("§7Measuring mode: §c%s", obj.getMarkers(player.getWorld()).getMode().toString().toLowerCase()));		
 		}
 		
 		return true;
