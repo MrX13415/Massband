@@ -31,10 +31,6 @@ public class HoloText {
 	public static final String metadata_OwnerUUID = "OwnerUUID";
 	public static final String metadata_IsOwnerTag = "IsOwnerTag";
 	
-	private static double defaultEntityLineOffset = Config.get().defaultEntityLineOffset.get(); // 0.3;	
-	private static long defaultOwnerHideTicks = Config.get().defaultOwnerHideTicks.get(); //20L * 3; //ticks (20 tick => 1 sec)
-	private static long defaultOwnerShowDelayTicks = Config.get().defaultOwnerShowDelayTicks.get(); //10L; //ticks (1 tick => 50 ms)
-
 	private static Plugin plugin;
 	
 	private	static long ownerTags_LastRun;
@@ -46,7 +42,6 @@ public class HoloText {
 	private String text;
 	private ArrayList<ArmorStand> entities = new ArrayList<>();
 	private ArrayList<Double> entityOffsets = new ArrayList<>();
-	private double lineOffset = defaultEntityLineOffset;
 	private boolean visible;
 	
 	private boolean ownerTagsEnabled = Config.get().marker_showOwnerTags.get();
@@ -61,7 +56,7 @@ public class HoloText {
 	
 	
 	private HoloText(Player player, Location location){
-		//if (plugin == null) throw new InitializationError("Not initialized. Use initialize(...) once befor using any HoloText object.");
+		//if (plugin == null) throw new InitializationError("Not initialized. Use initialize(...) once before using any HoloText object.");
 		this.player = player;
 		setLocation(location);
 	}
@@ -355,7 +350,7 @@ public class HoloText {
 	 * @return The calculated offset value
 	 */
 	public double getLineOffset(int lineIndex) {
-		return Math.abs((getLines().length - lineIndex - 1) * lineOffset);
+		return Math.abs((getLines().length - lineIndex - 1) * getEntityLineOffset());
 	}
 	
 	public void refresh(){
@@ -415,7 +410,7 @@ public class HoloText {
 	public void showOwner() {
 		if (!ownerTagsEnabled) return;
 		
-		showOwner(defaultOwnerShowDelayTicks, defaultOwnerHideTicks);
+		showOwner(getOwnerShowDelayTicks(), getOwnerHideTicks());
 	}
 	
 	public void showOwner(long showdelayticks, long autohideticks) {
@@ -630,20 +625,16 @@ public class HoloText {
 		this.location = location;
 	}
 
-	public static double getDefaultEntityLineOffset() {
-		return defaultEntityLineOffset;
+	public static double getEntityLineOffset() {
+		return Config.get().defaultEntityLineOffset.get(); // default: 0.3
 	}
-
-	public static void setDefaultEntityLineOffset(double defaultEntityLineOffset) {
-		HoloText.defaultEntityLineOffset = defaultEntityLineOffset;
+	
+	public static long getOwnerHideTicks() {
+		return Config.get().defaultOwnerHideTicks.get(); //default: 20L * 3 ; in ticks (20 tick => 1 sec)
 	}
-
-	public double getLineOffset() {
-		return lineOffset;
-	}
-
-	public void setLineOffset(double lineOffset) {
-		this.lineOffset = lineOffset;
+	
+	public static long getOwnerShowDelayTicks() {
+		return Config.get().defaultOwnerShowDelayTicks.get(); //default: 10L ; in ticks (1 tick => 50 ms)
 	}
 
 	public String getOwnerNameFormat() {
