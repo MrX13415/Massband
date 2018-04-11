@@ -4,6 +4,7 @@ import org.bukkit.command.Command;
 import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
 
+import net.icelane.massband.config.configs.Config;
 import net.icelane.massband.core.Massband;
 import net.icelane.massband.io.CommandBase;
 
@@ -38,12 +39,18 @@ public class Massband_Count extends CommandBase{
 				int value = Integer.valueOf(args[0]);
 				if (value < 1 && value > -1 ) value = 1;  // min marker count is 1!
 				if (value < 0) value = -1;  // no "limit"
-
+				
 				obj.getMarkers(player.getWorld()).setMaxCount(value);
 				
-				player.sendMessage("§7Marker count set to: §c" +  (value == -1 ? "No Limit" : value));
+				player.sendMessage(String.format("§aMarker count set to: §c%s", value == -1 ? "No Limit" : value));
+				
+				// player limit
+				int playerlimit = Config.get().limits_Marker_PlayerMaxCount.get();	
+				if (value < 0 || value >= playerlimit)
+					player.sendMessage(String.format("§7(Marker limit: §9%s§7)", playerlimit));
+					
 			}catch (NumberFormatException ex){
-				player.sendMessage("§cError: incorrect argument!");
+				player.sendMessage("§cError: §6incorrect argument!");
 			}
 		}else{
 			int count = obj.getMarkers(player.getWorld()).getMaxCount();
