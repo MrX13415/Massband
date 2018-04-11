@@ -45,7 +45,7 @@ public class Massband_Count extends CommandBase{
 				player.sendMessage(String.format("§aMarker count set to: §c%s", value == -1 ? "No Limit" : value));
 				
 				// player limit
-				int playerlimit = Config.get().limits_Marker_PlayerMaxCount.get();	
+				int playerlimit = Config.get().marker_PlayerMaxCount.get();	
 				if (value < 0 || value >= playerlimit)
 					player.sendMessage(String.format("§7(Marker limit: §9%s§7)", playerlimit));
 					

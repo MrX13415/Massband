@@ -23,30 +23,23 @@ public class Config extends ConfigBase<Config> {
 	
 	// ---------- CONFIG ---------- //
 	
-	//TODO: Add max/min limits for markercount etc. 
-	
 	@Override
 	public String name() {
 		return "config.yml";
 	}
 
-	public Entry_Integer limits_Marker_PlayerMaxCount = 
-			Entry.define("Limits.Marker.PlayerMaxCount",
-					Integer.MAX_VALUE,
-					"The absolut maximum number of markers a single player is allowed to place.");
-	
-	public Entry_Integer limits_Marker_GlobalMaxCount = 
-			Entry.define("Limits.Marker.GlobalMaxCount",
-					Integer.MAX_VALUE,
-					"The absolut maximum number of markers to be place on the whole server.");
-	
-	public Entry_Boolean cleanupEnabled = 
+	public Entry_Boolean cleanup_Enabled = 
 			Entry.define("Cleanup.Enabled",
 					true,
 					"This will remove any leftover \"markers\" on server startup.",
 					"This will make sure there arn't any markers without an associated player.");
 	
-	public Entry_Double defaultEntityLineOffset = 
+	public Entry_Integer marker_PlayerMaxCount = 
+			Entry.define("Marker.PlayerMaxCount",
+					1024,
+					"The absolut maximum number of markers a single player is allowed to place.");
+	
+	public Entry_Double marker_LineOffset = 
 			Entry.define("Marker.LineOffset",
 					0.3,
 					"The space between multiple lines of a marker.");	
@@ -57,13 +50,13 @@ public class Config extends ConfigBase<Config> {
 					"If another player is nearby, an \"owner tag\" will be shown for each marker,",
 					"displaying the name of the player the marker belongs to.");
 	
-	public Entry_Long defaultOwnerHideTicks = 
+	public Entry_Long marke_OwnerHideTicks = 
 			Entry.define("Marker.OwnerTags.HideTicks",
 					20L * 3,
 					"The minimum time an onwer tag should be visible.",
 					"In Ticks. (20 Ticks => 1 sec)");
 	
-	public Entry_Long defaultOwnerShowDelayTicks = 
+	public Entry_Long marker_OwnerShowDelayTicks = 
 			Entry.define("Marker.OwnerTags.DelayTicks",
 					10L,
 					"The minimum delay before showing the owner tags again.",

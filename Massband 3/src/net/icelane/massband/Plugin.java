@@ -42,7 +42,7 @@ public class Plugin extends JavaPlugin{
 		Server.registerEvents();
 		Server.registerCommands();
 		
-		if (Config.get().cleanupEnabled.get()) 
+		if (Config.get().cleanup_Enabled.get()) 
 			Massband.removeAllMarkers(null);
 	}
 	
