@@ -31,13 +31,13 @@ public class Config extends ConfigBase<Config> {
 	public Entry_Boolean cleanup_Enabled = 
 			Entry.define("Cleanup.Enabled",
 					true,
-					"This will remove any leftover \"markers\" on server startup.",
-					"This will make sure there arn't any markers without an associated player.");
+					"This will remove any leftover \"markers\" on server start-up.",
+					"This will make sure there aren't any markers without an associated player.");
 	
 	public Entry_Integer marker_PlayerMaxCount = 
 			Entry.define("Marker.PlayerMaxCount",
 					1024,
-					"The absolut maximum number of markers a single player is allowed to place.");
+					"The absolute maximum number of markers a single player is allowed to place.");
 	
 	public Entry_Double marker_LineOffset = 
 			Entry.define("Marker.LineOffset",
@@ -53,7 +53,7 @@ public class Config extends ConfigBase<Config> {
 	public Entry_Long marke_OwnerHideTicks = 
 			Entry.define("Marker.OwnerTags.HideTicks",
 					20L * 3,
-					"The minimum time an onwer tag should be visible.",
+					"The minimum time an owner tag should be visible.",
 					"In Ticks. (20 Ticks => 1 sec)");
 	
 	public Entry_Long marker_OwnerShowDelayTicks = 

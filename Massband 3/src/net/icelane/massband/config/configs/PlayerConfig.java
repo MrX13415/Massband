@@ -66,13 +66,13 @@ public class PlayerConfig extends PlayerConfigBase<PlayerConfig> {
 	public Entry_Boolean interact_preventAction = 
 			Entry.define("Interact.Prevent-Action",
 					true,
-					"Weather the default action (e.g. \"breaking a block\") should be preventet,",
-					"when the \"interact material\" is been holded.");
+					"Weather the default action (e.g. \"breaking a block\") should be prevented,",
+					"when the \"interact material\" is been held.");
 	
 	public Entry_Boolean interact_switchbuttons = 
 			Entry.define("Interact.Switch-Buttons",
 					false,
-					"Inverts actions of the left and right mouse buttons. Usefull for left-handed.");
+					"Inverts actions of the left and right mouse buttons. Useful for left-handed.");
 	
 	public Entry_Long interact_doubleClickTimeFrame = 
 			Entry.define("Interact.DoubleClick-TimeFrame",
