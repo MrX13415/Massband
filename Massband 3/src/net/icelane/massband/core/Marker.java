@@ -15,6 +15,7 @@ import org.bukkit.entity.Player;
 import org.bukkit.util.Vector;
 
 import net.icelane.massband.Plugin;
+import net.icelane.massband.config.configs.Config;
 import net.icelane.massband.minecraft.HoloText;
 import net.icelane.math.Point;
 import net.icelane.math.Polygon;
@@ -220,7 +221,15 @@ public class Marker {
 	}	
 	
 	public void add(Block block, BlockFace face){
-		if (getMaxCount() > 0 && getCount() >= getMaxCount() + 1){
+		// player limit reached ...
+		int playerlimit = Config.get().marker_PlayerMaxCount.get();		
+		if (getCount() >= playerlimit) {
+			player.sendMessage(String.format("§6You are not allowed to place more the §4%s§6 markers at once.", playerlimit));
+			if (getCount() > playerlimit) return;
+		}
+		
+		// reach the current max count setting ...
+		if (maxCount > 0 && getCount() >= maxCount + 1){
 			removeAll();
 		}
 		
