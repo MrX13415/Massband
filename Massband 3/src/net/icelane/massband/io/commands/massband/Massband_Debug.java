@@ -7,6 +7,7 @@ import org.bukkit.entity.Player;
 import net.icelane.massband.core.Massband;
 import net.icelane.massband.io.CommandBase;
 import net.icelane.massband.io.commands.massband.debug.Debug_Matrix;
+import net.icelane.massband.io.commands.massband.debug.Debug_OwnerTagsShowSelf;
 import net.icelane.massband.io.commands.massband.debug.Debug_Permissions;
 
 public class Massband_Debug extends CommandBase{
@@ -25,6 +26,7 @@ public class Massband_Debug extends CommandBase{
 		
 		addCommand(Debug_Matrix.class);
 		addCommand(Debug_Permissions.class);
+		addCommand(Debug_OwnerTagsShowSelf.class);
 	}
 
 	@Override
