@@ -310,7 +310,7 @@ public class Massband_Settings extends CommandBase{
 			sender.sendMessage(getSettingsHeaderText(config));
 			sender.sendMessage(getSettingEntryText(config, entry, oldValue));
 			config.save();
-			sender.sendMessage("§aValue changed to: §c" + value);
+			sender.sendMessage("§aValue changed to: §c" + entry.get());
 		}else{
 			sender.sendMessage("§cError: §7Invalid value: §6" + value);
 		}
