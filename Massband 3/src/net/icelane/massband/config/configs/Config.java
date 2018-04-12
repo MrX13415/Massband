@@ -44,11 +44,16 @@ public class Config extends ConfigBase<Config> {
 					0.3,
 					"The space between multiple lines of a marker.");	
 	
-	public Entry_Boolean marker_showOwnerTags = 
+	public Entry_Boolean marker_OwnerTagsEnabled = 
 			Entry.define("Marker.OwnerTags.Enable",
 					true,
 					"If another player is nearby, an \"owner tag\" will be shown for each marker,",
 					"displaying the name of the player the marker belongs to.");
+	
+	public Entry_Integer marker_OwnerTagsDiameter = 
+			Entry.define("Marker.OwnerTags.Diameter",
+					7,
+					"The diameter in which owner tags will be shown on markers around the player.");
 	
 	public Entry_Long marke_OwnerHideTicks = 
 			Entry.define("Marker.OwnerTags.HideTicks",
