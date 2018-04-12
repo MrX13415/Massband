@@ -168,6 +168,10 @@ public class Marker {
 		return markerList.size();
 	}
 	
+	public boolean isCountLimitReached() {
+		return getCount() >= Config.get().marker_PlayerMaxCount.get();
+	}
+	
 	public HoloText get(int index){
 		if (!inBounds(index, markerList)) return null;
 		return markerList.get(index);
@@ -224,7 +228,7 @@ public class Marker {
 		// player limit reached ...
 		int playerlimit = Config.get().marker_PlayerMaxCount.get();		
 		if (getCount() >= playerlimit) {
-			player.sendMessage(String.format("§6You are not allowed to place more the §4%s§6 markers at once.", playerlimit));
+			player.sendMessage(String.format("§6You are not allowed to place more then §c%s§6 markers at once.", playerlimit));
 			if (getCount() > playerlimit) return;
 		}
 		
