@@ -14,7 +14,7 @@ public final class EntryTypes {
 	public static class Entry_Boolean extends Entry<Boolean>{
 		@Override
 		public Boolean valueOf(String value){
-			return Boolean.valueOf(value);
+			return value.trim().equals("1") || Boolean.valueOf(value);
 		}
 
 		@Override
