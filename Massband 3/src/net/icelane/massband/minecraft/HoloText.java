@@ -31,9 +31,10 @@ public class HoloText {
 	public static final String metadata_OwnerUUID = "OwnerUUID";
 	public static final String metadata_IsOwnerTag = "IsOwnerTag";
 	
-	private static Plugin plugin;
+	private static boolean ownerTags_ShowSelf;
+	private	static long ownerTags_LastRun;	
 	
-	private	static long ownerTags_LastRun;
+	private static Plugin plugin;	
 	
 	private String format_ownerName = "§o§8%s";
 	
@@ -44,7 +45,7 @@ public class HoloText {
 	private ArrayList<Double> entityOffsets = new ArrayList<>();
 	private boolean visible;
 	
-	private boolean ownerTagsEnabled = Config.get().marker_showOwnerTags.get();
+	private boolean ownerTagsEnabled = Config.get().marker_OwnerTagsEnabled.get();
 	private boolean ownerShown;
 	private int ownerNameEntityId;
 	private long ownerHideTaskTicks;
@@ -56,7 +57,7 @@ public class HoloText {
 	
 	
 	private HoloText(Player player, Location location){
-		//if (plugin == null) throw new InitializationError("Not initialized. Use initialize(...) once before using any HoloText object.");
+		if (plugin == null) throw new RuntimeException("Not initialized. Use initialize(...) once before using any HoloText object.");
 		this.player = player;
 		setLocation(location);
 	}
@@ -357,7 +358,7 @@ public class HoloText {
 		String lines[] = getLines(); 
 		
 		// /!\ Important: Reset, because the entity gets reused for "normal" text.
-		//ownerNameEntityId = 0;
+		//ownerNameEntityId = 0; (TODO: is this still required?)
 		ArmorStand ownerEntity = null;
 		
 		if (getEntityCount() > 0 && isOwnerEntity(getFirstEntity())) {
@@ -456,8 +457,8 @@ public class HoloText {
 		if (ownerShown) return false;
 		hideOwner();
 		
-		// calculate the Y offset, so it above the first line.
-		// "-1", because "getLineOffset" dosn't know the "new" line yet.2
+		// calculate the Y offset, so it's above the first line.
+		// "-1", because "getLineOffset" doesn't know the "new" line yet.
 		double offset = Math.abs(getLineOffset(-1) * -1);
 		
 		// calculate the new location ...
@@ -489,13 +490,14 @@ public class HoloText {
 	
 	public static void showOwnerTagsOnPlayerMove(PlayerMoveEvent event){
 		// owner tags are disabled!
-		if (!Config.get().marker_showOwnerTags.get()) return;
+		if (!Config.get().marker_OwnerTagsEnabled.get()) return;
 		
 		// run only 4 times per second ...
 		if (System.currentTimeMillis() - ownerTags_LastRun < 250) return;
 		ownerTags_LastRun = System.currentTimeMillis(); 
 		
-		List<Entity> nearby = event.getPlayer().getNearbyEntities(10, 10, 10);
+		int diameter = Config.get().marker_OwnerTagsDiameter.get();
+		List<Entity> nearby = event.getPlayer().getNearbyEntities(diameter, diameter, diameter);
 
 		for (Entity entity : nearby) {		
 			// check for ArmorStand ...
@@ -518,7 +520,7 @@ public class HoloText {
 			
 			//HoloText marker = (HoloText) hlobject.value();
 			// show the owner tag if the player is not the owner itself.
-			if (!marker.isOwner(event.getPlayer())) marker.showOwner();
+			if (!marker.isOwner(event.getPlayer()) || isOwnerTagsShowSelf()) marker.showOwner();
 		}		
 	}
 	
@@ -652,4 +654,13 @@ public class HoloText {
 	public BukkitTask getOwnerShowTask() {
 		return ownerShowTask;
 	}
+
+	public static boolean isOwnerTagsShowSelf() {
+		return ownerTags_ShowSelf;
+	}
+
+	public static void setOwnerTagsShowSelf(boolean ownerTags_ShowSelf) {
+		HoloText.ownerTags_ShowSelf = ownerTags_ShowSelf;
+	}
+	
 }
