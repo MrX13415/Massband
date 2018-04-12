@@ -42,6 +42,8 @@ public class Debug_Matrix extends CommandBase{
 		return true;
 	}
 
+	//TODO: Remove dragons below! 
+	
 	@Override
 	public boolean command(Player player, Command cmd, String label, String[] args) {
 		if (args.length == 3){			
@@ -53,9 +55,15 @@ public class Debug_Matrix extends CommandBase{
 			Marker markers = Massband.get(player).getMarkers(player.getWorld());
 			
 			if (createTask > -1) {
-				player.sendMessage("§cAllready runngin: " + count + " / " + (size_x * size_y));
+				player.sendMessage("§cAllready running: " + count + " / " + (size_x * size_y));
 				return true;
 			}
+			
+			if (markers.getMaxCount() != -1) {
+				player.sendMessage("§6Set your marker count to \"§cno limit§6\" via §a/mb nl §6first.");
+				return true;
+			}
+			
 			count = 0;;
 			pos_x = 0;
 			pos_z = 0;
@@ -74,14 +82,18 @@ public class Debug_Matrix extends CommandBase{
 								playerLocation.getBlockZ() + pos_z);
 						markers.add(loc.getBlock(), BlockFace.UP);
 						count++;
-						
-						if (count > (size_x * size_y)) { 
+							
+						if (createTask == -1) {
 							player.sendMessage("§aMatrix created [" + size_x + " x " + size_y + "] y " + pos_y + " | count: " + (count -1));
-							Server.get().getScheduler().cancelTask(createTask);
-							createTask = -1;
-						} else {
-							player.sendMessage("§7Creating matrix " + count + " / " + (size_x * size_y));
+							break;
 						}
+						
+						if (count > (size_x * size_y) || markers.isCountLimitReached()) { 
+							Server.get().getScheduler().cancelTask(createTask);
+							createTask = -1; // cancle task ...
+						}
+
+						player.sendMessage("§7Creating matrix " + count + " / " + (size_x * size_y));
 						
 						pos_x++;
 						if (pos_x >= size_x) {
