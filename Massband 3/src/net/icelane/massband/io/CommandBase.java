@@ -395,38 +395,43 @@ public abstract class CommandBase implements TabExecutor{
 
 	/**
 	 * Returns a list of all matching sub commands and defined tab values for the given argument.
-	 * @param arg A command argument.
+	 * @param args An array of command arguments.
 	 * @return A list of all matching strings.
 	 */
-	public List<String> getTabList(String arg){
+	public List<String> getTabList(String[] args){
+		String arg = args.length > 0 ? args[args.length - 1] : "";
+			
 		ArrayList<String> resultList = new ArrayList<>();
 		arg = arg.toLowerCase().trim();
 		
-		for(CommandBase cmd : commands){
+		// only add sub command, if no arguments. where already present.
+		if (args.length <= 1) {			
 			// search for "arg" in command names ...
-			if (arg.length() == 0 || cmd.getName().toLowerCase().contains(arg)){
-				resultList.add(cmd.getName());
-			}
-		}
-		
-		if (resultList.size() == 0){
 			for(CommandBase cmd : commands){
-				// search for "arg" in aliases ...
-				for (String alias : cmd.getAliases()) {
-					if (alias.toLowerCase().contains(arg)){
-						resultList.add(cmd.getName());
+				if (arg.length() == 0 || cmd.getName().toLowerCase().contains(arg)){
+					resultList.add(cmd.getName());
+				}
+			}
+			
+			// search for "arg" in aliases ...
+			if (resultList.size() == 0){
+				for(CommandBase cmd : commands){
+					for (String alias : cmd.getAliases()) {
+						if (alias.toLowerCase().contains(arg)){
+							resultList.add(cmd.getName());
+						}
 					}
 				}
 			}
-		}
-		
-		for (String value : tabList){
-			// search for "arg" in command names ...
-			if (arg.length() == 0 || value.toLowerCase().contains(arg)){
-				resultList.add(value);
+			
+			// search for "arg" in tab list ...
+			for (String value : tabList){
+				if (arg.length() == 0 || value.toLowerCase().contains(arg)){
+					resultList.add(value);
+				}
 			}
 		}
-		
+	
 		// add the "?" as command, cause its available on all commands
 		if (arg.length() == 0) resultList.add("?");
 		
@@ -447,7 +452,7 @@ public abstract class CommandBase implements TabExecutor{
 			}
 		}
 		
-		return getTabList(args.length > 0 ? args[args.length - 1] : "");
+		return getTabList(args);
 	}
 	
 	@Override
