@@ -5,10 +5,8 @@ import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
 
 import net.icelane.massband.Plugin;
-import net.icelane.massband.Server;
 import net.icelane.massband.core.Massband;
 import net.icelane.massband.io.CommandBase;
-import net.icelane.massband.minecraft.HoloText;
 
 public class Debug_Message extends CommandBase{
 
