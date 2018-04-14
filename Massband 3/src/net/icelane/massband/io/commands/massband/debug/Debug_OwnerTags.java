@@ -9,19 +9,19 @@ import net.icelane.massband.Server;
 import net.icelane.massband.io.CommandBase;
 import net.icelane.massband.minecraft.HoloText;
 
-public class Debug_OwnerTagsShowSelf extends CommandBase{
+public class Debug_OwnerTags extends CommandBase{
 
 	@Override
 	public String name() {
-		return "OwnerTagsShowSelf";
+		return "ownertags";
 	}
 	
 	@Override
 	public void initialize() {
-		setAliases("OwnerTagsShowSelf");
+		setAliases("tgs");
 		setDescription("Owner tags will be shown to the owner as well.");
 		setUsage("[true|false]");
-		setPermission("massband.debug.ownertagsshowself", true);
+		setPermission("massband.debug.ownertags", true);
 		setDebugRequired(true);
 	}
 
