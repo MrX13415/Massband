@@ -13,7 +13,7 @@ import net.icelane.massband.io.commands.massband.Massband_Clear;
 import net.icelane.massband.io.commands.massband.Massband_Settings;
 import net.icelane.massband.io.commands.massband.Massband_Count;
 import net.icelane.massband.io.commands.massband.Massband_Debug;
-import net.icelane.massband.io.commands.massband.Massband_Info;
+import net.icelane.massband.io.commands.massband.Massband_Help;
 import net.icelane.massband.io.commands.massband.Massband_Limit;
 import net.icelane.massband.io.commands.massband.Massband_Mode;
 import net.icelane.massband.io.commands.massband.Massband_NoLimit;
@@ -29,14 +29,14 @@ public class MassbandCommand extends CommandBase{
 	
 	@Override
 	public void initialize() {
-		addCommand(Massband_Clear.class);
-		addCommand(Massband_Count.class);
+		addCommand(Massband_Help.class);
 		addCommand(Massband_Limit.class);
 		addCommand(Massband_NoLimit.class);
+		addCommand(Massband_Count.class);
 		addCommand(Massband_Mode.class);
+		addCommand(Massband_Clear.class);
 		addCommand(Massband_Default.class);
 		addCommand(Massband_Settings.class);
-		addCommand(Massband_Info.class);		
 		addCommand(Massband_Debug.class);
 	}
 	
