@@ -42,8 +42,6 @@ public class Debug_Matrix extends CommandBase{
 		return true;
 	}
 
-	//TODO: Remove dragons below! 
-	
 	@Override
 	public boolean command(Player player, Command cmd, String label, String[] args) {
 		if (args.length == 3){			
@@ -64,7 +62,7 @@ public class Debug_Matrix extends CommandBase{
 				return true;
 			}
 			
-			count = 0;;
+			count = 0;
 			pos_x = 0;
 			pos_z = 0;
 			playerLocation = player.getLocation();
@@ -72,14 +70,16 @@ public class Debug_Matrix extends CommandBase{
 			createTask = Server.get().getScheduler().scheduleSyncRepeatingTask(Plugin.get(), new Runnable() {
 				@Override
 				public void run() {
-					int iiii = (size_x * size_y) - count + 1;
-					if (iiii > 50) iiii = 10;
+					// Only place a number of markers per "run" of the task. 
+					int perRunCount = (size_x * size_y) - count + 1;
+					if (perRunCount > 20) perRunCount = 20;
 					
-					for (int i = 0; i < iiii; i++) {
+					for (int i = 0; i < perRunCount; i++) {
+						// place a marker ...
 						Location loc = new Location(player.getWorld(),
 								playerLocation.getBlockX() + pos_x,
 								pos_y,
-								playerLocation.getBlockZ() + pos_z);
+								playerLocation.getBlockZ() + pos_z);			
 						markers.add(loc.getBlock(), BlockFace.UP);
 						count++;
 							
@@ -90,15 +90,18 @@ public class Debug_Matrix extends CommandBase{
 						
 						if (count > (size_x * size_y) || markers.isCountLimitReached()) { 
 							Server.get().getScheduler().cancelTask(createTask);
-							createTask = -1; // cancle task ...
+							createTask = -1; // Cancel task ...
 						}
 
 						player.sendMessage("§7Creating matrix " + count + " / " + (size_x * size_y));
 						
+						
 						pos_x++;
+						// row completed: Move to next ...
 						if (pos_x >= size_x) {
 							pos_x = 0;
 							pos_z++;
+							//Matrix completed: Place the last marker on the first marker (#).
 							if (pos_z >= size_y) {
 								pos_z = 0;
 							}
