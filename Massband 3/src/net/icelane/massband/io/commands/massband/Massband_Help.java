@@ -8,7 +8,7 @@ import net.icelane.massband.Plugin;
 import net.icelane.massband.core.Massband;
 import net.icelane.massband.io.CommandBase;
 
-public class Massband_Info extends CommandBase{
+public class Massband_Help extends CommandBase{
 
 	@Override
 	public String name() {
@@ -58,7 +58,7 @@ public class Massband_Info extends CommandBase{
 					" §7no marker to remove all markers. (§a/mb §6clear§7)"
 				};
 		
-		// For "swutched" buttons: Make it easier for other languages to get a proper translation.
+		// For "switched" buttons: Make it easier for other languages to get a proper translation.
 		String[] helpMsgL = new String[]
 				{
 					String.format(" §7Hold the item §9%s §7in any hand to interact with Massband.", obj.getInteract().getMaterial()),

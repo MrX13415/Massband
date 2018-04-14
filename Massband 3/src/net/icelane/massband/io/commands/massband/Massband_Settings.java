@@ -213,7 +213,7 @@ public class Massband_Settings extends CommandBase{
 			sender.sendMessage(CommandText.getPermissionDenied(this, otherPermission));
 			return false;
 		}
-
+		//TODO: Consider offline players
 		// You need to specify a player on console!
 		if (other && console && targetPlayer == null) {
 			if (args.length > 0) {
