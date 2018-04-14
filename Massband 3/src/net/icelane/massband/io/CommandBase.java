@@ -466,7 +466,7 @@ public abstract class CommandBase implements TabExecutor{
 			return true;
 		}
 
-		if (debugRequired && !Massband.isDebug()) {
+		if (debugRequired && !Massband.debug()) {
 			setFailReason(FailReason.Debug);
 			
 			sender.sendMessage(CommandText.getDebugRequired(this));

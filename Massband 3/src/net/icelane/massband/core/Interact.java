@@ -13,6 +13,7 @@ import org.bukkit.event.player.PlayerSwapHandItemsEvent;
 import org.bukkit.inventory.EquipmentSlot;
 import org.bukkit.inventory.ItemStack;
 
+import net.icelane.massband.Server;
 import net.icelane.massband.core.Marker.BlockAxis;
 import net.icelane.massband.core.Marker.MarkerSettings;
 import net.icelane.massband.core.Marker.MeasureMode;
@@ -66,12 +67,14 @@ public class Interact {
 		lastInteractSlot = slot;
 		lastInteractBlock = block;
 		
-		//DEBUG:
-		//Server.logger().info("doubleclick: " + doubleclick + " delta: " + delta);
-		//Server.logger().info("item: " + item);
-		//Server.logger().info("item: " + event.getHand());
-		//Server.logger().info("--------------" );
-
+		//DBEUG
+		if (Massband.debugMessage()) {
+			Server.logger().info("doubleclick: " + doubleclick + " delta: " + delta);
+			Server.logger().info("item: " + item);
+			Server.logger().info("item: " + event.getHand());
+			Server.logger().info("--------------" );
+		}
+		
 		// is there already a marker?
 		int index = markers.indexOf(block.getLocation());
 		

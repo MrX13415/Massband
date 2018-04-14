@@ -154,7 +154,7 @@ Effects:
 				if (sender == null) break;
 				// if we don't have the permission, skip it ...
 				if (!cmd.hasPermission(sender)) continue;
-				if (cmd.debugRequired && !Massband.isDebug()) continue;
+				if (cmd.debugRequired && !Massband.debug()) continue;
 				break;
 			default: break;
 			}

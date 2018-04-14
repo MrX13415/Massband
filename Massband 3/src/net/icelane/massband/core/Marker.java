@@ -15,6 +15,7 @@ import org.bukkit.entity.Player;
 import org.bukkit.util.Vector;
 
 import net.icelane.massband.Plugin;
+import net.icelane.massband.Server;
 import net.icelane.massband.config.configs.Config;
 import net.icelane.massband.minecraft.HoloText;
 import net.icelane.math.Point;
@@ -123,7 +124,9 @@ public class Marker {
 		for (HoloText marker : markerList){
 			for(Entity entity : chunk.getEntities()){
 				if (marker.hasEntity(entity)){
-					//DEBUG: Server.logger().info(marker.getText() + " --> " + marker.getEntity().getEntityId());
+					//DEBUG
+					if (Massband.debugMessage()) Server.logger().info("hideInChunck " + marker.getText() + " --> " + marker.getFirstEntity().getEntityId());
+					
 					marker.hide();
 					if (!result) result = true;
 				}
@@ -285,8 +288,11 @@ public class Marker {
 	}
 	 
 	public Point[] get2DPoints() {
-		//DEBUG: Server.logger().info("-------------------------");
-		//DEBUG: Server.logger().info(" Ignored: " + getIgnoredAxis());
+		//DEBUG
+		if (Massband.debugMessage()) {
+			Server.logger().info("-------------------------");
+			Server.logger().info(" Ignored: " + getIgnoredAxis());
+		}
 		Point[] inPoints = getPoints();
 		ArrayList<Point> outPoints = new ArrayList<Point>(inPoints.length);
 		
@@ -305,10 +311,11 @@ public class Marker {
 			if(!outPoints.contains(out)) {
 				outPoints.add(out);
 			
-			//DEBUG:
-			//	Server.logger().info(" -> P[" + index + "] " + out + " <= " + inPoints[index]);
-			//}else {
-			//	Server.logger().info("    P[" + index + "] " + out + " <= " + inPoints[index]);
+				//DEBUG
+				if (Massband.debugMessage()) Server.logger().info(" -> P[" + index + "] " + out + " <= " + inPoints[index]);
+			}else {
+				//DEBUG
+				if (Massband.debugMessage()) Server.logger().info("    P[" + index + "] " + out + " <= " + inPoints[index]);
 			}
 		}
 		

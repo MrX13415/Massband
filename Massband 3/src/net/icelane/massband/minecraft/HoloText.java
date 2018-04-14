@@ -358,7 +358,6 @@ public class HoloText {
 		String lines[] = getLines(); 
 		
 		// /!\ Important: Reset, because the entity gets reused for "normal" text.
-		//ownerNameEntityId = 0; (TODO: is this still required?)
 		ArmorStand ownerEntity = null;
 		
 		if (getEntityCount() > 0 && isOwnerEntity(getFirstEntity())) {
