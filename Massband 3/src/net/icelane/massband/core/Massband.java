@@ -23,7 +23,8 @@ public class Massband {
 
 	private static HashMap<UUID, Massband> list = new HashMap<>();
 	
-	private static boolean debug;
+	private static boolean debug;     // debug mode enabled.
+	private static boolean debugMsg;  // debug messages are shown.
 	
 	private Player player;
 	private PlayerConfig config;
@@ -142,7 +143,8 @@ public class Massband {
 	public static void chuckLoad(ChunkLoadEvent event){
 		if (event.isNewChunk()) return;
 
-		//DEBUG: Server.get().getConsoleSender().sendMessage("§e--> Chunk loaded!");
+		//DEBUG
+		if (Massband.debugMessage()) Server.get().getConsoleSender().sendMessage("§e--> Chunk loaded!");
 		
 		for (UUID uuid : list.keySet()){
 			Massband obj = Massband.get(uuid);
@@ -211,13 +213,23 @@ public class Massband {
 		return config;
 	}
 	
-	public static boolean isDebug() {
+	public static boolean debug() {
 		return debug;
 	}
 
 	public static void setDebug(boolean debug) {
 		Massband.debug = debug;
+		if (!debug) setDebugMessage(false);
 		Server.logger().warning("Debug mode " + (debug ? "enabled" : "disabled"));
+	}
+
+	public static boolean debugMessage() {
+		return debugMsg;
+	}
+
+	public static void setDebugMessage(boolean debugMsg) {
+		Massband.debugMsg = debugMsg;
+		Server.logger().warning("Debug messages " + (debug ? "enabled" : "disabled"));
 	}
 	
 }
