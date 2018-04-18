@@ -21,6 +21,8 @@ import net.icelane.massband.minecraft.HoloText;
 
 public class Massband {
 
+	public static final String Interact_Permission = "massband.interact";
+	
 	private static HashMap<UUID, Massband> list = new HashMap<>();
 	
 	private static boolean debug;     // debug mode enabled.
@@ -30,6 +32,7 @@ public class Massband {
 	private PlayerConfig config;
 	private HashMap<UUID, Marker> worldMarkersList = new HashMap<>(); // UUID => World.ID
 	private Interact interact;
+	private boolean disabled;    // disables massband for this player
 	
 	private Massband(Player player) {
 		this.player = player;
@@ -50,6 +53,26 @@ public class Massband {
 	
 	public static Massband get(UUID uuid){
 		return list.get(uuid);
+	}
+	
+	public boolean hasPermission() {
+		return canUse(this.player);
+	}
+	
+	public static boolean hasPermission(Player player) {
+		return canUse(player);
+	}
+	
+	public static boolean canUse(Player player) {
+		boolean perm = player.hasPermission(Interact_Permission);
+		Massband obj = get(player);
+		
+		if (perm && !obj.disabled) return true;
+		if (!perm && obj.disabled) return false;
+		
+		obj.disabled = !perm;	
+		if (obj.disabled)  obj.reset();  	
+		return false;
 	}
 
 	public void load(){
@@ -148,7 +171,7 @@ public class Massband {
 		
 		for (UUID uuid : list.keySet()){
 			Massband obj = Massband.get(uuid);
-
+			
 			if (!obj.getPlayer().isOnline()) continue;
 			if (!obj.hasItem()) continue;
 			if (obj.getPlayer().getWorld() != event.getWorld()) continue;

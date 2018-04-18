@@ -1,6 +1,5 @@
 package net.icelane.massband.event;
 
-import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
 import org.bukkit.event.block.BlockBreakEvent;
@@ -33,6 +32,8 @@ public class PlayerEvents implements Listener {
 	
 	@EventHandler
 	public void onPlayerInteract(PlayerInteractEvent event){
+		if (!Massband.canUse(event.getPlayer())) return; // no permission
+		
 		// fire the interact event only once ...
 		if (playerInteract_Handled){
 			playerInteract_Handled = false;
@@ -59,77 +60,101 @@ public class PlayerEvents implements Listener {
 	
 	@EventHandler
 	public void onPlayerDropItem(PlayerDropItemEvent event) {
+		if (!Massband.canUse(event.getPlayer())) return; // no permission
+		
 		Massband obj = Massband.get(event.getPlayer());
 		if (obj != null) obj.getInteract().itemDrop(event.getPlayer());
 	}
 	
 	@EventHandler
 	public void onPlayerItemBreak(PlayerItemBreakEvent event) {
+		if (!Massband.canUse(event.getPlayer())) return; // no permission
+		
 		Massband obj = Massband.get(event.getPlayer());
 		if (obj != null) obj.getInteract().itemBreak(event.getPlayer());
 	}
 		
 	@EventHandler
 	public void onPlayerItemConsume(PlayerItemConsumeEvent event) {
+		if (!Massband.canUse(event.getPlayer())) return; // no permission
+		
 		Massband obj = Massband.get(event.getPlayer());
 		if (obj != null) obj.getInteract().itemConsume(event.getPlayer());
 	}
 	
 	@EventHandler
 	public void onPlayerSwapHandItems(PlayerSwapHandItemsEvent event) {
+		if (!Massband.canUse(event.getPlayer())) return; // no permission
+		
 		Massband obj = Massband.get(event.getPlayer());
 		if (obj != null) obj.getInteract().swapHandItem(event);
 	}
 
 	@EventHandler
 	public void onPlayerItemHeld(PlayerItemHeldEvent event){
+		if (!Massband.canUse(event.getPlayer())) return; // no permission
+		
 		Massband obj = Massband.get(event.getPlayer());
 		if (obj != null) obj.getInteract().itemHeld(event);
 	}
 	
 	@EventHandler
 	public void onPlayerBlockBreak(BlockBreakEvent event){
+		if (!Massband.canUse(event.getPlayer())) return; // no permission
+		
 		Massband obj = Massband.get(event.getPlayer());
 		if (obj != null) obj.getInteract().blockBreak(event);
 	}
 	
 	@EventHandler
 	public void onPlayerJoin(PlayerJoinEvent event){
+		if (!Massband.canUse(event.getPlayer())) return; // no permission
+		
 		Massband obj = Massband.get(event.getPlayer());
 		if (obj != null) obj.join(event);
 	}
 
 	@EventHandler
 	public void onPlayerQuit(PlayerQuitEvent event){
+		if (!Massband.canUse(event.getPlayer())) return; // no permission
+		
 		Massband obj = Massband.get(event.getPlayer());
 		if (obj != null) obj.quit(event);
 	}
 	
 	@EventHandler
 	public void onPlayerMove(PlayerMoveEvent event){
+		if (!Massband.canUse(event.getPlayer())) return; // no permission
+		
 		Massband obj = Massband.get(event.getPlayer());
 		if (obj != null) obj.move(event);
 	}
 	
 	public void onPlayerTeleporEvent(PlayerTeleportEvent event) {
+		if (!Massband.canUse(event.getPlayer())) return; // no permission
+		
 		Massband obj = Massband.get(event.getPlayer());
 		if (obj != null) obj.teleport(event);
 	}	
 	
 	@EventHandler
 	public void onPlayerChangedWorld(PlayerChangedWorldEvent event){
+		if (!Massband.canUse(event.getPlayer())) return; // no permission
+		
 		Massband obj = Massband.get(event.getPlayer());
 		if (obj != null) obj.worldChange(event.getFrom());
 	}
 	
-	/**
-	 * Called when a player picks-up an item.
-	 * @param event
-	 */
-	@SuppressWarnings("deprecation")
-	@EventHandler
-	public void onPlayerPickupItem(org.bukkit.event.player.PlayerPickupItemEvent event){
-		Massband obj = Massband.get(event.getPlayer());
-		if (obj != null) obj.getInteract().itemPickup((Player) event.getPlayer(), event.getItem().getItemStack());
-	}
+//	/**
+//	 * Called when a player picks-up an item.
+//	 * @param event
+//	 */
+//	@SuppressWarnings("deprecation")
+//	@EventHandler
+//	public void onPlayerPickupItem(org.bukkit.event.player.PlayerPickupItemEvent event){
+//		if (!Massband.hasPermissions(event.getPlayer())) return; // no permission
+//		
+//		Massband obj = Massband.get(event.getPlayer());
+//		if (obj != null) obj.getInteract().itemPickup((Player) event.getPlayer(), event.getItem().getItemStack());
+//	}
 }

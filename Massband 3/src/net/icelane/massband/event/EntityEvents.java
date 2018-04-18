@@ -18,6 +18,7 @@ public class EntityEvents implements Listener {
 	@EventHandler
 	public void onEntityPickupItem(EntityPickupItemEvent event){
 		if (!(event.getEntity() instanceof Player)) return;
+		if (!Massband.canUse((Player) event.getEntity())) return; // no permission
 
 		Massband obj = Massband.get((Player) event.getEntity());
 		if (obj != null) obj.getInteract().itemPickup((Player) event.getEntity(), event.getItem().getItemStack());

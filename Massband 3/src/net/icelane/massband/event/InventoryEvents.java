@@ -18,6 +18,7 @@ public class InventoryEvents implements Listener {
 	@EventHandler
 	public void onInventoryClose(InventoryCloseEvent event){
 		if (!(event.getPlayer() instanceof Player)) return;
+		if (!Massband.canUse((Player) event.getPlayer())) return; // no permission
 		
 		Massband obj = Massband.get((Player) event.getPlayer());
 		if (obj != null) obj.getInteract().inventoryClose(event);

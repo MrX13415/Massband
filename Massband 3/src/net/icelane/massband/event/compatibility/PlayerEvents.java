@@ -19,6 +19,8 @@ public class PlayerEvents extends net.icelane.massband.event.PlayerEvents {
 	@SuppressWarnings("deprecation")
 	@EventHandler
 	public void onPlayerPickupItem(org.bukkit.event.player.PlayerPickupItemEvent event){
+		if (!Massband.canUse(event.getPlayer())) return; // no permission
+		
 		Massband obj = Massband.get(event.getPlayer());
 		if (obj != null) obj.getInteract().itemPickup((Player) event.getPlayer(), event.getItem().getItemStack());
 	}
