@@ -16,11 +16,46 @@ commands:
 
 permissions:
   massband.*:
-     description: Gives access to all Massband commands
+     description: Gives access to all Massband functions.
      children:
        massband.command: true
-  massband.debug:
-     description: Gives access to all debug commands of Massband.
+       
+       
+  massband.interact:
+     description: Gives access to the settings command.
+     default: false 
+     
   massband.command:
      description: Root permission of the Massband command
      default: true
+     children:
+         massband.command.settings: true
+         
+  massband.command.count:
+     description: Gives access to the settings command.
+  massband.command.default:
+     description: Gives access to the settings command.
+  massband.command.info:
+     description: Gives access to the settings command.
+  massband.command.mode:
+     description: Gives access to the settings command.
+  
+  massband.command.settings:
+     description: Gives access to the settings command.
+  massband.command.settings.other:
+     description: Gives access to the settings command.
+  massband.command.settings.config:
+     description: Gives access to the settings command.
+  massband.command.settings.default:
+     description: Gives access to the settings command.
+  
+  massband.debug:
+     description: Gives access to the debug command.
+  massband.debug.matrix:
+     description: Gives access to the debug command.
+  massband.debug.message:
+     description: Gives access to the debug command.
+  massband.debug.ownertags:
+     description: Gives access to the debug command.
+  massband.debug.permission:
+     description: Gives access to the debug command.
