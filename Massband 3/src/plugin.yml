@@ -1,7 +1,7 @@
 main: net.icelane.massband.Plugin
 
 name: Massband
-version: 3.0.7 beta
+version: 3.0.8 beta
 description: Various measuring tools for making the players building life a bit easier.
 author: MrX13415
 website: https://dev.bukkit.org/bukkit-plugins/massband/
@@ -10,52 +10,130 @@ commands:
   massband:
     aliases: [mb]
     description: Manage Massband
-    permission: massband.command      
+    permission: massband.command
     usage: |
            /<self> [command]
 
-permissions:
-  massband.*:
-     description: Gives access to all Massband functions.
-     children:
-       massband.command: true
-       
-       
+permissions:  
   massband.interact:
-     description: Gives access to the settings command.
-     default: false 
-     
-  massband.command:
-     description: Root permission of the Massband command
-     default: true
-     children:
-         massband.command.settings: true
-         
+    description: Gives ability to use all interactive Massband features.
+              
   massband.command.count:
-     description: Gives access to the settings command.
+    description: Gives permission to use the "/Massband count" command. 
   massband.command.default:
-     description: Gives access to the settings command.
-  massband.command.info:
-     description: Gives access to the settings command.
+    description: Gives permission to use the "/Massband default" command.
+  massband.command.help:
+    description: Gives permission to use the "/Massband help" command.
   massband.command.mode:
-     description: Gives access to the settings command.
-  
+    description: Gives permission to use the "/Massband mode" command.
+    
   massband.command.settings:
-     description: Gives access to the settings command.
+    description: Gives permission to use the "/Massband settings" command.
   massband.command.settings.other:
-     description: Gives access to the settings command.
+    description: Gives ability to change settings for other players too.
   massband.command.settings.config:
-     description: Gives access to the settings command.
+    description: Gives permission to use the "/Massband settings config" command.
   massband.command.settings.default:
-     description: Gives access to the settings command.
-  
+    description: Gives permission to use the "/Massband settings default" command.
+    
+  massband.command.settings.*:
+    default: false
+    description: Gives ability to use all settings commands.
+    children:
+      massband.command.settings.all: true        
+  massband.command.settings.all:
+    default: false
+    description: Gives ability to use all settings commands.
+    children:
+      massband.command.settings: true
+      massband.command.settings.other: true
+      massband.command.settings.config: true
+      massband.command.settings.default: true
+      
+  massband.command:
+    default: false
+    description: Gives default permission to use the "/Massband" command.
+    children:
+      massband.command.count: true
+      massband.command.default: true
+      massband.command.help: true
+      massband.command.mode: true
+      massband.command.settings: true
+      
+  massband.command.*:
+    default: false
+    description: Gives all permissions to use the "/Massband" command.
+    children:
+      massband.command.all: true
+  massband.command.all:
+    default: false
+    description: Gives all permissions to use the "/Massband" command.
+    children:
+      massband.command: true
+      massband.command.settings.all: true
+      
   massband.debug:
-     description: Gives access to the debug command.
+    description: Gives permission to use the "/Massband debug" command.
   massband.debug.matrix:
-     description: Gives access to the debug command.
+    description: Gives permission to use the "/Massband debug matrix" command. 
   massband.debug.message:
-     description: Gives access to the debug command.
+    description: Gives permission to use the "/Massband debug message" command.
   massband.debug.ownertags:
-     description: Gives access to the debug command.
+    description: Gives permission to use the "/Massband debug ownertags" command.
   massband.debug.permission:
-     description: Gives access to the debug command.
+    description: Gives permission to use the "/Massband debug permission" command.
+    
+  massband.debug.*:
+    default: false
+    description: Gives ability to use all debug commands.
+    children:
+      massband.debug.all: true
+  massband.debug.all:
+    default: false
+    description: Gives ability to use all debug commands.
+    children:
+      massband.debug: true
+      massband.debug.count: true
+      massband.debug.matrix: true
+      massband.debug.message: true
+      massband.debug.ownertags: true
+      massband.debug.permission: true
+      
+  massband.*:
+    default: false
+    description: Gives all permissions to use Massband.
+    children:
+      massband.all: true
+  massband.all:
+    default: false
+    description: Gives all permissions to use Massband.
+    children:
+      massband.interact: true
+      massband.command.all: true
+      massband.debug.all: true
+    
+  massband:
+    default: true
+    description: Gives default permissions to use Massband.
+    children:
+      massband.default: true    
+  massband.default:
+    default: true
+    description: Gives default permissions to use Massband.
+    children:
+      massband.interact: true
+      massband.command: true     
+  massband.mod:
+    default: false
+    description: Gives mod permissions to use Massband.
+    children:
+      massband.interact: true
+      massband.command: true 
+      massband.command.settings.other: true
+  massband.admin:
+    default: false
+    description: Gives admin permissions to use Massband.
+    children:
+      massband.interact: true
+      massband.command.all: true
+
