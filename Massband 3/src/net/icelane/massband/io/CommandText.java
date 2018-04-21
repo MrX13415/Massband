@@ -73,6 +73,12 @@ Effects:
 		
 	}	
 	
+	public static String getInteractPermissionWarning(CommandSender sender) {
+		if (sender instanceof Player && !sender.hasPermission(Massband.Interact_Permission))
+			return String.format("§c/!\\ §9Permission required to be able use §cMassband§9!\n    §aPermission: §6%s\n", Massband.Interact_Permission);	
+		return "";
+	}
+	
 	public static String getHelp(CommandBase command, CommandSender sender){
 		// output formats 
 		String format_header  = "\n§aCommand: §7/%1$s§c%2$s §aAliases: §c%3$s";
@@ -180,7 +186,9 @@ Effects:
 			out_usage = String.format(format_usage, usage);
 		}
 		
-		return out_header + out_desc + out_perm + out_usage + out_args;
+		String warns = "\n" + getInteractPermissionWarning(sender);
+		
+		return out_header + out_desc + out_perm + out_usage + out_args + warns;
 	}
 	
 	public static String getFullCommandName(CommandBase command, boolean parentOnly) {

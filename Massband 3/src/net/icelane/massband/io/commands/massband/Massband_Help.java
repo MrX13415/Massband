@@ -7,6 +7,7 @@ import org.bukkit.entity.Player;
 import net.icelane.massband.Plugin;
 import net.icelane.massband.core.Massband;
 import net.icelane.massband.io.CommandBase;
+import net.icelane.massband.io.CommandText;
 
 public class Massband_Help extends CommandBase{
 
@@ -39,7 +40,9 @@ public class Massband_Help extends CommandBase{
 		
 		String[] helpMsgR = new String[]
 				{
-					String.format(" §7Hold the item §9%s §7in any hand to interact with Massband.", obj.getInteract().getMaterial()),
+					String.format(
+					CommandText.getInteractPermissionWarning(player),
+					" §7Hold the item §9%s §7in any hand to interact with Massband.", obj.getInteract().getMaterial()),
 					" ",
 					" §6Right click §7on any face of a block to place a §cMarker§7.",
 					" §6Right click §7on the same block again to remove it.",
@@ -61,7 +64,9 @@ public class Massband_Help extends CommandBase{
 		// For "switched" buttons: Make it easier for other languages to get a proper translation.
 		String[] helpMsgL = new String[]
 				{
-					String.format(" §7Hold the item §9%s §7in any hand to interact with Massband.", obj.getInteract().getMaterial()),
+					String.format(
+					CommandText.getInteractPermissionWarning(player),		
+					" §7Hold the item §9%s §7in any hand to interact with Massband.", obj.getInteract().getMaterial()),
 					" ",
 					" §6Left click §7on any face of a block to place a §cMarker§7.",
 					" §6Left click §7on the same block again to remove it.",

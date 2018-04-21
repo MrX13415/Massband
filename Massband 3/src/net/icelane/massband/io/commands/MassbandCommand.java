@@ -42,7 +42,6 @@ public class MassbandCommand extends CommandBase{
 	
 	@Override
 	public boolean command(CommandSender sender, Command cmd, String label, String[] args) {
-	
 		if (args.length <= 0) return false;
 		
 		if (args.length == 1) {
