@@ -20,7 +20,7 @@ public class Massband_Help extends CommandBase{
 	public void initialize() {
 		setAliases("info", "i", "h");
 		setDescription("Information on how to use massband.");
-		setPermission("massband.command.info", true);
+		setPermission("massband.command.help", true);
 	}
 
 	@Override
