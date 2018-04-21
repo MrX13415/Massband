@@ -8,8 +8,6 @@ import net.icelane.massband.io.commands.massband.Massband_Settings;
 
 public class Settings_Config extends Massband_Settings{
 
-//	public static final String Default = "default";
-	
 	@Override
 	public String name() {
 		return "config";
