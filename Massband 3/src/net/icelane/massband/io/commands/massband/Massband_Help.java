@@ -41,7 +41,7 @@ public class Massband_Help extends CommandBase{
 		String[] helpMsgR = new String[]
 				{
 					String.format(
-					CommandText.getInteractPermissionWarning(player),
+					CommandText.getInteractPermissionWarning(player) + 
 					" §7Hold the item §9%s §7in any hand to interact with Massband.", obj.getInteract().getMaterial()),
 					" ",
 					" §6Right click §7on any face of a block to place a §cMarker§7.",
@@ -65,7 +65,7 @@ public class Massband_Help extends CommandBase{
 		String[] helpMsgL = new String[]
 				{
 					String.format(
-					CommandText.getInteractPermissionWarning(player),		
+					CommandText.getInteractPermissionWarning(player) + 
 					" §7Hold the item §9%s §7in any hand to interact with Massband.", obj.getInteract().getMaterial()),
 					" ",
 					" §6Left click §7on any face of a block to place a §cMarker§7.",
