@@ -87,7 +87,7 @@ public abstract class ConfigBase<T extends ConfigBase<T>> {
 			String lastKey = "";
 			int  sectionlvl = 0;
 			
-			// create the file if not presant			
+			// create the file if not present			
 			if (!file.exists()) {
 				if (createAlways) save = true;
 				if (save) creatFile(file);
