@@ -330,6 +330,7 @@ public class Massband_Settings extends CommandBase{
 			entry.resetToDefault();
 			sender.sendMessage(getSettingEntryText(config, entry));
 		}
+		config.save();
 		
 		String msg = String.format("§9Config reset to default: §6%s", this.name);		
 		if (!targetSelf) msg = String.format("§9Config for Player §4%s §9reset to default: §6%s", this.name, targetPlayer.getName());

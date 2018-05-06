@@ -13,9 +13,11 @@ public abstract class Entry<T> {
 
 	private String path = "";
 	private String[] comments = new String[0];
-	private T defaultValue;
 	private T value;
 	private String[] values;
+	private T defaultValue;
+	private Entry<T> entryDefault; 
+	
 	
 	public static <T> Entry<T> define(Entry<T> entry, String path, T value, String... comment){
 		entry.setPath(path);
@@ -23,6 +25,7 @@ public abstract class Entry<T> {
 		entry.setDefault(value);
 		entry.setValues(entry.getDefault().toString());
 		entry.set(entry.getDefault());
+				
 		return entry;
 	}
 	
@@ -56,11 +59,12 @@ public abstract class Entry<T> {
 //	}
 	
 	public void resetToDefault() {
+		if (entryDefault != null) this.value = entryDefault.get();
 		this.value = defaultValue;
 	}
 	
 	public abstract T valueOf(String value) throws IllegalArgumentException, NullPointerException;
-
+	
 	public String[] getValues() {
 		return values;
 	}
@@ -149,6 +153,15 @@ public abstract class Entry<T> {
 		} catch (IllegalArgumentException|NullPointerException ex) {
 			return false;
 		}
+	}
+
+	protected Entry<T> getDefaultEntry() {
+		return entryDefault;
+	}
+
+	@SuppressWarnings("unchecked") // We assume the caller "knows" what he is doing.
+	protected void setDefaultEntry(Entry<?> defaultEntry) {
+		this.entryDefault = (Entry<T>) defaultEntry;
 	}
 	
 	
