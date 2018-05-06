@@ -16,10 +16,10 @@ public abstract class Entry<T> {
 	private T value;
 	private String[] values;
 	private T defaultValue;
-	private Entry<T> entryDefault; 
-	
+
 	
 	public static <T> Entry<T> define(Entry<T> entry, String path, T value, String... comment){
+		
 		entry.setPath(path);
 		entry.setComments(comment);
 		entry.setDefault(value);
@@ -58,8 +58,23 @@ public abstract class Entry<T> {
 //		return (Entry_) define(new Entry_(), path, value, comment);
 //	}
 	
+	@SuppressWarnings("unchecked")
+	public void resetToDefault(ConfigBase<?> defaultConfig) {
+		if (defaultConfig == null || PlayerConfigBase.class.isAssignableFrom(defaultConfig.getClass())) {
+			resetToDefault(); return;
+		}
+			
+		PlayerConfigBase<?> playerConfig = (PlayerConfigBase<?>) defaultConfig;
+		
+		if (playerConfig.isDefault()) {
+			resetToDefault(); return;
+		}
+			
+		Entry<?> defaultEntry = playerConfig.getEntry(getPath());		
+		this.value = (T) defaultEntry.get();
+	}
+	
 	public void resetToDefault() {
-		if (entryDefault != null) this.value = entryDefault.get();
 		this.value = defaultValue;
 	}
 	
@@ -154,42 +169,5 @@ public abstract class Entry<T> {
 			return false;
 		}
 	}
-
-	protected Entry<T> getDefaultEntry() {
-		return entryDefault;
-	}
-
-	@SuppressWarnings("unchecked") // We assume the caller "knows" what he is doing.
-	protected void setDefaultEntry(Entry<?> defaultEntry) {
-		this.entryDefault = (Entry<T>) defaultEntry;
-	}
-	
-	
-// Attempt to improve value of:
-//		public static Number asNumber(String str, Class<? extends Number> param) throws UnsupportedOperationException {
-//		    try {
-//		        /*
-//		         * Try to access the staticFactory method for: 
-//		         * Byte, Short, Integer, Long, Double, and Float
-//		         */
-//		        Method m = param.getMethod("valueOf", String.class);
-//		        Object o = m.invoke(param, str);
-//		        return param.cast(o);
-//		    } catch (NoSuchMethodException e1) {
-//		        /* Try to access the constructor for BigDecimal or BigInteger*/
-//		        try {
-//		            Constructor<? extends Number> ctor = param
-//		                    .getConstructor(String.class);
-//		            return ctor.newInstance(str);
-//		        } catch (ReflectiveOperationException e2) {
-//		            /* AtomicInteger and AtomicLong not supported */
-//		            throw new UnsupportedOperationException(
-//		                    "Cannot convert string to " + param.getName());
-//		        }
-//		    } catch (ReflectiveOperationException e2) {
-//		        throw new UnsupportedOperationException("Cannot convert string to "
-//		                + param.getName());
-//		    }   
-//		}
-		
+			
 }

@@ -53,6 +53,10 @@ public abstract class ConfigBase<T extends ConfigBase<T>> {
 		return null;
 	}
 	
+	public ConfigBase<T> getDefaultConfig() {
+		return this;	
+	}
+	
 	/**
 	 * The name and extension of this config file. May also specify a relative
 	 * path.<br>

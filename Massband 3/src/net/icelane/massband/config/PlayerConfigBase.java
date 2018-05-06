@@ -1,10 +1,10 @@
 package net.icelane.massband.config;
 
 import java.io.File;
-import java.lang.reflect.Field;
 import java.util.UUID;
 
 import org.bukkit.entity.Player;
+
 import net.icelane.massband.Server;
 
 public abstract class PlayerConfigBase<T extends PlayerConfigBase<T>> extends ConfigBase<T> {
@@ -19,28 +19,35 @@ public abstract class PlayerConfigBase<T extends PlayerConfigBase<T>> extends Co
 		return config;
 	}
 	
+	public ConfigBase<T> getDefaultConfig() {
+		return PlayerConfigBase.getDefault(getConfigClass());	
+	}
+	
 	public static <T extends PlayerConfigBase<T>> T getDefault(Class<T> cfgclass) {
 		return PlayerConfigBase.initialize(null, cfgclass);
 	}
 	
 	public void initializeEnties() {
 		if (isDefault()) return;
-				
-		T defaultConfig = getDefault(getConfigClass());
-		
-		for (Field defaultField : defaultConfig.getClass().getDeclaredFields()) {
-			if (!Entry.class.isAssignableFrom(defaultField.getType())) continue;
 			
-			try {
-				Field configField = this.getClass().getField(defaultField.getName());		
-				Entry<?> defaultEntry = (Entry<?>) defaultField.get(defaultConfig);
-				Entry<?> configEntry = (Entry<?>) configField.get(this);
-				
-				configEntry.setDefaultEntry(defaultEntry);			
-			} catch (Exception ex) {
-				Server.logger().warning("Unable to initialize default entry.");
-			}
-		}	
+		
+//		T defaultConfig = getDefault(getConfigClass());
+//		
+//		
+//		
+//		for (Field defaultField : defaultConfig.getClass().getDeclaredFields()) {
+//			if (!Entry.class.isAssignableFrom(defaultField.getType())) continue;
+//			
+//			try {
+//				Field configField = this.getClass().getField(defaultField.getName());		
+//				Entry<?> defaultEntry = (Entry<?>) defaultField.get(defaultConfig);
+//				Entry<?> configEntry = (Entry<?>) configField.get(this);
+//				
+//				configEntry.setDefaultEntry(defaultEntry);			
+//			} catch (Exception ex) {
+//				Server.logger().warning("Unable to initialize default entry.");
+//			}
+//		}	
 	}
 	
 	public boolean isDefault() {

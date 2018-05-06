@@ -327,7 +327,7 @@ public class Massband_Settings extends CommandBase{
 		// reset config
 		List<Entry<?>> entryList = config.getEntryList();
 		for (Entry<?> entry : entryList) {
-			entry.resetToDefault();
+			entry.resetToDefault(config.getDefaultConfig());
 			sender.sendMessage(getSettingEntryText(config, entry));
 		}
 		config.save();
@@ -343,7 +343,7 @@ public class Massband_Settings extends CommandBase{
 		if (!isResetRequest(argument)) return false;
 		
 		// reset entry
-		entry.resetToDefault();
+		entry.resetToDefault(config.getDefaultConfig());
 		config.save();
 		
 		String msg = String.format("§9Entry reset to default.");		
