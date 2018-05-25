@@ -10,6 +10,7 @@ import net.icelane.massband.io.commands.massband.debug.Debug_Matrix;
 import net.icelane.massband.io.commands.massband.debug.Debug_Message;
 import net.icelane.massband.io.commands.massband.debug.Debug_OwnerTags;
 import net.icelane.massband.io.commands.massband.debug.Debug_Permissions;
+import net.icelane.massband.resources.Messages;
 
 public class Massband_Debug extends CommandBase{
 
@@ -21,8 +22,8 @@ public class Massband_Debug extends CommandBase{
 	@Override
 	public void initialize() {
 		setAliases("debug");
-		setDescription("Debug command. peep bop.");
-		setUsage("true|false");
+		setDescription(Messages.getString("Massband_Debug.description")); //$NON-NLS-1$
+		setUsage(Messages.getString("Massband_Debug.usage")); //$NON-NLS-1$
 		setPermission("massband.debug", false);
 
 		addCommand(Debug_Message.class);
@@ -36,10 +37,10 @@ public class Massband_Debug extends CommandBase{
 		if (args.length == 1){
 			if (args[0].equalsIgnoreCase("true") || args[0].equalsIgnoreCase("1")){
 				Massband.setDebug(true);
-				if (sender instanceof Player) sender.sendMessage("§9Debug: §6/!\\ §aDebug enabled");
+				if (sender instanceof Player) sender.sendMessage(Messages.getString("Massband_Debug.enabled")); //$NON-NLS-1$
 			}else{
 				Massband.setDebug(false);
-				if (sender instanceof Player) sender.sendMessage("§9Debug: §6/!\\ §cDebug disabled");
+				if (sender instanceof Player) sender.sendMessage(Messages.getString("Massband_Debug.disabled")); //$NON-NLS-1$
 			}
 			return true;
 		}

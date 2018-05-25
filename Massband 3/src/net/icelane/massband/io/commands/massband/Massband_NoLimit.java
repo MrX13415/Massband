@@ -6,6 +6,7 @@ import org.bukkit.entity.Player;
 
 import net.icelane.massband.core.Massband;
 import net.icelane.massband.io.CommandBase;
+import net.icelane.massband.resources.Messages;
 
 public class Massband_NoLimit extends CommandBase{
 
@@ -17,7 +18,7 @@ public class Massband_NoLimit extends CommandBase{
 	@Override
 	public void initialize() {
 		setAliases("unlimited", "nolimit", "nol", "nl");
-		setDescription("Set the number of markers to be placed to unlimited.");
+		setDescription(Messages.getString("Massband_NoLimit.description")); //$NON-NLS-1$
 		setPermission("massband.command.count", true);
 		setInGameOnly(true);
 	}
@@ -32,7 +33,7 @@ public class Massband_NoLimit extends CommandBase{
 		Massband obj = Massband.get(player);
 		
 		obj.getMarkers(player.getWorld()).setMaxCount(-1);
-		player.sendMessage("§aMarker count set to: §cNo Limit");
+		player.sendMessage(Messages.getString("Massband_NoLimit.nolimit")); //$NON-NLS-1$
 		
 		return true;
 	}

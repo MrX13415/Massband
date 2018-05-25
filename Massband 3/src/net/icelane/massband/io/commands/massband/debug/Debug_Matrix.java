@@ -11,6 +11,7 @@ import net.icelane.massband.Server;
 import net.icelane.massband.core.Marker;
 import net.icelane.massband.core.Massband;
 import net.icelane.massband.io.CommandBase;
+import net.icelane.massband.resources.Messages;
 
 public class Debug_Matrix extends CommandBase{
 	
@@ -30,8 +31,8 @@ public class Debug_Matrix extends CommandBase{
 	
 	@Override
 	public void initialize() {
-		setDescription("Create matrix of markers.");
-		setUsage("<dx> <dy> <y>");
+		setDescription(Messages.getString("Debug_Matrix.description")); //$NON-NLS-1$
+		setUsage(Messages.getString("Debug_Matrix.usage")); //$NON-NLS-1$
 		setPermission("massband.debug.matrix", true);
 		setInGameOnly(true);
 		setDebugRequired(true);
@@ -53,12 +54,12 @@ public class Debug_Matrix extends CommandBase{
 			Marker markers = Massband.get(player).getMarkers(player.getWorld());
 			
 			if (createTask > -1) {
-				player.sendMessage("§cAllready running: " + count + " / " + (size_x * size_y));
+				player.sendMessage(String.format(Messages.getString("Debug_Matrix.running"), count, (size_x * size_y))); //$NON-NLS-1$
 				return true;
 			}
 			
 			if (markers.getMaxCount() != -1) {
-				player.sendMessage("§6Set your marker count to \"§cno limit§6\" via §a/mb nl §6first.");
+				player.sendMessage(Messages.getString("Debug_Matrix.markerinfo")); //$NON-NLS-1$
 				return true;
 			}
 			
@@ -84,7 +85,7 @@ public class Debug_Matrix extends CommandBase{
 						count++;
 							
 						if (createTask == -1) {
-							player.sendMessage("§aMatrix created [" + size_x + " x " + size_y + "] y " + pos_y + " | count: " + (count -1));
+							player.sendMessage(String.format(Messages.getString("Debug_Matrix.created"), size_x, size_y, pos_y, (count -1))); //$NON-NLS-1$
 							break;
 						}
 						
@@ -93,7 +94,7 @@ public class Debug_Matrix extends CommandBase{
 							createTask = -1; // Cancel task ...
 						}
 
-						player.sendMessage("§7Creating matrix " + count + " / " + (size_x * size_y));
+						player.sendMessage(String.format(Messages.getString("Debug_Matrix.creating"), count, (size_x * size_y))); //$NON-NLS-1$
 						
 						
 						pos_x++;
@@ -113,9 +114,9 @@ public class Debug_Matrix extends CommandBase{
 		
 			return true;
 			} catch (Exception e) {
-				player.sendMessage("§cInvalid numbers!");
+				player.sendMessage(Messages.getString("Debug_Matrix.argumenterror")); //$NON-NLS-1$
 			}
-			player.sendMessage("§cUsage: mb _matrix <dx> <dz> <y>");
+			player.sendMessage(Messages.getString("Debug_Matrix.usage_info")); //$NON-NLS-1$
 			return true;
 		}
 		

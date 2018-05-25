@@ -18,6 +18,7 @@ import net.icelane.massband.Plugin;
 import net.icelane.massband.Server;
 import net.icelane.massband.config.configs.Config;
 import net.icelane.massband.minecraft.HoloText;
+import net.icelane.massband.resources.Messages;
 import net.icelane.math.Point;
 import net.icelane.math.Polygon;
 
@@ -41,21 +42,21 @@ public class Marker {
 	private Player player;
 	private World world;
 	
-	private String format_markerFirst    = "§c#\n%1$s";                  // (1) additional info
-	private String format_markerLast     = "§7(%1$s§7) §6%2$s\n§9%3$s";  // (1) marker count (2) length (3) area
-	private String format_marker         = "§7#%1$s: §a%2$s";            // (1) marker index (2) length
-	private String format_markerOne      = "§6%2$s ";                    // (2) length
-	private String format_mode_axis      = "§9(%1$s§9, %2$s§9)";         // (0) axis 1 (2) axis 2
-	private String format_blocks_length  = "%1d §cblocks %s";            //
-	private String format_blocks_area    = "%1d §7blocks§c²";            // 
-	private String format_blocks_auto    = "§7(%s§7)";                   // 
-	private String format_blocks_axis    = "§9(%s§9)";                   //
-	private String format_vectors_length = "%.3f§cm";                    // 
-	private String format_vectors_area   = "%.3f§7m§c²";                 //
+	private String format_markerFirst    = Messages.getString("Marker.format_first");                  // (1) additional info //$NON-NLS-1$
+	private String format_markerLast     = Messages.getString("Marker.format_last");  // (1) marker count (2) length (3) area //$NON-NLS-1$
+	private String format_marker         = Messages.getString("Marker.format");            // (1) marker index (2) length //$NON-NLS-1$
+	private String format_markerOne      = Messages.getString("Marker.format_length");                    // (2) length //$NON-NLS-1$
+	private String format_mode_axis      = Messages.getString("Marker.format_mode_axis");         // (0) axis 1 (2) axis 2 //$NON-NLS-1$
+	private String format_blocks_length  = Messages.getString("Marker.format_blocks_length");            // //$NON-NLS-1$
+	private String format_blocks_area    = Messages.getString("Marker.format_blocks_area");            //  //$NON-NLS-1$
+	private String format_blocks_auto    = Messages.getString("Marker.format_blocks_auto");                   //  //$NON-NLS-1$
+	private String format_blocks_axis    = Messages.getString("Marker.format_blocks_axis");                   // //$NON-NLS-1$
+	private String format_vectors_length = Messages.getString("Marker.format_vectors_length");                    //  //$NON-NLS-1$
+	private String format_vectors_area   = Messages.getString("Marker.format_vectors_area");                 // //$NON-NLS-1$
 
-	private String text_axis_X           = "§cX";                        // 
-	private String text_axis_Y           = "§aY";                        // 
-	private String text_axis_Z           = "§9Z";                        // 
+	private String text_axis_X           = Messages.getString("Marker.axis_x");                        //  //$NON-NLS-1$
+	private String text_axis_Y           = Messages.getString("Marker.axis_y");                        //  //$NON-NLS-1$
+	private String text_axis_Z           = Messages.getString("Marker.axis_z");                        //  //$NON-NLS-1$
 
 	private ArrayList<HoloText> markerList = new ArrayList<>();
 	private ArrayList<Block> blockList = new ArrayList<>();
@@ -231,7 +232,7 @@ public class Marker {
 		// player limit reached ...
 		int playerlimit = Config.get().marker_PlayerMaxCount.get();		
 		if (getCount() >= playerlimit) {
-			player.sendMessage(String.format("§6You are not allowed to place more then §c%s§6 markers at once.", playerlimit));
+			player.sendMessage(String.format(Messages.getString("Marker.limiterror"), playerlimit)); //$NON-NLS-1$
 			if (getCount() > playerlimit) return;
 		}
 		
@@ -241,7 +242,7 @@ public class Marker {
 		}
 		
 		if (getCount() == 0){
-			HoloText marker = HoloText.create(player, world, block, face, "#");
+			HoloText marker = HoloText.create(player, world, block, face, Messages.getString("Marker.first")); //$NON-NLS-1$
 			marker.prepareDefaultMetadata(Metadata_Identifier);
 			marker.writeMetadata();
 			markerList.add(marker);

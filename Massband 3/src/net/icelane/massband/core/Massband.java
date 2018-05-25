@@ -18,6 +18,7 @@ import org.bukkit.event.world.ChunkUnloadEvent;
 import net.icelane.massband.Server;
 import net.icelane.massband.config.configs.PlayerConfig;
 import net.icelane.massband.minecraft.HoloText;
+import net.icelane.massband.resources.Messages;
 
 public class Massband {
 
@@ -94,10 +95,10 @@ public class Massband {
 			int count = Marker.clean(world);
 			if (count == 0) continue; 
 			
-			Server.logger().info(String.format("[%s] %s Markers removed from world", world.getName(), count));
+			Server.logger().info(String.format(Messages.getString("Massband.markers_removed_console"), world.getName(), count)); //$NON-NLS-1$
 			if (sender == null) continue;
 			if (sender instanceof Player) 
-				sender.sendMessage(String.format("§9World: §7[§5%s§7] §c%s §6Markers removed", world.getName(), count));		
+				sender.sendMessage(String.format(Messages.getString("Massband.markers_removed"), world.getName(), count));		 //$NON-NLS-1$
 		}
 	}
 	
@@ -243,7 +244,7 @@ public class Massband {
 	public static void setDebug(boolean debug) {
 		Massband.debug = debug;
 		if (!debug) setDebugMessage(false);
-		Server.logger().warning("Debug mode " + (debug ? "enabled" : "disabled"));
+		Server.logger().warning(Messages.getString("Massband.debug") + (debug ? Messages.getString("Massband.debug_enabled") : Messages.getString("Massband.debug_disbabled"))); //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
 	}
 
 	public static boolean debugMessage() {
@@ -252,7 +253,7 @@ public class Massband {
 
 	public static void setDebugMessage(boolean debugMsg) {
 		Massband.debugMsg = debugMsg;
-		Server.logger().warning("Debug messages " + (debug ? "enabled" : "disabled"));
+		Server.logger().warning(Messages.getString("Massband.debugmessages") + (debug ? Messages.getString("Massband.debug_enabled") : Messages.getString("Massband.debug_disbabled"))); //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
 	}
 	
 }

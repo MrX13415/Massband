@@ -6,6 +6,7 @@ import org.bukkit.entity.Player;
 
 import net.icelane.massband.core.Massband;
 import net.icelane.massband.io.CommandBase;
+import net.icelane.massband.resources.Messages;
 
 public class Massband_Clear extends CommandBase{
 
@@ -17,7 +18,7 @@ public class Massband_Clear extends CommandBase{
 	@Override
 	public void initialize() {
 		setAliases("clr", "remove");
-		setDescription("Removes all markers");
+		setDescription(Messages.getString("Massband_Clear.description")); //$NON-NLS-1$
 		setPermission("massband.command.clear", true);
 		setInGameOnly(true);
 	}
@@ -33,7 +34,7 @@ public class Massband_Clear extends CommandBase{
 		
 		obj.getMarkers(player.getWorld()).removeAll();
 		
-		player.sendMessage("§7All markers have been removed");
+		player.sendMessage(Messages.getString("Massband_Clear.markers_removed")); //$NON-NLS-1$
 		
 		return true;
 	}

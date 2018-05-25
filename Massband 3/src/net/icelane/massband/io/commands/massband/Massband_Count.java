@@ -7,6 +7,7 @@ import org.bukkit.entity.Player;
 import net.icelane.massband.config.configs.Config;
 import net.icelane.massband.core.Massband;
 import net.icelane.massband.io.CommandBase;
+import net.icelane.massband.resources.Messages;
 
 public class Massband_Count extends CommandBase{
 
@@ -18,9 +19,9 @@ public class Massband_Count extends CommandBase{
 	@Override
 	public void initialize() {
 		setAliases("markers", "cnt", "c");
-		setDescription("Set the number of markers to be placed. Set to -1 for no Limit.");
+		setDescription(Messages.getString("Massband_Count.description")); //$NON-NLS-1$
 		setPermission("massband.command.count", true);
-		setUsage("<marker count>");
+		setUsage(Messages.getString("Massband_Count.usage")); //$NON-NLS-1$
 		setInGameOnly(true);
 		setTabList("10", "1", "-1");
 	}
@@ -42,19 +43,19 @@ public class Massband_Count extends CommandBase{
 				
 				obj.getMarkers(player.getWorld()).setMaxCount(value);
 				
-				player.sendMessage(String.format("§aMarker count set to: §c%s", value == -1 ? "No Limit" : value));
+				player.sendMessage(String.format(Messages.getString("Massband_Count.count_set"), value == -1 ? Messages.getString("Massband_Count.nolimit") : value)); //$NON-NLS-1$ //$NON-NLS-2$
 				
 				// player limit
 				int playerlimit = Config.get().marker_PlayerMaxCount.get();	
 				if (value < 0 || value >= playerlimit)
-					player.sendMessage(String.format("§7(Marker limit: §9%s§7)", playerlimit));
+					player.sendMessage(String.format(Messages.getString("Massband_Count.limit"), playerlimit)); //$NON-NLS-1$
 					
 			}catch (NumberFormatException ex){
-				player.sendMessage("§cError: §6incorrect argument!");
+				player.sendMessage(Messages.getString("Massband_Count.argumenterror")); //$NON-NLS-1$
 			}
 		}else{
 			int count = obj.getMarkers(player.getWorld()).getMaxCount();
-			player.sendMessage("§7Marker count: §c" + (count == -1 ? "No Limit" : count));		
+			player.sendMessage(Messages.getString("Massband_Count.count") + (count == -1 ? Messages.getString("Massband_Count.nolimit") : count));		 //$NON-NLS-1$ //$NON-NLS-2$
 		}
 		
 		return true;

@@ -5,6 +5,7 @@ import java.util.ArrayList;
 import org.bukkit.util.Vector;
 
 import net.icelane.massband.Server;
+import net.icelane.massband.resources.Messages;
 
 public class Polygon {
 
@@ -257,7 +258,7 @@ public class Polygon {
 					
 					// /!\ Safety time out, just in case the maxSubPointCount is way to big.
 					if ((System.currentTimeMillis() - calcStartTime) > 1000) {
-						Server.get().getConsoleSender().sendMessage("[Massband] §cWARNING: Polygone calculation timeout (1000ms) exeeded. Operation aborted!");
+						Server.get().getConsoleSender().sendMessage(Messages.getString("Polygon.timeoutwarning")); //$NON-NLS-1$
 						return points;
 					}
 					

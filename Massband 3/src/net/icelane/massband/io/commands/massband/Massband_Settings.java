@@ -19,10 +19,11 @@ import net.icelane.massband.io.CommandBase;
 import net.icelane.massband.io.CommandText;
 import net.icelane.massband.io.commands.massband.settings.Settings_Config;
 import net.icelane.massband.io.commands.massband.settings.Settings_Default;
+import net.icelane.massband.resources.Messages;
 
 public class Massband_Settings extends CommandBase{
 
-	public static final String ResetCommand = "reset";
+	public static final String ResetCommand = Messages.getString("Massband_Settings.subcommand_reset"); //$NON-NLS-1$
 	public static final Permission otherPermission = new Permission("massband.command.settings.other", PermissionDefault.OP);
 	
 	@Override
@@ -33,16 +34,16 @@ public class Massband_Settings extends CommandBase{
 	@Override
 	public void initialize() {
 		setAliases("cfg", "set");
-		setDescription("Allows changes to your personal settings of Massband.");
+		setDescription(Messages.getString("Massband_Settings.description")); //$NON-NLS-1$
 		setPermission("massband.command.settings", true);
-		setUsage("reset | <config entry> [value]");
+		setUsage(Messages.getString("Massband_Settings.usage")); //$NON-NLS-1$
 		
 		addCommand(Settings_Default.class);
 		addCommand(Settings_Config.class);
 		
 		addSubPermission(otherPermission);
-		setDescription("Allows changes to the personal settings of Massband for any player.", otherPermission);
-		setUsage("[player] reset | [player] <config entry> [value]", otherPermission);
+		setDescription(Messages.getString("Massband_Settings.other_description"), otherPermission); //$NON-NLS-1$
+		setUsage(Messages.getString("Massband_Settings.other_usage"), otherPermission); //$NON-NLS-1$
 	}
 
 	@Override
@@ -139,13 +140,13 @@ public class Massband_Settings extends CommandBase{
 	}
 	
 	public String getSettingsHeaderText(ConfigBase<?> config) {
-		return "§aSettings for Player: §c" + ((PlayerConfig)config).getPlayer().getName();
+		return Messages.getString("Massband_Settings.msg_header") + ((PlayerConfig)config).getPlayer().getName(); //$NON-NLS-1$
 	}
 	
 	public String getSettingEntryComment(ConfigBase<?> config, Entry<?> entry) {
 		String result = "";
 		for (String comment : entry.getComments()) {
-			result += String.format("      §7%s\n", comment);	
+			result += String.format(Messages.getString("Massband_Settings.entry_comment"), comment);	 //$NON-NLS-1$
 		}
 		return result;
 	}
@@ -167,15 +168,15 @@ public class Massband_Settings extends CommandBase{
 		}
 			
 		if (!defaultVal.isEmpty()) {
-			defStrPart = String.format("   §7(default: §9%s§7)", defaultVal);
+			defStrPart = String.format(Messages.getString("Massband_Settings.entry_default_value"), defaultVal); //$NON-NLS-1$
 		}
 		
 		if (oldValue != null) {
-			oldValPart = String.format("§f%s §7-> ", oldValue.trim());
+			oldValPart = String.format(Messages.getString("Massband_Settings.entry_oldvalue"), oldValue.trim()); //$NON-NLS-1$
 		}
 
-		return String.format("§f - §6%s §7=  %s§c%s%s", 
-				entry.getPath().replaceAll("\\.", "§c.§6"),
+		return String.format(Messages.getString("Massband_Settings.entry"),  //$NON-NLS-1$
+				entry.getPath().replaceAll("\\.", Messages.getString("Massband_Settings.entry_dot")), //$NON-NLS-2$
 				oldValPart,
 				entry.get().toString(),
 				defStrPart);	
@@ -218,7 +219,7 @@ public class Massband_Settings extends CommandBase{
 		if (other && console && targetPlayer == null) {
 			if (args.length > 0) {
 				setFailReason(FailReason.None);
-				sender.sendMessage("§cError: §7Player not found: §6" + args[0].trim());
+				sender.sendMessage(Messages.getString("Massband_Settings.playernotfound") + args[0].trim()); //$NON-NLS-1$
 				return true; // syntax was correct.
 			}else {
 				setFailReason(FailReason.Invalid);
@@ -232,7 +233,7 @@ public class Massband_Settings extends CommandBase{
 		else config = getConfig((CommandSender)targetPlayer);  // other player
 
 		if (config == null) {
-			sender.sendMessage("§cError: §7No configuration was found!");			
+			sender.sendMessage(Messages.getString("Massband_Settings.confignotfound"));			 //$NON-NLS-1$
 			return true; // syntax was correct.
 		}
 		
@@ -258,7 +259,7 @@ public class Massband_Settings extends CommandBase{
 		Entry<?> entry = config.getEntry(entryStr);
 
 		if (entry == null) {
-			sender.sendMessage("§cError: §7Unkown entry: §6" + entryStr);
+			sender.sendMessage(Messages.getString("Massband_Settings.unknownentry") + entryStr); //$NON-NLS-1$
 			return true; // syntax was correct.
 		}
 
@@ -310,9 +311,9 @@ public class Massband_Settings extends CommandBase{
 			sender.sendMessage(getSettingsHeaderText(config));
 			sender.sendMessage(getSettingEntryText(config, entry, oldValue));
 			config.save();
-			sender.sendMessage("§aValue changed to: §c" + entry.get());
+			sender.sendMessage(Messages.getString("Massband_Settings.value_changed") + entry.get()); //$NON-NLS-1$
 		}else{
-			sender.sendMessage("§cError: §7Invalid value: §6" + value);
+			sender.sendMessage(Messages.getString("Massband_Settings.value_invalid") + value); //$NON-NLS-1$
 		}
 	}
 	
@@ -332,8 +333,8 @@ public class Massband_Settings extends CommandBase{
 		}
 		config.save();
 		
-		String msg = String.format("§9Config reset to default: §6%s", this.name);		
-		if (!targetSelf) msg = String.format("§9Config for Player §4%s §9reset to default: §6%s", this.name, targetPlayer.getName());
+		String msg = String.format(Messages.getString("Massband_Settings.config_reset"), this.name);		 //$NON-NLS-1$
+		if (!targetSelf) msg = String.format(Messages.getString("Massband_Settings.playerconfig_reset"), this.name, targetPlayer.getName()); //$NON-NLS-1$
 		sender.sendMessage(msg);
 		
 		return true;
@@ -346,8 +347,8 @@ public class Massband_Settings extends CommandBase{
 		entry.resetToDefault(config.getDefaultConfig());
 		config.save();
 		
-		String msg = String.format("§9Entry reset to default.");		
-		if (!targetSelf) msg = String.format("§9Entry reset to default for Player: §4%s", targetPlayer.getName());
+		String msg = String.format(Messages.getString("Massband_Settings.entry_reset"));		 //$NON-NLS-1$
+		if (!targetSelf) msg = String.format(Messages.getString("Massband_Settings.entry_reset_player"), targetPlayer.getName()); //$NON-NLS-1$
 		sender.sendMessage(msg);
 		sender.sendMessage(getSettingEntryText(config, entry));
 		

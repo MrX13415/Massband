@@ -11,6 +11,7 @@ import net.icelane.massband.core.Massband;
 import net.icelane.massband.io.CommandBase;
 import net.icelane.massband.io.commands.massband.Massband_Clear;
 import net.icelane.massband.io.commands.massband.Massband_Settings;
+import net.icelane.massband.resources.Messages;
 import net.icelane.massband.io.commands.massband.Massband_Count;
 import net.icelane.massband.io.commands.massband.Massband_Debug;
 import net.icelane.massband.io.commands.massband.Massband_Help;
@@ -47,39 +48,39 @@ public class MassbandCommand extends CommandBase{
 		if (args.length == 1) {
 			//******* Easteregg *******
 			if (args[0].equalsIgnoreCase("cat") || args[0].equalsIgnoreCase("meow") || args[0].equalsIgnoreCase(":3")){
-				sender.sendMessage("§aMeow §c:3");
+				sender.sendMessage(Messages.getString("MassbandCommand.meow")); //$NON-NLS-1$
 				return true;
 			}
 			//*************************
 	
 			//**** Hidden Features ****
 			if (args[0].equalsIgnoreCase("_colors") || args[0].equalsIgnoreCase("_color")){
-				sender.sendMessage("§7Colors: §11 §22 §33 §44 §55 §66 §77 §88 §99 §aa §bb §cc §dd §ee §ff");
+				sender.sendMessage(Messages.getString("MassbandCommand.colors")); //$NON-NLS-1$
 				return true;
 			}
 			
 			if (args[0].equalsIgnoreCase("_disable") && sender.isOp()){
-				sender.sendMessage("§c/!\\ §6Massband will be disabled!");
+				sender.sendMessage(Messages.getString("MassbandCommand.massband_disabled")); //$NON-NLS-1$
 				Plugin.get().disable();
 				return true;
 			}
 			
 			if (args[0].equalsIgnoreCase("_load") && sender.isOp()){
 				Config.get().load();
-				sender.sendMessage("§c(i) §6Massband config loaded");
+				sender.sendMessage(Messages.getString("MassbandCommand.config_loaded")); //$NON-NLS-1$
 				return true;
 			}
 			
 			if (args[0].equalsIgnoreCase("_save") && sender.isOp()){
 				Config.get().save();
-				sender.sendMessage("§c(i) §6Massband config saved");
+				sender.sendMessage(Messages.getString("MassbandCommand.config_saved")); //$NON-NLS-1$
 				return true;
 			}
 			
 			if (args[0].equalsIgnoreCase("_clean") && sender.isOp()){
-				sender.sendMessage("§c(i) §6Running cleanup...");
+				sender.sendMessage(Messages.getString("MassbandCommand.cleanup")); //$NON-NLS-1$
 				Massband.removeAllMarkers(sender);
-				sender.sendMessage("§c(i) §6Cleanup done");
+				sender.sendMessage(Messages.getString("MassbandCommand.cleanup_done")); //$NON-NLS-1$
 				return true;
 			}
 			//*************************
@@ -92,9 +93,9 @@ public class MassbandCommand extends CommandBase{
 				if (player != null)
 				{
 					Massband.get(player).config().load();
-					sender.sendMessage("§c(i) §6Massband config for player '" + player.getName() + "' loaded");
+					sender.sendMessage(String.format(Messages.getString("MassbandCommand.playerconfig_loaded"), player.getName())); //$NON-NLS-1$
 				}else {
-					sender.sendMessage("§cError: Player not found: " + args[1].trim());		
+					sender.sendMessage(String.format(Messages.getString("MassbandCommand.playernotfound") + args[1].trim()));		 //$NON-NLS-1$
 				}
 				return true;
 			}
@@ -105,9 +106,9 @@ public class MassbandCommand extends CommandBase{
 				if (player != null)
 				{
 					Massband.get(player).config().save();
-					sender.sendMessage("§c(i) §6Massband config for player '" + player.getName() + "' saved");
+					sender.sendMessage(String.format(Messages.getString("MassbandCommand.playerconfig_saved"), player.getName())); //$NON-NLS-1$
 				}else {
-					sender.sendMessage("§cError: Player not found: " + args[1].trim());		
+					sender.sendMessage(String.format(Messages.getString("MassbandCommand.playernotfound"), args[1].trim()));		 //$NON-NLS-1$
 				}
 				return true;
 			}

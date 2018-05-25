@@ -6,6 +6,7 @@ import org.bukkit.entity.Player;
 
 import net.icelane.massband.core.Massband;
 import net.icelane.massband.io.CommandBase;
+import net.icelane.massband.resources.Messages;
 
 public class Massband_Default extends CommandBase{
 
@@ -17,7 +18,7 @@ public class Massband_Default extends CommandBase{
 	@Override
 	public void initialize() {
 		setAliases("default", "def", "reset", "rst");
-		setDescription("Resets all parameters to your default settings in the current world.");
+		setDescription(Messages.getString("Massband_Default.description")); //$NON-NLS-1$
 		setPermission("massband.command.default", true);
 		setInGameOnly(true);
 	}
@@ -32,7 +33,7 @@ public class Massband_Default extends CommandBase{
 		Massband obj = Massband.get(player);
 		obj.reset();
 		
-		player.sendMessage(String.format("§aParameters reset to §9default§a.", player.getName()));
+		player.sendMessage(String.format(Messages.getString("Massband_Default.resetmessage"), player.getName())); //$NON-NLS-1$
 		
 		return true;
 	}

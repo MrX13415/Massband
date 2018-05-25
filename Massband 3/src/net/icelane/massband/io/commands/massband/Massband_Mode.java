@@ -7,6 +7,7 @@ import org.bukkit.entity.Player;
 import net.icelane.massband.core.Marker;
 import net.icelane.massband.core.Marker.MeasureMode;
 import net.icelane.massband.io.CommandBase;
+import net.icelane.massband.resources.Messages;
 import net.icelane.massband.core.Massband;
 
 public class Massband_Mode extends CommandBase{
@@ -19,14 +20,12 @@ public class Massband_Mode extends CommandBase{
 	@Override
 	public void initialize() {
 		setAliases("md", "m");
-		setDescription("Set measuring mode to be used.");
-		setHelp("§7Set measuring mode to be used. Available modes:"
-				+ "\n   §71: §cblocks    §7Measurs block distance in X or Y direction or 45 degrees diagonal."
-				+ "\n   §72: §cvectors   §7Measures the vector distance between the center points of blocks.");
+		setDescription(Messages.getString("Massband_Mode.description")); //$NON-NLS-1$
+		setHelp(Messages.getString("Massband_Mode.help")); //$NON-NLS-1$
 		setPermission("massband.command.mode", true);
-		setUsage("blocks|vectors");
+		setUsage(Messages.getString("Massband_Mode.usage")); //$NON-NLS-1$
 		setInGameOnly(true);
-		setTabList("blocks", "vectors");
+		setTabList(Messages.getString("Massband_Mode.tablist_blocks"), Messages.getString("Massband_Mode.tablist_vectors")); //$NON-NLS-1$ //$NON-NLS-2$
 	}
 
 	@Override
@@ -58,12 +57,12 @@ public class Massband_Mode extends CommandBase{
 				obj.getMarkers(player.getWorld()).setMode(value);
 				obj.getMarkers(player.getWorld()).recalculate();
 				
-				player.sendMessage(String.format("§aMeasuring mode set to: §c%s", value.toString().toLowerCase()));
+				player.sendMessage(String.format(Messages.getString("Massband_Mode.mode_set"), value.toString().toLowerCase())); //$NON-NLS-1$
 			}catch (Exception ex){
-				player.sendMessage("§cError: §6incorrect argument!");
+				player.sendMessage(Messages.getString("Massband_Mode.argumenterror")); //$NON-NLS-1$
 			}
 		}else{
-			player.sendMessage(String.format("§7Measuring mode: §c%s", obj.getMarkers(player.getWorld()).getMode().toString().toLowerCase()));		
+			player.sendMessage(String.format(Messages.getString("Massband_Mode.mode"), obj.getMarkers(player.getWorld()).getMode().toString().toLowerCase()));		 //$NON-NLS-1$
 		}
 		
 		return true;
