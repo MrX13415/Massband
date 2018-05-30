@@ -8,6 +8,7 @@ import org.bukkit.permissions.PermissionDefault;
 import net.icelane.massband.Plugin;
 import net.icelane.massband.config.configs.Config;
 import net.icelane.massband.core.Massband;
+import net.icelane.massband.resources.Messages;
 
 public class CommandText {
 
@@ -59,34 +60,34 @@ Effects:
 	}
 	
 	public static String getWildCardDescription(CommandBase command) {
-		return String.format("Gives full access to the %s command.", command.getName());
+		return String.format(Messages.getString("CommandText.WildCardDescription"), command.getName()); //$NON-NLS-1$
 	}
 	
 	public static String getIngameOnly(CommandBase command){
-		String format = "§cOnly for ingame usage!";
+		String format = Messages.getString("CommandText.OnlyIngame"); //$NON-NLS-1$
 		return format;
 	}
 	
 	public static String getDebugRequired(CommandBase command){
-		String format = "§cEnable Debug mode first!";
+		String format = Messages.getString("CommandText.DebugRequired"); //$NON-NLS-1$
 		return format;
 		
 	}	
 	
 	public static String getInteractPermissionWarning(CommandSender sender) {
 		if (sender instanceof Player && !sender.hasPermission(Massband.Interact_Permission))
-			return String.format("§c/!\\ §9Permission required to be able use §cMassband§9!\n    §aPermission: §6%s\n", Massband.Interact_Permission);	
+			return String.format(Messages.getString("CommandText.InteractPermissionMissing"), Massband.Interact_Permission);	 //$NON-NLS-1$
 		return "";
 	}
 	
 	public static String getHelp(CommandBase command, CommandSender sender){
 		// output formats 
-		String format_header  = "\n§aCommand: §7/%1$s§c%2$s §aAliases: §c%3$s";
-		String format_desc    = "\n  §7%1$s";
-		String format_perm    = "\n  §aPermission: §c%1$s";
-		String format_subPerm = "\n  §a             + §c%1$s";
-		String format_usage   = "\n  §aUsage: §6%1$s";
-		String format_cmd     = "  §f - §c%1$s §6%2$s §7%3$s";
+		String format_header  = Messages.getString("CommandText.help_format_header"); //$NON-NLS-1$
+		String format_desc    = Messages.getString("CommandText.help_format_description"); //$NON-NLS-1$
+		String format_perm    = Messages.getString("CommandText.help_format_permission"); //$NON-NLS-1$
+		String format_subPerm = Messages.getString("CommandText.help_format_subpermission"); //$NON-NLS-1$
+		String format_usage   = Messages.getString("CommandText.help_format_usage"); //$NON-NLS-1$
+		String format_cmd     = Messages.getString("CommandText.help_format_commandentry"); //$NON-NLS-1$
 		
 		// command info
 		String label   = command.getName();
@@ -107,7 +108,7 @@ Effects:
 		String out_header = String.format(format_header, parents, label, aliases);
 		String out_desc   = String.format(format_desc, desc);
 		String out_perm   = "";
-		String out_usage  = (command.getCommands().size() > 0) ? String.format(format_usage, "<command>") : "";
+		String out_usage  = (command.getCommands().size() > 0) ? String.format(format_usage, Messages.getString("CommandText.help_usage_command1")) : ""; //$NON-NLS-1$ //$NON-NLS-2$
 		String out_args   = "";
 
 		// define description
@@ -138,7 +139,7 @@ Effects:
 				}
 				else if (command.getPermission().getDefault() == PermissionDefault.FALSE ||
 						command.getPermission().getDefault() == PermissionDefault.OP) {
-					out_perm = String.format(format_perm, "OP");
+					out_perm = String.format(format_perm, Messages.getString("CommandText.OP")); //$NON-NLS-1$
 				}
 			}
 			
@@ -178,8 +179,8 @@ Effects:
 		
 		// define usage
 		if (usage.length() > 0){
-			if (visibleCommands > 0 && !usage.toLowerCase().contains("command")) {
-				usage = "<command> | " + usage;
+			if (visibleCommands > 0 && !usage.toLowerCase().contains(Messages.getString("CommandText.help_usage_command2"))) { //$NON-NLS-1$
+				usage = Messages.getString("CommandText.help_usage_command3") + usage; //$NON-NLS-1$
 			}
 			
 			usage = usage.replace("<self>", command.getNames());
@@ -207,8 +208,8 @@ Effects:
 	
 	public static String getPermissionDenied(CommandBase command, Permission permission){
 		// output formats 
-		String format_header = "§cDENIED §aCommand: §7/%s§c%s %s";
-		String format_perm = "§aPermission: §6%s";
+		String format_header = Messages.getString("CommandText.permission_denied_header"); //$NON-NLS-1$
+		String format_perm = Messages.getString("CommandText.permission_denied_permission"); //$NON-NLS-1$
 		
 		// command info
 		String label   = command.getName();
@@ -231,7 +232,7 @@ Effects:
 			}
 			else if (permission.getDefault() == PermissionDefault.FALSE ||
 					permission.getDefault() == PermissionDefault.OP) {
-				out_perm = String.format(format_perm, "OP");
+				out_perm = String.format(format_perm, Messages.getString("CommandText.OP")); //$NON-NLS-1$
 			}
 		}
 				
