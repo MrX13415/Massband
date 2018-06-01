@@ -42,21 +42,23 @@ public class Marker {
 	private Player player;
 	private World world;
 	
-	private String format_markerFirst    = Messages.getString("Marker.format_first");                  // (1) additional info //$NON-NLS-1$
-	private String format_markerLast     = Messages.getString("Marker.format_last");  // (1) marker count (2) length (3) area //$NON-NLS-1$
-	private String format_marker         = Messages.getString("Marker.format");            // (1) marker index (2) length //$NON-NLS-1$
-	private String format_markerOne      = Messages.getString("Marker.format_length");                    // (2) length //$NON-NLS-1$
-	private String format_mode_axis      = Messages.getString("Marker.format_mode_axis");         // (0) axis 1 (2) axis 2 //$NON-NLS-1$
-	private String format_blocks_length  = Messages.getString("Marker.format_blocks_length");            // //$NON-NLS-1$
-	private String format_blocks_area    = Messages.getString("Marker.format_blocks_area");            //  //$NON-NLS-1$
-	private String format_blocks_auto    = Messages.getString("Marker.format_blocks_auto");                   //  //$NON-NLS-1$
-	private String format_blocks_axis    = Messages.getString("Marker.format_blocks_axis");                   // //$NON-NLS-1$
-	private String format_vectors_length = Messages.getString("Marker.format_vectors_length");                    //  //$NON-NLS-1$
-	private String format_vectors_area   = Messages.getString("Marker.format_vectors_area");                 // //$NON-NLS-1$
+	private String format_markerFirst    = Messages.getString("Marker.format_first");              // (1) Length (2) additional info        //$NON-NLS-1$
+	private String format_markerLast     = Messages.getString("Marker.format_last");               // (1) marker count (2) length (3) area  //$NON-NLS-1$
+	private String format_marker         = Messages.getString("Marker.format");                    // (1) marker index (2) length           //$NON-NLS-1$
+	private String format_markerOne      = Messages.getString("Marker.format_length");             // (2) Length                            //$NON-NLS-1$
+	private String format_mode_axis      = Messages.getString("Marker.format_mode_axis");          // (1) Axis 1 (2) Axis 2                 //$NON-NLS-1$
+	private String format_blocks_length  = Messages.getString("Marker.format_blocks_length");      // (1) Length (2) Axis                   //$NON-NLS-1$  ^
+	private String format_blocks_perim   = Messages.getString("Marker.format_blocks_perimeter");   // (1) Perimeter Length                  //$NON-NLS-1$  
+	private String format_blocks_area    = Messages.getString("Marker.format_blocks_area");        // (1) Area measurement                  //$NON-NLS-1$
+	private String format_blocks_auto    = Messages.getString("Marker.format_blocks_auto");        // (1) Axis                              //$NON-NLS-1$
+	private String format_blocks_axis    = Messages.getString("Marker.format_blocks_axis");        // (1) Axis                              //$NON-NLS-1$
+	private String format_vectors_length = Messages.getString("Marker.format_vectors_length");     // (1) Length                            //$NON-NLS-1$
+	private String format_vectors_perim  = Messages.getString("Marker.format_vectors_perimeter");  // (1) Perimeter Length                  //$NON-NLS-1$
+	private String format_vectors_area   = Messages.getString("Marker.format_vectors_area");       // (1) Area measurement                  //$NON-NLS-1$
 
-	private String text_axis_X           = Messages.getString("Marker.axis_x");                        //  //$NON-NLS-1$
-	private String text_axis_Y           = Messages.getString("Marker.axis_y");                        //  //$NON-NLS-1$
-	private String text_axis_Z           = Messages.getString("Marker.axis_z");                        //  //$NON-NLS-1$
+	private String text_axis_X             = Messages.getString("Marker.axis_x");                    //$NON-NLS-1$
+	private String text_axis_Y             = Messages.getString("Marker.axis_y");                    //$NON-NLS-1$
+	private String text_axis_Z             = Messages.getString("Marker.axis_z");                    //$NON-NLS-1$
 
 	private ArrayList<HoloText> markerList = new ArrayList<>();
 	private ArrayList<Block> blockList = new ArrayList<>();
@@ -332,6 +334,95 @@ public class Marker {
 		return Polygon.GetBlockArea(get2DPoints());
 	}
 	
+	public String getValue(double distance, MarkerSettings settings) {
+		return getValueStr(distance, settings, false);
+	}
+	
+	public String getValueStr(double distance, MarkerSettings settings, boolean isPermeter) {
+		String formatB = format_blocks_length;
+		String formatV = format_vectors_length;
+		if (isPermeter) {
+			formatB = format_blocks_perim;
+			formatV = format_vectors_perim;
+		}
+		
+		if (mode == MeasureMode.BLOCKS){
+			String strAxis = String.format(
+					(settings.isAutoAxis() ? format_blocks_auto : format_blocks_axis),
+					getAxisText(settings.getAxis()));
+			
+			return String.format(formatB, (int) distance, strAxis);
+		}
+		
+		return String.format(formatV, distance);
+	}
+	
+	public double calcDistance(Vector vecPrev, Vector vec, MarkerSettings settings) {
+		if (vecPrev == null) return 0;
+		
+		switch (getIgnoredAxis()) {
+		case X: vec.setX(0); vecPrev.setX(0); break;
+		case Y: vec.setY(0); vecPrev.setY(0); break;
+		case Z: vec.setZ(0); vecPrev.setZ(0); break;
+		default: break;
+		}
+		
+		if (mode == MeasureMode.VECTORS){
+			return vecPrev.distance(vec);
+		}
+
+		// if (mode == MeasureMode.BLOCKS) 
+		int distX = Math.abs(vecPrev.getBlockX() - vec.getBlockX());
+		int distY = Math.abs(vecPrev.getBlockY() - vec.getBlockY());
+		int distZ = Math.abs(vecPrev.getBlockZ() - vec.getBlockZ());
+		
+		if (settings.isAutoAxis()){
+			int newDist = Math.max(distX, Math.max(distY, distZ));
+			if (newDist == distX) settings.setAxis(BlockAxis.X);
+			if (newDist == distY) settings.setAxis(BlockAxis.Y);
+			if (newDist == distZ) settings.setAxis(BlockAxis.Z);
+			return newDist;
+		}else{
+			switch (settings.getAxis()) {
+			case X:    return distX;
+			case Y:    return distY;
+			case Z:    return distZ;
+			default:   return Math.max(distX, Math.max(distY, distZ));
+			}
+		}
+	}
+	
+	private void updateFirstMarker() {
+		updateFirstMarker(0);
+	}
+	
+	private void updateFirstMarker(double distance) {
+		if (markerList.size() == 0) return;
+		
+		HoloText holotext = markerList.get(0);
+		MarkerSettings settings = getSettings(0);
+		
+		String perimeterLength = "";			
+		if (distance > 0 && getCount() >= 3) {
+			double perimeterDistance = distance + calcDistance(
+					getVector(getCount() - 1),
+					getVector(0),
+					settings);
+
+			perimeterLength = getValueStr(perimeterDistance, settings, true);
+		}
+		
+		String modOpts = "";
+		if (getIgnoredAxis() != BlockAxis.None){
+			modOpts = String.format(format_mode_axis,
+					getAxisText(getAllowedAxis()[0]),
+					getAxisText(getAllowedAxis()[1]));
+		}
+		
+		holotext.setText(String.format(format_markerFirst, perimeterLength, modOpts));
+		holotext.show();
+	}
+	
 	public void recalculate(){
 		int index = 0;
 		int size  = getCount();
@@ -344,78 +435,77 @@ public class Marker {
 			Vector vec = getVector(index);
 			MarkerSettings settings = getSettings(index);
 			
-			if (vecPrev != null){
-				switch (getIgnoredAxis()) {
-				case X: vec.setX(0); vecPrev.setX(0); break;
-				case Y: vec.setY(0); vecPrev.setY(0); break;
-				case Z: vec.setZ(0); vecPrev.setZ(0); break;
-				default: break;
-				}
-				
-				if (mode == MeasureMode.VECTORS){
-					distance += vecPrev.distance(vec);
-				}else{
-					int distX = Math.abs(vecPrev.getBlockX() - vec.getBlockX());
-					int distY = Math.abs(vecPrev.getBlockY() - vec.getBlockY());
-					int distZ = Math.abs(vecPrev.getBlockZ() - vec.getBlockZ());
+			distance += calcDistance(vecPrev, vec, settings);
 					
-					if (settings.isAutoAxis()){
-						int newDist = Math.max(distX, Math.max(distY, distZ));
-						if (newDist == distX) settings.setAxis(BlockAxis.X);
-						if (newDist == distY) settings.setAxis(BlockAxis.Y);
-						if (newDist == distZ) settings.setAxis(BlockAxis.Z);
-						distance += newDist;
-					}else{
-						switch (settings.getAxis()) {
-						case X:    distance += distX; break;
-						case Y:    distance += distY; break;
-						case Z:    distance += distZ; break;
-						default: break;
-						}
-					}
-				}
-			}
+//			if (vecPrev != null){
+//				switch (getIgnoredAxis()) {
+//				case X: vec.setX(0); vecPrev.setX(0); break;
+//				case Y: vec.setY(0); vecPrev.setY(0); break;
+//				case Z: vec.setZ(0); vecPrev.setZ(0); break;
+//				default: break;
+//				}
+//				
+//				if (mode == MeasureMode.VECTORS){
+//					distance += vecPrev.distance(vec);
+//				}else{
+//					int distX = Math.abs(vecPrev.getBlockX() - vec.getBlockX());
+//					int distY = Math.abs(vecPrev.getBlockY() - vec.getBlockY());
+//					int distZ = Math.abs(vecPrev.getBlockZ() - vec.getBlockZ());
+//					
+//					if (settings.isAutoAxis()){
+//						int newDist = Math.max(distX, Math.max(distY, distZ));
+//						if (newDist == distX) settings.setAxis(BlockAxis.X);
+//						if (newDist == distY) settings.setAxis(BlockAxis.Y);
+//						if (newDist == distZ) settings.setAxis(BlockAxis.Z);
+//						distance += newDist;
+//					}else{
+//						switch (settings.getAxis()) {
+//						case X:    distance += distX; break;
+//						case Y:    distance += distY; break;
+//						case Z:    distance += distZ; break;
+//						default: break;
+//						}
+//					}
+//				}
+//			}
 			vecPrev = vec;
 						
 			// format value ...
-			String value = String.format(format_vectors_length, distance);
-			if (mode == MeasureMode.BLOCKS){
-				String strAxis = String.format(
-						(settings.isAutoAxis() ? format_blocks_auto : format_blocks_axis),
-						getAxisText(settings.getAxis()));
-				
-				value = String.format(format_blocks_length, (int) distance, strAxis);
-			}
+			String value = getValue(distance, settings);
 			
+//			String.format(format_vectors_length, distance);
+//			if (mode == MeasureMode.BLOCKS){
+//				String strAxis = String.format(
+//						(settings.isAutoAxis() ? format_blocks_auto : format_blocks_axis),
+//						getAxisText(settings.getAxis()));
+//				
+//				value = String.format(format_blocks_length, (int) distance, strAxis);
+//			}
+//			
 			String out  = "";
 			
 			if (index == 0){
-				String modOpts = "";
-				
-				if (getIgnoredAxis() != BlockAxis.None){
-					modOpts = String.format(format_mode_axis,
-							getAxisText(getAllowedAxis()[0]),
-							getAxisText(getAllowedAxis()[1]));
-				}
-				
-				out = String.format(format_markerFirst, modOpts);
-				
-			}else{
-				String format = format_marker;
-				if (index == size - 1) format = format_markerLast;  //last
-				if (size == 2) format = format_markerOne;
-
-				// calculate polygon area on last marker ... 
-				String strArea = "";
-				if (size > 2 && index == (getCount() - 1)) {
-					if (mode == MeasureMode.BLOCKS)
-						strArea = String.format(format_blocks_area, getBlockArea());
-					if (mode == MeasureMode.VECTORS)
-						strArea = String.format(format_vectors_area, getArea()); 
-				}
-				
-				out = String.format(format, index, value, strArea);
+				updateFirstMarker();
+				index++;
+				continue;
 			}
+			
+			String format = format_marker;
+			if (index == size - 1) format = format_markerLast;  //last
+			if (size == 2) format = format_markerOne;
+
+			// calculate polygon area on last marker ... 
+			String strArea = "";
+			if (size > 2 && index == (size - 1)) {
+				if (mode == MeasureMode.BLOCKS)
+					strArea = String.format(format_blocks_area, getBlockArea());
+				if (mode == MeasureMode.VECTORS)
+					strArea = String.format(format_vectors_area, getArea());
+				
+				updateFirstMarker(distance); // include length if necessary 
+			}
+			
+			out = String.format(format, index, value, strArea);
 						
 			holotext.setText(out);
 			holotext.show();
