@@ -328,7 +328,7 @@ public class Massband_Settings extends CommandBase{
 		// reset config
 		List<Entry<?>> entryList = config.getEntryList();
 		for (Entry<?> entry : entryList) {
-			entry.resetToDefault(config.getDefaultConfig());
+			entry.resetToDefault(config);
 			sender.sendMessage(getSettingEntryText(config, entry));
 		}
 		config.save();
@@ -344,7 +344,7 @@ public class Massband_Settings extends CommandBase{
 		if (!isResetRequest(argument)) return false;
 		
 		// reset entry
-		entry.resetToDefault(config.getDefaultConfig());
+		entry.resetToDefault(config);
 		config.save();
 		
 		String msg = String.format(Messages.getString("Massband_Settings.entry_reset"));		 //$NON-NLS-1$
