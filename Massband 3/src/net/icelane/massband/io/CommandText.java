@@ -115,8 +115,7 @@ Effects:
 		if (help.length() > 0){
 			out_desc = String.format(format_desc, help); 
 		}
-		
-		
+				
 		PermissionVisibility permVis = (PermissionVisibility) Config.get().help_permissionVisibility.get();
 		boolean showPerms = false;
 		switch (permVis) {
@@ -187,9 +186,10 @@ Effects:
 			out_usage = String.format(format_usage, usage);
 		}
 		
+		String infos = "\n" + Messages.getString("CommandText.help_usage_info");
 		String warns = "\n" + getInteractPermissionWarning(sender);
 		
-		return out_header + out_desc + out_perm + out_usage + out_args + warns;
+		return out_header + out_desc + out_perm + out_usage + out_args + infos + warns;
 	}
 	
 	public static String getFullCommandName(CommandBase command, boolean parentOnly) {
