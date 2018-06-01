@@ -33,10 +33,11 @@ public class Debug_OwnerTags extends CommandBase{
 			HoloText.setOwnerTagsShowSelf(args[0].equalsIgnoreCase("true") || args[0].equalsIgnoreCase("1"));
 			Server.logger().warning(Messages.getString("Debug_OwnerTags.ownertags") + (Plugin.get().isPermissionsEnabled() ? Messages.getString("Debug_OwnerTags.ownertags_enabled") : Messages.getString("Debug_OwnerTags.ownertags_disabled"))); //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
 			
-			if (Plugin.get().isPermissionsEnabled())
+			if (HoloText.isOwnerTagsShowSelf()) {
 				if (sender instanceof Player) sender.sendMessage(Messages.getString("Debug_OwnerTags.ownertags_show")); //$NON-NLS-1$
-			else
+			} else {
 				if (sender instanceof Player) sender.sendMessage(Messages.getString("Debug_OwnerTags.ownertags_hide")); //$NON-NLS-1$
+			}
 			
 			return true;
 		}

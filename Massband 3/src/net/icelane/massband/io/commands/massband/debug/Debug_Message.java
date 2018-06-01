@@ -4,7 +4,6 @@ import org.bukkit.command.Command;
 import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
 
-import net.icelane.massband.Plugin;
 import net.icelane.massband.core.Massband;
 import net.icelane.massband.io.CommandBase;
 import net.icelane.massband.resources.Messages;
@@ -31,10 +30,11 @@ public class Debug_Message extends CommandBase{
 			// enable or disable permissions ...
 			Massband.setDebugMessage(args[0].equalsIgnoreCase("true") || args[0].equalsIgnoreCase("1"));
 	
-			if (Plugin.get().isPermissionsEnabled())
+			if (Massband.debugMessage()) {
 				if (sender instanceof Player) sender.sendMessage(Messages.getString("Debug_Message.show")); //$NON-NLS-1$
-			else
+			} else {
 				if (sender instanceof Player) sender.sendMessage(Messages.getString("Debug_Message.hide")); //$NON-NLS-1$
+			}
 			
 			return true;
 		}
