@@ -4,10 +4,12 @@ import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
 import org.bukkit.permissions.Permission;
 import org.bukkit.permissions.PermissionDefault;
+import org.hamcrest.core.IsInstanceOf;
 
 import net.icelane.massband.Plugin;
 import net.icelane.massband.config.configs.Config;
 import net.icelane.massband.core.Massband;
+import net.icelane.massband.io.commands.MassbandCommand;
 import net.icelane.massband.resources.Messages;
 
 public class CommandText {
@@ -186,7 +188,10 @@ Effects:
 			out_usage = String.format(format_usage, usage);
 		}
 		
-		String infos = "\n" + Messages.getString("CommandText.help_usage_info");
+		String infos = "";	
+		if (command instanceof MassbandCommand)
+			infos += "\n" + Messages.getString("CommandText.help_usage_info");
+		
 		String warns = "\n" + getInteractPermissionWarning(sender);
 		
 		return out_header + out_desc + out_perm + out_usage + out_args + infos + warns;
