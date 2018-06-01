@@ -59,18 +59,19 @@ public abstract class Entry<T> {
 //	}
 	
 	@SuppressWarnings("unchecked")
-	public void resetToDefault(ConfigBase<?> defaultConfig) {
-		if (defaultConfig == null || PlayerConfigBase.class.isAssignableFrom(defaultConfig.getClass())) {
+	public void resetToDefault(ConfigBase<?> config) {
+		// reset non player config ...
+		if (config == null || !PlayerConfigBase.class.isAssignableFrom(config.getClass())) {
 			resetToDefault(); return;
 		}
 			
-		PlayerConfigBase<?> playerConfig = (PlayerConfigBase<?>) defaultConfig;
+		PlayerConfigBase<?> playerConfig = (PlayerConfigBase<?>) config;
 		
 		if (playerConfig.isDefault()) {
 			resetToDefault(); return;
 		}
-			
-		Entry<?> defaultEntry = playerConfig.getEntry(getPath());		
+		
+		Entry<?> defaultEntry = playerConfig.getDefaultConfig().getEntry(getPath());		
 		this.value = (T) defaultEntry.get();
 	}
 	
