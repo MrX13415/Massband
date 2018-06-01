@@ -76,7 +76,7 @@ public class PlayerConfig extends PlayerConfigBase<PlayerConfig> {
 	
 	public Entry_Long interact_doubleClickTimeFrame = 
 			Entry.define("Interact.DoubleClick-TimeFrame",
-					150L,
+					300L,
 					"The time frame, which defines when two clicks are counted as \"double click\".",
 					"In Milliseconds.");
 
