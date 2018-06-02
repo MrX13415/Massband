@@ -4,7 +4,6 @@ import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
 import org.bukkit.permissions.Permission;
 import org.bukkit.permissions.PermissionDefault;
-import org.hamcrest.core.IsInstanceOf;
 
 import net.icelane.massband.Plugin;
 import net.icelane.massband.config.configs.Config;
