@@ -678,26 +678,60 @@ public abstract class CommandBase implements TabExecutor{
 		subPermsUsage.put(permissions, usage);
 	}
 	
+	/**
+	 * Defines the permission associated with the command and the default state of it.
+	 * @param permission The full qualified permission name to be set.
+	 * @param defaultValue Weather the permission is granted by default or if it's denied by default. 
+	 */
 	public void setPermission(String permission, boolean defaultValue){
 		setPermission(permission, defaultValue ? PermissionDefault.TRUE : PermissionDefault.OP);
 	}
 	
+	/**
+	 * Defines the permission associated with the command and the default state of it.
+	 * @param permission The full qualified permission name to be set.
+	 * @param defaultValue A value defining who has access to this permission by default.
+	 */
 	public void setPermission(String permission, PermissionDefault defaultValue){
 		setPermission(new Permission(permission, defaultValue));
 	}
 	
+	/**
+	 * Defines the permission associated with the command.
+	 * @param permission A permission object to be set.
+	 */
 	public void setPermission(Permission permission){
 		this.permission = permission;
 	}
 	
+	/**
+	 * Defines a sub permission associated with the command.
+	 * Can be use to block some features of a command behind a separate permission node.
+	 * Useful to allow only certain features to be available to some users.
+	 * @param permission The full qualified permission name to be set.
+	 * @param defaultValue A value defining who has access to this permission by default.
+	 */
 	public void addSubPermission(String permission, boolean defaultValue) {
 		addSubPermission(permission, defaultValue ? PermissionDefault.TRUE : PermissionDefault.OP);
 	}
 	
+	/**
+	 * Defines a sub permission associated with the command.
+	 * Can be use to block some features of a command behind a separate permission node.
+	 * Useful to allow only certain features to be available to some users.
+	 * @param permission The full qualified permission name to be set.
+	 * @param defaultValue A value defining who has access to this permission by default.
+	 */
 	public void addSubPermission(String permission, PermissionDefault defaultValue) {
 		addSubPermission(new Permission(permission, defaultValue));
 	}
 	
+	/**
+	 * Defines a sub permission associated with the command.
+	 * Can be use to block some features of a command behind a separate permission node.
+	 * Useful to allow only certain features to be available to some users.
+	 * @param permission A permission object to be set.
+	 */
 	public void addSubPermission(Permission permission) {
 		subPermissions.add(permission);
 	}
@@ -706,26 +740,50 @@ public abstract class CommandBase implements TabExecutor{
 		return subPermissions.toArray(new Permission[0]);
 	}
 	
+	/**
+	 * Sets predefined values to be shown in the list of available arguments while using autocomplete.
+	 * @param tabValue
+	 */
 	public void setTabList(String...tabValue){
 		tabList = tabValue;
 	}
 
+	/**
+	 * Weather the command only works in game or if it should also be available in the console.
+	 * @return Weather the command is only available "in game".
+	 */
 	public boolean isInGameOnly() {
 		return inGameOnly;
 	}
 
+	/**
+	 * Sets weather the command only works in game or if the should also be available in the console.
+	 * @param inGameOnly Weather the command should only be available "in game".
+	 */
 	public void setInGameOnly(boolean inGameOnly) {
 		this.inGameOnly = inGameOnly;
 	}
 
+	/**
+	 * The command requires the "debug" mode to be enabled first.
+	 * @return Weather the debug mode is required.
+	 */
 	public boolean isDebugRequired() {
 		return debugRequired;
 	}
 
+	/**
+	 * Sets weather the command requires the "debug" mode to be enabled first.
+	 * @param debugRequired Weather the debug mode is required.
+	 */
 	public void setDebugRequired(boolean debugRequired) {
 		this.debugRequired = debugRequired;
 	}
 
+	/** 
+	 * The reason why a command failed with "false".
+	 * @return The reason the command failed.
+	 */
 	public FailReason getFailReason() {
 		return failReason;
 	}
@@ -739,10 +797,20 @@ public abstract class CommandBase implements TabExecutor{
 		this.failReason = falseReason;
 	}
 
+	/**
+	 * The visibility value set for this command.
+	 * @return A value defining the "visibility" used.
+	 */
 	public Visibility getVisibility() {
 		return visibility;
 	}
 
+	/**
+	 * Sets who will be able to "see" the command in the available command list.
+	 * <br>
+	 * <b>Warning:</b> Does not prevent the usage of the command if a user "can't" see it!
+	 * @param visibility A value defining the "visibility" to use.
+	 */
 	public void setVisibility(Visibility visibility) {
 		this.visibility = visibility;
 	}
