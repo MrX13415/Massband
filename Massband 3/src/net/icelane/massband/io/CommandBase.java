@@ -396,18 +396,20 @@ public abstract class CommandBase implements TabExecutor{
 	/**
 	 * Returns a list of all matching sub commands and defined tab values for the given argument.
 	 * @param args An array of command arguments.
+	 * @param sender The sender of the command.
 	 * @return A list of all matching strings.
 	 */
-	public List<String> getTabList(String[] args){
+	public List<String> getTabList(String[] args, CommandSender sender){
 		String arg = args.length > 0 ? args[args.length - 1] : "";
 			
 		ArrayList<String> resultList = new ArrayList<>();
 		arg = arg.toLowerCase().trim();
 		
-		// only add sub command, if no arguments. where already present.
+		// only add sub command, if no arguments where already present.
 		if (args.length <= 1) {			
 			// search for "arg" in command names ...
 			for(CommandBase cmd : commands){
+				if (!cmd.isVisible(sender)) continue;
 				if (arg.length() == 0 || cmd.getName().toLowerCase().contains(arg)){
 					resultList.add(cmd.getName());
 				}
@@ -416,6 +418,7 @@ public abstract class CommandBase implements TabExecutor{
 			// search for "arg" in aliases ...
 			if (resultList.size() == 0){
 				for(CommandBase cmd : commands){
+					if (!cmd.isVisible(sender)) continue;
 					for (String alias : cmd.getAliases()) {
 						if (alias.toLowerCase().contains(arg)){
 							resultList.add(cmd.getName());
@@ -452,7 +455,7 @@ public abstract class CommandBase implements TabExecutor{
 			}
 		}
 		
-		return getTabList(args);
+		return getTabList(args, sender);
 	}
 	
 	@Override
@@ -804,7 +807,21 @@ public abstract class CommandBase implements TabExecutor{
 	public Visibility getVisibility() {
 		return visibility;
 	}
-
+	
+	public boolean isVisible(CommandSender sender) {
+		// handle the visibility of the command
+		switch (getVisibility()) {
+		case Hidden: return false; // The command is hidden so we skip it!
+		case Permission:
+			if (sender == null)  break;
+			// if we don't have the permission, skip it ...
+			if (!hasPermission(sender)) return false;
+			if (debugRequired && !Massband.debug()) return false;
+		default: break;
+		}
+		return true;
+	}
+	
 	/**
 	 * Sets who will be able to "see" the command in the available command list.
 	 * <br>
