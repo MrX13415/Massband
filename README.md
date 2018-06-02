@@ -3,14 +3,14 @@
 # Massband III
 
 
-Massband is a plugin for **Minecraft-Servers** based on **Bukkit**. It offers variouse measuring tools for making the players bulding life a bit easier.
+Massband is a plug-in for **Minecraft-Servers** based on **Bukkit**. It offers various measuring tools for making the players building life a bit easier.
 
 
 ---
 
 
-**Version 3.0.7 Beta**
-#### **[DOWNLOAD](https://dev.bukkit.org/bukkit-plugins/massband/files/)** _(via Bukkit-Dev)_
+**Version 3.0.10 Release**
+#### **[DOWNLOAD](https://dev.bukkit.org/projects/massband/files)** _(via Bukkit-Dev)_
 
 Designed for servers compatible to the **Bukkit API** (_Spigot, CraftBukkit, etc._) using Minecraft version **1.10.x** to **1.12.x**, .
 For more informations visit the **[Bukkit-Dev](https://dev.bukkit.org/bukkit-plugins/massband)** webpage.
