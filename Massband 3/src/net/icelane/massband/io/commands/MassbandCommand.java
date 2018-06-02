@@ -16,8 +16,10 @@ import net.icelane.massband.io.commands.massband.Massband_Count;
 import net.icelane.massband.io.commands.massband.Massband_Debug;
 import net.icelane.massband.io.commands.massband.Massband_Help;
 import net.icelane.massband.io.commands.massband.Massband_Limit;
+import net.icelane.massband.io.commands.massband.Massband_Load;
 import net.icelane.massband.io.commands.massband.Massband_Mode;
 import net.icelane.massband.io.commands.massband.Massband_NoLimit;
+import net.icelane.massband.io.commands.massband.Massband_Purge;
 import net.icelane.massband.io.commands.massband.Massband_Default;
 
 
@@ -38,6 +40,8 @@ public class MassbandCommand extends CommandBase{
 		addCommand(Massband_Clear.class);
 		addCommand(Massband_Default.class);
 		addCommand(Massband_Settings.class);
+		addCommand(Massband_Load.class);
+		addCommand(Massband_Purge.class);
 		addCommand(Massband_Debug.class);
 	}
 	
@@ -66,8 +70,9 @@ public class MassbandCommand extends CommandBase{
 			}
 			
 			if (args[0].equalsIgnoreCase("_load") && sender.isOp()){
-				Config.get().load();
 				sender.sendMessage(Messages.getString("MassbandCommand.config_loaded")); //$NON-NLS-1$
+//				Config.get().load();
+//				sender.sendMessage(Messages.getString("MassbandCommand.config_loaded")); //$NON-NLS-1$
 				return true;
 			}
 			
@@ -79,8 +84,9 @@ public class MassbandCommand extends CommandBase{
 			
 			if (args[0].equalsIgnoreCase("_clean") && sender.isOp()){
 				sender.sendMessage(Messages.getString("MassbandCommand.cleanup")); //$NON-NLS-1$
-				Massband.removeAllMarkers(sender);
-				sender.sendMessage(Messages.getString("MassbandCommand.cleanup_done")); //$NON-NLS-1$
+//				sender.sendMessage(Messages.getString("MassbandCommand.cleanup")); //$NON-NLS-1$
+//				Massband.removeAllMarkers(sender);
+//				sender.sendMessage(Messages.getString("MassbandCommand.cleanup_done")); //$NON-NLS-1$
 				return true;
 			}
 			//*************************
