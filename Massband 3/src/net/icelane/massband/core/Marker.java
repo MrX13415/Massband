@@ -350,7 +350,8 @@ public class Marker {
 			String strAxis = String.format(
 					(settings.isAutoAxis() ? format_blocks_auto : format_blocks_axis),
 					getAxisText(settings.getAxis()));
-			
+		
+			if (isPermeter) distance--; // First marker shound't be counted twice.
 			return String.format(formatB, (int) distance, strAxis);
 		}
 		
