@@ -27,6 +27,7 @@ public abstract class ConfigBase<T extends ConfigBase<T>> {
 	private static String format_comment  = "%1$s# %2$s";
 	private static String format_values   = "Values: %s";
 	private static String format_valSep   = " | ";
+	private static int valuesInlineMaxChar = 80;
 	private static String[] format_header = new String[]{
 			"#-------------------------------------------------------------------------------",
 			"#- %1$s",
@@ -281,7 +282,7 @@ public abstract class ConfigBase<T extends ConfigBase<T>> {
 			Entry<?> entry = queue.get(index);
 			String[] sections = entry.getSection().split("\\.");
 			
-			// make sure we only use entries wich fit to the current section ...
+			// make sure we only use entries which fit to the current section ...
 			if (level > 0 && level <= sections.length) {
 				if (!sections[level - 1].equalsIgnoreCase(sectionName)) continue;
 			}
@@ -298,19 +299,21 @@ public abstract class ConfigBase<T extends ConfigBase<T>> {
 					}
 				}
 				// values ...
-				if (entry.getValues().length > 1) {
-					String values = Stream.of(entry.getValues())
-						    .map(Object::toString)
-						    .collect(Collectors.joining(format_valSep,"",""));
-					
-					lines.add(String.format(format_comment, getIndent(level),
-							String.format(format_values,values)));
-				}
+//				if (entry.getValues().length > 1) {
+//					String values = Stream.of(entry.getValues())
+//						    .map(Object::toString)
+//						    .collect(Collectors.joining(format_valSep,"",""));
+//					
+//					lines.add(String.format(format_comment, getIndent(level),
+//							String.format(format_values,values)));
+//				}
+				addValueList(entry, lines, level);
 				
 				// entry ...
 				String value = entry.get() == null ? "" : entry.get().toString();
 				lines.add(String.format(format_entry, getIndent(level), entry.getKey(), value));
-					
+				
+				
 			}else if (loop){
 				// 2nd loop run: Search for sub entries ...
 				if (sections.length >= level) {
@@ -323,6 +326,59 @@ public abstract class ConfigBase<T extends ConfigBase<T>> {
 		}
 		
 		return lines;
+	}
+	
+	private static void addValueList(Entry<?> entry, List<String> lines, int level) {
+		if (entry.getValues().length <= 1) return;
+		
+		String values = Stream.of(entry.getValues())
+				    .map(Object::toString)
+				    .collect(Collectors.joining(format_valSep,"",""));
+			
+		if (values.length() <= valuesInlineMaxChar) {
+			lines.add(String.format(format_comment, getIndent(level), String.format(format_values,values)));
+			return;
+		}
+		
+		int colCount = 3;
+		int valPerCol = (int) Math.ceil(entry.getValues().length / ((double)colCount));
+		int valIndex = 0;
+		String[] vals = new String[valPerCol*colCount];
+		
+		for (int colIndex = 0; colIndex < colCount; colIndex++) {
+			int maxFor = (colIndex+1)==colCount ? entry.getValues().length : valPerCol * (colIndex+1);
+			valIndex = colIndex;
+			
+			// padding ...
+			int padding = 0;
+			for (int index = valPerCol * colIndex; index < maxFor; index++) {
+				int entrylength = entry.getValues()[index].length();
+				padding = entrylength > padding ? entrylength : padding;
+			}
+				
+			for (int index = valPerCol * colIndex; index < maxFor; index++) {
+				String item = entry.getValues()[index];
+				item = String.format("%1$-" + padding + "s", item);
+				vals[valIndex] = item;
+				valIndex += colCount;
+			}
+		}
+		
+		
+		lines.add(String.format(format_comment, getIndent(level), String.format(format_values, "")));
+		
+		values = "";
+		int col = 0;
+	
+		for (String string : vals) {
+			values += string;
+			col++;
+			if (col == colCount) {
+				lines.add(String.format(format_comment, getIndent(level), values));
+				col = 0;
+				values = "";
+			}
+		}
 	}
 	
 	public ArrayList<Entry<?>> getEntryList(){
