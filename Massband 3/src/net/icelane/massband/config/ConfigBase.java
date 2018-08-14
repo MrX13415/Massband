@@ -355,7 +355,7 @@ public abstract class ConfigBase<T extends ConfigBase<T>> {
 				int entrylength = entry.getValues()[index].length();
 				padding = entrylength > padding ? entrylength : padding;
 			}
-				
+			padding += 2;
 			for (int index = valPerCol * colIndex; index < maxFor; index++) {
 				String item = entry.getValues()[index];
 				item = String.format("%1$-" + padding + "s", item);
@@ -371,7 +371,7 @@ public abstract class ConfigBase<T extends ConfigBase<T>> {
 		int col = 0;
 	
 		for (String string : vals) {
-			values += string;
+			if (string != null) values += string;
 			col++;
 			if (col == colCount) {
 				lines.add(String.format(format_comment, getIndent(level), values));
