@@ -49,7 +49,13 @@ public abstract class CommandBase implements TabExecutor{
 		/**
 		 * The command will only be visible if the command sender has the required permission to use it.
 		 */
-		Permission
+		Permission,
+		/**
+		 * Use this in conjunction with the variable "inGameOnly". The command will only visible according to the value set in "inGameOnly".
+		 * If "inGameOnly" is set to true, the command will only be shown in game.
+		 * If "inGameOnly" is set to false, the command will only be shown in the console.
+		 */
+		InGameOnly
 	}
 	
 	public enum FailReason{
@@ -817,6 +823,9 @@ public abstract class CommandBase implements TabExecutor{
 			// if we don't have the permission, skip it ...
 			if (!hasPermission(sender)) return false;
 			if (debugRequired && !Massband.debug()) return false;
+		case InGameOnly:
+			if (isPlayer(sender)) return isInGameOnly(); // Player and executed in game.
+			else return !isInGameOnly(); // Console and not executed in game.
 		default: break;
 		}
 		return true;

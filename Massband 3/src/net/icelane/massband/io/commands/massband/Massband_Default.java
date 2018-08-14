@@ -21,6 +21,7 @@ public class Massband_Default extends CommandBase{
 		setDescription(Messages.getString("Massband_Default.description")); //$NON-NLS-1$
 		setPermission("massband.command.default", true);
 		setInGameOnly(true);
+		setVisibility(Visibility.InGameOnly);
 	}
 
 	@Override

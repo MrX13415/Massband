@@ -21,6 +21,7 @@ public class Massband_NoLimit extends CommandBase{
 		setDescription(Messages.getString("Massband_NoLimit.description")); //$NON-NLS-1$
 		setPermission("massband.command.count", true);
 		setInGameOnly(true);
+		setVisibility(Visibility.InGameOnly);
 	}
 
 	@Override

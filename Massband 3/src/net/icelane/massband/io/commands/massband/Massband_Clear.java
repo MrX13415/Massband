@@ -21,6 +21,7 @@ public class Massband_Clear extends CommandBase{
 		setDescription(Messages.getString("Massband_Clear.description")); //$NON-NLS-1$
 		setPermission("massband.command.clear", true);
 		setInGameOnly(true);
+		setVisibility(Visibility.InGameOnly);
 	}
 
 	@Override

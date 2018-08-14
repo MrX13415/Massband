@@ -154,18 +154,8 @@ Effects:
 		
 		// define commands (args)
 		for (CommandBase cmd : command.getCommands()) {
-			// handle the visibility of the command
-			switch (cmd.getVisibility()) {
-			case Hidden: continue; // The command is hidden so we skip it!
-			case Permission:
-				if (sender == null) break;
-				// if we don't have the permission, skip it ...
-				if (!cmd.hasPermission(sender)) continue;
-				if (cmd.debugRequired && !Massband.debug()) continue;
-				break;
-			default: break;
-			}
-			
+			if (!cmd.isVisible(sender)) continue;
+
 			// add it ...
 			out_args += String.format(format_cmd,
 					cmd.getName(),

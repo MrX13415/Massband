@@ -23,6 +23,7 @@ public class Massband_Count extends CommandBase{
 		setPermission("massband.command.count", true);
 		setUsage(Messages.getString("Massband_Count.usage")); //$NON-NLS-1$
 		setInGameOnly(true);
+		setVisibility(Visibility.InGameOnly);
 		setTabList("10", "1", "-1");
 	}
 

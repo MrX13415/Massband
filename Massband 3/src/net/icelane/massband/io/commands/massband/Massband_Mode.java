@@ -6,9 +6,9 @@ import org.bukkit.entity.Player;
 
 import net.icelane.massband.core.Marker;
 import net.icelane.massband.core.Marker.MeasureMode;
+import net.icelane.massband.core.Massband;
 import net.icelane.massband.io.CommandBase;
 import net.icelane.massband.resources.Messages;
-import net.icelane.massband.core.Massband;
 
 public class Massband_Mode extends CommandBase{
 
@@ -25,6 +25,7 @@ public class Massband_Mode extends CommandBase{
 		setPermission("massband.command.mode", true);
 		setUsage(Messages.getString("Massband_Mode.usage")); //$NON-NLS-1$
 		setInGameOnly(true);
+		setVisibility(Visibility.InGameOnly);
 		setTabList(Messages.getString("Massband_Mode.tablist_blocks"), Messages.getString("Massband_Mode.tablist_vectors")); //$NON-NLS-1$ //$NON-NLS-2$
 	}
 
