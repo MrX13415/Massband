@@ -182,7 +182,7 @@ public abstract class ConfigBase<T extends ConfigBase<T>> {
 			}
 			
 			if (save){
-				// seach for a header ...
+				// search for a header ...
 				boolean headerFound = false;
 				for (String line : lines) {
 					if (line.trim().isEmpty()) continue;
