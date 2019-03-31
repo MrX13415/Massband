@@ -43,6 +43,12 @@ public class Interact {
 		if (block == null) return;
 		if (face == null) return;
 		if (item == null) return;
+		
+		//DBEUG
+		if (Massband.debugMessage()) {
+			Server.logger().info("item: " + item.getType() + " hand: " + event.getHand() + " settings: " + this.getMaterial());
+		}
+		
 		if (item.getType() != this.getMaterial()) return;
 		
 		// handle double click ...
@@ -70,8 +76,6 @@ public class Interact {
 		//DBEUG
 		if (Massband.debugMessage()) {
 			Server.logger().info("doubleclick: " + doubleclick + " delta: " + delta);
-			Server.logger().info("item: " + item);
-			Server.logger().info("item: " + event.getHand());
 			Server.logger().info("--------------" );
 		}
 		
