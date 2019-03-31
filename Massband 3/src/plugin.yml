@@ -1,7 +1,9 @@
 main: net.icelane.massband.Plugin
 
+api-version: 1.13
+
 name: Massband
-version: 3.0.10
+version: 3.0.11
 description: Various measuring tools for making the players building life a bit easier.
 author: MrX13415
 website: https://dev.bukkit.org/projects/massband
