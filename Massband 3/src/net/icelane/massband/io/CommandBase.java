@@ -818,14 +818,14 @@ public abstract class CommandBase implements TabExecutor{
 		// handle the visibility of the command
 		switch (getVisibility()) {
 		case Hidden: return false; // The command is hidden so we skip it!
-		case Permission:
-			if (sender == null)  break;
-			// if we don't have the permission, skip it ...
-			if (!hasPermission(sender)) return false;
-			if (debugRequired && !Massband.debug()) return false;
 		case InGameOnly:
 			if (isPlayer(sender)) return isInGameOnly(); // Player and executed in game.
 			else return !isInGameOnly(); // Console and not executed in game.
+		case Permission:
+			if (sender == null) break;
+			// if we don't have the permission, skip it ...
+			if (!hasPermission(sender)) return false;
+			if (debugRequired && !Massband.debug()) return false;
 		default: break;
 		}
 		return true;
