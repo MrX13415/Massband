@@ -184,7 +184,10 @@ public class Massband {
 	}
 	
 	public static void chuckUnload(ChunkUnloadEvent event){
-		if (event.isCancelled()) return;
+		// We need to fix this because, this event can no longer be cancelled.
+		// So someone thought it's better to remove the function rather then
+		// marking it as deprecated, and just disabled it's implementation.
+		//if (event.isCancelled()) return;
 		
 		for (UUID uuid : list.keySet()){
 			Massband obj = Massband.get(uuid);
